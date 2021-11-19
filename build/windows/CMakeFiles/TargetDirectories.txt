@@ -1,0 +1,5 @@
+C:/SuperEGG/Codes/C++/doge/build/windows/CMakeFiles/ALL_BUILD.dir
+C:/SuperEGG/Codes/C++/doge/build/windows/CMakeFiles/ZERO_CHECK.dir
+C:/SuperEGG/Codes/C++/doge/build/windows/src/CMakeFiles/doge.dir
+C:/SuperEGG/Codes/C++/doge/build/windows/src/CMakeFiles/doge-static.dir
+C:/SuperEGG/Codes/C++/doge/build/windows/src/CMakeFiles/test.dir

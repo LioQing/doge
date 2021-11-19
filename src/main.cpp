@@ -1,0 +1,62 @@
+#include <iostream>
+
+#include <doge/doge.hpp>
+#include <ctime>
+
+namespace TestScene
+{
+    void Start(doge::Engine& e)
+    {
+        for (auto i = 0; i < 10; ++i)
+        {
+            auto& my_shape = e.AddEntity("Test", "test");
+            my_shape.AddComponent<doge::Position>();
+            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(rand() % 100 / 100.f - 0.5f, rand() % 100 / 100.f - 0.5f));
+
+            doge::CircleShape shape
+            {
+                .radius = 10,
+                .origin = doge::Vec2f(10, 10),
+                .color = doge::Color(0x00FF0088),
+            };
+
+            my_shape.AddComponent<doge::CircleShape>(shape);
+        }
+    }
+
+    void Update(doge::Engine& e, doge::DeltaTime dt)
+    {
+        for (auto [pos, vel] : e.Select<doge::Position, doge::Velocity>().Components())
+        {
+            pos.position += vel.velocity * dt;
+
+            if (pos.position.x < 0) vel.velocity.x = std::abs(vel.velocity.x);
+            else if (pos.position.x > 1280) vel.velocity.x = -std::abs(vel.velocity.x);
+            if (pos.position.y < 0) vel.velocity.y = std::abs(vel.velocity.y);
+            else if (pos.position.y > 720) vel.velocity.y = -std::abs(vel.velocity.y);
+        }
+
+        // for (auto& e : e.Select<doge::Position, doge::Velocity>().Entities())
+        // {
+        //     auto& pos = e.GetComponent<doge::Position>();
+        //     auto& vel = e.GetComponent<doge::Velocity>();
+        //     pos.position += vel.velocity * dt;
+
+        //     if (pos.position.x < 0) vel.velocity.x = std::abs(vel.velocity.x);
+        //     else if (pos.position.x > 1280) vel.velocity.x = -std::abs(vel.velocity.x);
+        //     if (pos.position.y < 0) vel.velocity.y = std::abs(vel.velocity.y);
+        //     else if (pos.position.y > 720) vel.velocity.y = -std::abs(vel.velocity.y);
+        // }
+    }
+};
+
+int main()
+{
+    srand(time(0));
+    doge::Engine e;
+    e.SetFrameRate(60);
+    e.AddScene("Test", TestScene::Start, TestScene::Update);
+    e.Start("Test", doge::VideoSettings(1280, 720, doge::VideoSettings::Mode::Windowed));
+
+    return 0;
+}

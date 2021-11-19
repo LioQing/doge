@@ -1,0 +1,10 @@
+^C:\SUPEREGG\CODES\C++\DOGE\BUILD\WINDOWS\CMAKEFILES\3341B7B4195B39DCCBB4DD488AEC18C4\GENERATE.STAMP.RULE
+setlocal
+C:\Applications\CMake\bin\cmake.exe -SC:/SuperEGG/Codes/C++/doge -BC:/SuperEGG/Codes/C++/doge/build/windows --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/SuperEGG/Codes/C++/doge/build/windows/doge.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
