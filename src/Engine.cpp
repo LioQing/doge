@@ -1,7 +1,7 @@
 #include <doge/core/Engine.hpp>
 
-#include <doge/utils/lic.hpp>
-#include <doge/components/SceneInfo.hpp>
+#include <doge/utils.hpp>
+#include <doge/components.hpp>
 
 namespace doge
 {
@@ -117,6 +117,7 @@ namespace doge
     lic::Entity& Engine::AddCamera() const
     {
         auto& e = this->AddEntity();
+        e.AddComponent<Camera>();
         return e;
     }
 }

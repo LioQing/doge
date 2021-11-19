@@ -1,8 +1,0 @@
-# CMake generation dependency list for this directory.
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLConfig.cmake
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLConfigDependencies.cmake
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLConfigVersion.cmake
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLStaticTargets-debug.cmake
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLStaticTargets-release.cmake
-C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML/SFMLStaticTargets.cmake
-C:/SuperEGG/Codes/C++/doge/src/CMakeLists.txt

@@ -8,3 +8,4 @@
 #include "components/Rotation.hpp"
 #include "components/Scale.hpp"
 #include "components/SceneInfo.hpp"
+#include "components/Camera.hpp"
