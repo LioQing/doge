@@ -54,6 +54,8 @@ namespace doge
 
         void SetVideoSettings(const VideoSettings& video_settings);
 
+        const VideoSettings& GetVideoSettings() const;
+
         void SetTitle(const std::string& title);
 
         lic::Entity& AddEntity(bool all_scenes = false) const;

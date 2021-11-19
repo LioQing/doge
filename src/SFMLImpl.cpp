@@ -32,65 +32,77 @@ namespace doge
 
     void SFMLImpl::Render(const Engine& e)
     {
-        // circles
-        std::vector<sf::CircleShape> circle_shapes;
-
-        for (auto [entity, circle_comp] : e.Select<CircleShape>().EntitiesAndComponents())
+        for (auto [entity, camera] : e.Select<Camera>().EntitiesAndComponents())
         {
-            auto circle_shape = sf::CircleShape(circle_comp.radius);
-            circle_shape.setOrigin(conversions::ToSfVec2(circle_comp.origin));
-            circle_shape.setScale(conversions::ToSfVec2(global::GetScale(circle_comp)));
-            circle_shape.setPosition(conversions::ToSfVec2(global::GetPosition(circle_comp)));
-            circle_shape.setFillColor(conversions::ToSfColor(circle_comp.color));
-            circle_shape.setPointCount(circle_comp.point_count);
-            circle_shapes.emplace_back(circle_shape);
-        }
-
-        // convex shapes
-        std::vector<sf::ConvexShape> convex_shapes;
-
-        for (auto [entity, convex_comp] : e.Select<ConvexShape>().EntitiesAndComponents())
-        {
-            auto convex_shape = sf::ConvexShape(convex_comp.points.size());
-            for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
+            // view
+            sf::View view(cast::ToSfVec2(entity.GetIfHasComponentElseDefault<Position>().position), cast::ToSfVec2(camera.size));
+            if (camera.size == Vec2f::Zero())
             {
-                convex_shape.setPoint(i, conversions::ToSfVec2(convex_comp.points.at(i)));
+                view.setSize(cast::ToSfVec2<float>(e.GetVideoSettings().resolution));
             }
-            convex_shape.setOrigin(conversions::ToSfVec2(convex_comp.origin));
-            convex_shape.setScale(conversions::ToSfVec2(global::GetScale(convex_comp)));
-            convex_shape.setPosition(conversions::ToSfVec2(global::GetPosition(convex_comp)));
-            convex_shape.setRotation(conversions::ToDegree(global::GetRotation(convex_comp)));
-            convex_shape.setFillColor(conversions::ToSfColor(convex_comp.color));
-            convex_shapes.emplace_back(convex_shape);
-        }
+            view.setViewport(cast::ToSfRect(camera.port));
+            window.setView(view);
 
-        // rectangle shapes
-        std::vector<sf::RectangleShape> rectangle_shapes;
+            // circles
+            std::vector<sf::CircleShape> circle_shapes;
 
-        for (auto [entity, rectangle_comp] : e.Select<RectangleShape>().EntitiesAndComponents())
-        {
-            auto rectangle_shape = sf::RectangleShape(conversions::ToSfVec2(rectangle_comp.size));
-            rectangle_shape.setOrigin(conversions::ToSfVec2(rectangle_comp.origin));
-            rectangle_shape.setScale(conversions::ToSfVec2(global::GetScale(rectangle_comp)));
-            rectangle_shape.setPosition(conversions::ToSfVec2(global::GetPosition(rectangle_comp)));
-            rectangle_shape.setRotation(conversions::ToDegree(global::GetRotation(rectangle_comp)));
-            rectangle_shape.setFillColor(conversions::ToSfColor(rectangle_comp.color));
-            rectangle_shapes.emplace_back(rectangle_shape);
-        }
+            for (auto [entity, circle_comp] : e.Select<CircleShape>().EntitiesAndComponents())
+            {
+                auto circle_shape = sf::CircleShape(circle_comp.radius);
+                circle_shape.setOrigin(cast::ToSfVec2(circle_comp.origin));
+                circle_shape.setScale(cast::ToSfVec2(global::GetScale(circle_comp)));
+                circle_shape.setPosition(cast::ToSfVec2(global::GetPosition(circle_comp)));
+                circle_shape.setFillColor(cast::ToSfColor(circle_comp.color));
+                circle_shape.setPointCount(circle_comp.point_count);
+                circle_shapes.emplace_back(circle_shape);
+            }
 
-        // draw
-        window.clear();
-        for (auto drawable : circle_shapes)
-        {
-            window.draw(drawable);
-        }
-        for (auto drawable : convex_shapes)
-        {
-            window.draw(drawable);
-        }
-        for (auto drawable : rectangle_shapes)
-        {
-            window.draw(drawable);
+            // convex shapes
+            std::vector<sf::ConvexShape> convex_shapes;
+
+            for (auto [entity, convex_comp] : e.Select<ConvexShape>().EntitiesAndComponents())
+            {
+                auto convex_shape = sf::ConvexShape(convex_comp.points.size());
+                for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
+                {
+                    convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
+                }
+                convex_shape.setOrigin(cast::ToSfVec2(convex_comp.origin));
+                convex_shape.setScale(cast::ToSfVec2(global::GetScale(convex_comp)));
+                convex_shape.setPosition(cast::ToSfVec2(global::GetPosition(convex_comp)));
+                convex_shape.setRotation(cast::ToDegree(global::GetRotation(convex_comp)));
+                convex_shape.setFillColor(cast::ToSfColor(convex_comp.color));
+                convex_shapes.emplace_back(convex_shape);
+            }
+
+            // rectangle shapes
+            std::vector<sf::RectangleShape> rectangle_shapes;
+
+            for (auto [entity, rectangle_comp] : e.Select<RectangleShape>().EntitiesAndComponents())
+            {
+                auto rectangle_shape = sf::RectangleShape(cast::ToSfVec2(rectangle_comp.size));
+                rectangle_shape.setOrigin(cast::ToSfVec2(rectangle_comp.origin));
+                rectangle_shape.setScale(cast::ToSfVec2(global::GetScale(rectangle_comp)));
+                rectangle_shape.setPosition(cast::ToSfVec2(global::GetPosition(rectangle_comp)));
+                rectangle_shape.setRotation(cast::ToDegree(global::GetRotation(rectangle_comp)));
+                rectangle_shape.setFillColor(cast::ToSfColor(rectangle_comp.color));
+                rectangle_shapes.emplace_back(rectangle_shape);
+            }
+
+            // draw
+            window.clear();
+            for (auto drawable : circle_shapes)
+            {
+                window.draw(drawable);
+            }
+            for (auto drawable : convex_shapes)
+            {
+                window.draw(drawable);
+            }
+            for (auto drawable : rectangle_shapes)
+            {
+                window.draw(drawable);
+            }
         }
     }
 

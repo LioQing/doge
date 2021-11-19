@@ -94,6 +94,11 @@ namespace doge
         sfml_impl.CreateWindow(video_settings, title);
     }
 
+    const VideoSettings& Engine::GetVideoSettings() const
+    {
+        return this->video_settings;
+    }
+
     void Engine::SetTitle(const std::string& title)
     {
         this->title = title;

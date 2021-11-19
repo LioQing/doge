@@ -7,6 +7,8 @@ namespace TestScene
 {
     void Start(doge::Engine& e)
     {
+        e.AddCamera();
+
         for (auto i = 0; i < 10; ++i)
         {
             auto& my_shape = e.AddEntity("Test", "test");
@@ -30,10 +32,10 @@ namespace TestScene
         {
             pos.position += vel.velocity * dt;
 
-            if (pos.position.x < 0) vel.velocity.x = std::abs(vel.velocity.x);
-            else if (pos.position.x > 1280) vel.velocity.x = -std::abs(vel.velocity.x);
-            if (pos.position.y < 0) vel.velocity.y = std::abs(vel.velocity.y);
-            else if (pos.position.y > 720) vel.velocity.y = -std::abs(vel.velocity.y);
+            if (pos.position.x < -(float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = std::abs(vel.velocity.x);
+            else if (pos.position.x > (float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = -std::abs(vel.velocity.x);
+            if (pos.position.y < -(float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = std::abs(vel.velocity.y);
+            else if (pos.position.y > (float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = -std::abs(vel.velocity.y);
         }
 
         // for (auto& e : e.Select<doge::Position, doge::Velocity>().Entities())
@@ -54,6 +56,7 @@ int main()
 {
     srand(time(0));
     doge::Engine e;
+    e.SetTitle("doge test");
     e.SetFrameRate(60);
     e.AddScene("Test", TestScene::Start, TestScene::Update);
     e.Start("Test", doge::VideoSettings(1280, 720, doge::VideoSettings::Mode::Windowed));

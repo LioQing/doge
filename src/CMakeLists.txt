@@ -18,7 +18,7 @@ set(SRC_FILES
     lic.cpp
     Engine.cpp
     SFMLImpl.cpp
-    conversions.cpp
+    cast.cpp
     Color.cpp
     VideoSettings.cpp
 )
