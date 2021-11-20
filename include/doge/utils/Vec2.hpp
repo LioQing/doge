@@ -222,6 +222,21 @@ namespace doge
     {
         return Vec2<decltype(std::declval<T&>() - std::declval<U&>())>(v1.x - v2.x, v1.y - v2.y);
     }
+    template <typename T, typename U>
+    auto operator*(const Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return Vec2<decltype(std::declval<T&>() * std::declval<U&>())>(v1.x * v2.x, v1.y * v2.y);
+    }
+    template <typename T, typename U>
+    auto operator/(const Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return Vec2<decltype(std::declval<T&>() / std::declval<U&>())>(v1.x / v2.x, v1.y / v2.y);
+    }
+    template <typename T, typename U>
+    auto operator%(const Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return Vec2<decltype(std::fmod(std::declval<T&>(), std::declval<U&>()))>(std::fmod(v1.x, v2.x), std::fmod(v1.y, v2.y));
+    }
 
     template <typename T, typename U>
     Vec2<T>& operator+=(Vec2<T>& v1, const Vec2<U>& v2)
@@ -232,6 +247,21 @@ namespace doge
     Vec2<T>& operator-=(Vec2<T>& v1, const Vec2<U>& v2)
     {
         return v1 = v1 - v2;
+    }
+    template <typename T, typename U>
+    Vec2<T>& operator*=(Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return v1 = v1 * v2;
+    }
+    template <typename T, typename U>
+    Vec2<T>& operator/=(Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return v1 = v1 / v2;
+    }
+    template <typename T, typename U>
+    Vec2<T>& operator%=(Vec2<T>& v1, const Vec2<U>& v2)
+    {
+        return v1 = v1 % v2;
     }
 
     template <typename T, typename U>

@@ -11,13 +11,19 @@ namespace doge
     {
         global(const global&) = delete;
 
+        static Vec2f GetPosition(lic::EntityID eid);
+
+        static Vec2f GetScale(lic::EntityID eid);
+
+        static float GetRotation(lic::EntityID eid);
+
         template <typename TComp>
         requires requires (TComp c) {
             { c.position } -> std::convertible_to<Vec2f&>;
         }
         static Vec2f GetPosition(const lic::Component<TComp>& c)
         {
-            return c.GetEntity().GetIfHasComponentElseDefault<Position>().position + c.position;
+            return GetPosition(c.GetEntity()) + c.position;
         }
 
         template <typename TComp>
@@ -26,7 +32,7 @@ namespace doge
         }
         static Vec2f GetScale(const lic::Component<TComp>& c)
         {
-            return c.GetEntity().GetIfHasComponentElseDefault<Scale>().scale + c.scale;
+            return GetScale(c.GetEntity()) * c.scale;
         }
 
         template <typename TComp>
@@ -35,7 +41,7 @@ namespace doge
         }
         static float GetRotation(const lic::Component<TComp>& c)
         {
-            return c.GetEntity().GetIfHasComponentElseDefault<Rotation>().rotation + c.rotation;
+            return GetRotation(c.GetEntity()) + c.rotation;
         }
     };
 }

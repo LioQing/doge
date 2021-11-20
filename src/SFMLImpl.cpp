@@ -32,16 +32,17 @@ namespace doge
 
     void SFMLImpl::Render(const Engine& e)
     {
+        std::vector<std::tuple<sf::View, std::vector<sf::CircleShape>, std::vector<sf::ConvexShape>, std::vector<sf::RectangleShape>>> views_shapes;
         for (auto [entity, camera] : e.Select<Camera>().EntitiesAndComponents())
         {
             // view
-            sf::View view(cast::ToSfVec2(entity.GetIfHasComponentElseDefault<Position>().position), cast::ToSfVec2(camera.size));
+            sf::View view(cast::ToSfVec2(global::GetPosition(camera)), cast::ToSfVec2(camera.size * global::GetScale(camera)));
             if (camera.size == Vec2f::Zero())
             {
-                view.setSize(cast::ToSfVec2<float>(e.GetVideoSettings().resolution));
+                view.setSize(cast::ToSfVec2(e.GetVideoSettings().resolution * Vec2f(camera.port.width, camera.port.height) * global::GetScale(camera)));
             }
+            view.setRotation(cast::ToDegree(global::GetRotation(camera)));
             view.setViewport(cast::ToSfRect(camera.port));
-            window.setView(view);
 
             // circles
             std::vector<sf::CircleShape> circle_shapes;
@@ -89,8 +90,16 @@ namespace doge
                 rectangle_shapes.emplace_back(rectangle_shape);
             }
 
+            // add to views shapes
+            views_shapes.emplace_back(view, circle_shapes, convex_shapes, rectangle_shapes);
+        }
+
+        window.clear();
+        for (auto [view, circle_shapes, convex_shapes, rectangle_shapes] : views_shapes)
+        {
+            window.setView(view);
+
             // draw
-            window.clear();
             for (auto drawable : circle_shapes)
             {
                 window.draw(drawable);

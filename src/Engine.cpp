@@ -118,11 +118,4 @@ namespace doge
     {
         lic::DestroyEntity(eid);
     }
-
-    lic::Entity& Engine::AddCamera() const
-    {
-        auto& e = this->AddEntity();
-        e.AddComponent<Camera>();
-        return e;
-    }
 }

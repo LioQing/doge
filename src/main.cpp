@@ -7,7 +7,12 @@ namespace TestScene
 {
     void Start(doge::Engine& e)
     {
-        e.AddCamera();
+        e.AddCamera(doge::Camera{ .port = doge::Rectf(0, 0, 0.5, 0.5)     , .scale = doge::Vec2f(2, 2) });
+        e.AddCamera(doge::Camera{ .port = doge::Rectf(0, 0.5, 0.5, 0.5)   , .scale = doge::Vec2f(2, 2) });
+        e.AddCamera(doge::Camera{ .port = doge::Rectf(0.5, 0, 0.5, 0.5)   , .scale = doge::Vec2f(2, 2) });
+        e.AddCamera(doge::Camera{ .port = doge::Rectf(0.5, 0.5, 0.5, 0.5) , .scale = doge::Vec2f(2, 2) });
+
+        // e.AddCamera();
 
         for (auto i = 0; i < 10; ++i)
         {
@@ -15,14 +20,12 @@ namespace TestScene
             my_shape.AddComponent<doge::Position>();
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(rand() % 100 / 100.f - 0.5f, rand() % 100 / 100.f - 0.5f));
 
-            doge::CircleShape shape
+            my_shape.AddComponent<doge::CircleShape>(doge::CircleShape
             {
                 .radius = 10,
                 .origin = doge::Vec2f(10, 10),
                 .color = doge::Color(0x00FF0088),
-            };
-
-            my_shape.AddComponent<doge::CircleShape>(shape);
+            });
         }
     }
 

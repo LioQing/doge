@@ -21,6 +21,7 @@ set(SRC_FILES
     cast.cpp
     Color.cpp
     VideoSettings.cpp
+    global.cpp
 )
 
 message(STATUS "${SFML_LIBRARIES}")

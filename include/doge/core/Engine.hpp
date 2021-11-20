@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "../utils/lic.hpp"
+#include "../utils.hpp"
 #include "../components/SceneInfo.hpp"
 #include "SFMLImpl.hpp"
 #include "Scene.hpp"
@@ -70,7 +70,13 @@ namespace doge
 
         void DestroyEntity(lic::EntityID eid) const;
 
-        lic::Entity& AddCamera() const;
+        template <typename... TArgs>
+        lic::Entity& AddCamera(TArgs&&... args) const
+        {
+            auto& e = this->AddEntity();
+            e.AddComponent<Camera>(std::forward<TArgs>(args)...);
+            return e;
+        }
 
         template <typename... TComps>
         struct Range : public lic::Range<SceneInfo, TComps...>
