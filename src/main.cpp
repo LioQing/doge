@@ -18,7 +18,7 @@ namespace TestScene
         {
             auto& my_shape = e.AddEntity("Test", "test");
             my_shape.AddComponent<doge::Position>();
-            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(rand() % 100 / 100.f - 0.5f, rand() % 100 / 100.f - 0.5f));
+            my_shape.AddComponent<doge::Velocity>(rand() % 100 / 100.f - 0.5f, rand() % 100 / 100.f - 0.5f);
 
             my_shape.AddComponent<doge::CircleShape>(doge::CircleShape
             {

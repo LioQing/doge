@@ -6,6 +6,11 @@ namespace doge
 {
     struct Velocity
     {
-        Vec2f velocity;
+        Velocity() = default;
+        Velocity(const Velocity&) = default;
+        Velocity(const Vec2f& velocity);
+        Velocity(float x, float y);
+
+        Vec2f velocity = Vec2f::Zero();
     };
 }
