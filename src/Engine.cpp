@@ -104,9 +104,9 @@ namespace doge
         this->title = title;
     }
 
-    lic::Entity& Engine::AddEntity(bool all_scenes) const
+    const Entity Engine::AddEntity(bool all_scenes) const
     {
-        auto& e = lic::AddEntity();
+        auto e = Entity(lic::AddEntity());
         if (all_scenes)
             e.AddComponent<SceneInfo>();
         else

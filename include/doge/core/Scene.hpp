@@ -2,12 +2,10 @@
 
 #include <functional>
 
+#include "aliases.hpp"
+
 namespace doge
 {
-    struct Engine;
-
-    using DeltaTime = float;
-
     struct Scene
     {
         std::function<void(Engine&)> start;

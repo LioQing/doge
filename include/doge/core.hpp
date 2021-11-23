@@ -4,3 +4,4 @@
 #include "core/SFMLImpl.hpp"
 #include "core/VideoSettings.hpp"
 #include "core/Scene.hpp"
+#include "core/aliases.hpp"

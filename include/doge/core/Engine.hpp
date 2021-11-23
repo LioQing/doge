@@ -11,6 +11,7 @@
 #include "SFMLImpl.hpp"
 #include "Scene.hpp"
 #include "VideoSettings.hpp"
+#include "Entity.hpp"
 
 namespace doge
 {
@@ -58,12 +59,12 @@ namespace doge
 
         void SetTitle(const std::string& title);
 
-        lic::Entity& AddEntity(bool all_scenes = false) const;
+        const Entity AddEntity(bool all_scenes = false) const;
 
         template <std::convertible_to<std::string>... T>
-        lic::Entity& AddEntity(T... scene_ids) const
+        const Entity AddEntity(T... scene_ids) const
         {
-            auto& e = lic::AddEntity();
+            auto e = Entity(lic::AddEntity());
             e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
             return e;
         }
@@ -71,9 +72,9 @@ namespace doge
         void DestroyEntity(lic::EntityID eid) const;
 
         template <typename... TArgs>
-        lic::Entity& AddCamera(TArgs&&... args) const
+        const Entity AddCamera(TArgs&&... args) const
         {
-            auto& e = this->AddEntity();
+            auto e = this->AddEntity();
             e.AddComponent<Camera>(std::forward<TArgs>(args)...);
             return e;
         }
