@@ -8,7 +8,8 @@ namespace doge
 {
     struct Entity : public lic::Entity
     {
-        std::vector<lic::EntityID> parents;
+        lic::EntityID parent;
         std::vector<lic::EntityID> children;
+        bool has_parent = false;
     };
 }
