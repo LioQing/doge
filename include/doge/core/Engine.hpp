@@ -24,6 +24,7 @@ namespace doge
         std::string title = "";
 
         std::unordered_map<std::string, Scene> scenes;
+        std::unordered_multimap<lic::EntityID, lic::EntityID> parental_tree;
         std::string current_scene;
         DeltaTime fixed_time_step = 10.f;
         uint32_t fps = 60;
@@ -78,6 +79,69 @@ namespace doge
             e.AddComponent<Camera>(std::forward<TArgs>(args)...);
             return e;
         }
+
+        void SetParent(lic::EntityID eid, lic::EntityID parent);
+        void RemoveParent(lic::EntityID eid);
+        Entity GetParent(lic::EntityID eid);
+        bool HasParent(lic::EntityID eid);
+
+        struct EntityContainer : public std::vector<lic::EntityID>
+        {
+        private:
+
+            using VecIterator = std::vector<lic::EntityID>::const_iterator;
+
+        public:
+
+            struct Iterator : public VecIterator
+            {
+                Iterator(const VecIterator& iter) : VecIterator(iter) {}
+
+                Entity operator*() const;
+            };
+
+            Iterator begin() const;
+            Iterator end() const;
+            Iterator cbegin() const;
+            Iterator cend() const;
+        };
+
+        template <bool IncludeEntities, typename... TComps>
+        struct ComponentContainer : public std::vector<lic::EntityID>
+        {
+            template <std::contiguous_iterator TBackingIter>
+            struct BaseIterator : public TBackingIter
+            {
+                BaseIterator(const TBackingIter& iter) : TBackingIter(iter) {}
+
+                auto operator*()
+                {
+                    if constexpr (IncludeEntities == true)
+                    {
+                        if constexpr (std::is_same<TBackingIter, std::vector<lic::EntityID>::const_iterator>::value)
+                            return std::tuple<Entity, const lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                        else
+                            return std::tuple<Entity, lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                    }
+                    else
+                    {
+                        if constexpr (std::is_same<TBackingIter, std::vector<lic::EntityID>::const_iterator>::value)
+                            return std::tie<const lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                        else
+                            return std::tie<lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                    }
+                }
+            };
+
+            using Iterator = BaseIterator<std::vector<lic::EntityID>::iterator>;
+            using ConstIterator = BaseIterator<std::vector<lic::EntityID>::const_iterator>;
+
+            Iterator begin() { return Iterator(std::vector<lic::EntityID>::begin()); }
+            Iterator end() { return Iterator(std::vector<lic::EntityID>::end()); }
+
+            ConstIterator begin() const { return ConstIterator(std::vector<lic::EntityID>::cbegin()); }
+            ConstIterator end() const { return ConstIterator(std::vector<lic::EntityID>::cend()); }
+        };
 
         template <typename... TComps>
         struct Range : public lic::Range<SceneInfo, TComps...>
@@ -135,71 +199,71 @@ namespace doge
                 return Range(lic::Range<SceneInfo, TComps...>::Where([&](SceneInfo _, TComps... c){ return predicate(c...); }));
             }
 
-            lic::EntityContainer Entities() const
+            EntityContainer Entities() const
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).Entities();
-                return lic::Range<SceneInfo, TComps...>::Entities();
+                return EntityContainer(lic::Range<SceneInfo, TComps...>::entities);
             }
 
-            lic::ComponentContainer<false, TComps...> Components()
+            ComponentContainer<false, TComps...> Components()
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).Components();
-                return lic::Range<SceneInfo, TComps...>::template OnlyComponents<TComps...>();
+                return ComponentContainer<false, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
-            const lic::ComponentContainer<false, TComps...> Components() const
+            const ComponentContainer<false, TComps...> Components() const
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).Components();
-                return lic::Range<SceneInfo, TComps...>::template OnlyComponents<TComps...>();
+                return ComponentContainer<false, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
-            lic::ComponentContainer<false, TOnlyComps...> OnlyComponents()
+            ComponentContainer<false, TOnlyComps...> OnlyComponents()
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).OnlyComponents<TOnlyComps...>();
-                return lic::Range<SceneInfo, TComps...>::template OnlyComponents<TOnlyComps...>();
+                return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
-            const lic::ComponentContainer<false, TOnlyComps...> OnlyComponents() const
+            const ComponentContainer<false, TOnlyComps...> OnlyComponents() const
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).OnlyComponents<TOnlyComps...>();
-                return lic::Range<SceneInfo, TComps...>::template OnlyComponents<TOnlyComps...>();
+                return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
-            lic::ComponentContainer<true, TComps...> EntitiesAndComponents()
+            ComponentContainer<true, TComps...> EntitiesAndComponents()
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).EntitiesAndComponents();
-                return lic::Range<SceneInfo, TComps...>::template EntitiesAndOnlyComponents<TComps...>();
+                return ComponentContainer<true, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
-            const lic::ComponentContainer<true, TComps...> EntitiesAndComponents() const
+            const ComponentContainer<true, TComps...> EntitiesAndComponents() const
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).EntitiesAndComponents();
-                return lic::Range<SceneInfo, TComps...>::template EntitiesAndOnlyComponents<TComps...>();
+                return ComponentContainer<true, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
-            lic::ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents()
+            ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents()
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).EntitiesAndOnlyComponents<TOnlyComps...>();
-                return lic::Range<SceneInfo, TComps...>::template EntitiesAndOnlyComponents<TOnlyComps...>();
+                return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
-            const lic::ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents() const
+            const ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents() const
             {
                 if (!current_scene.empty())
                     return InAnyOf(current_scene).EntitiesAndOnlyComponents<TOnlyComps...>();
-                return lic::Range<SceneInfo, TComps...>::template EntitiesAndOnlyComponents<TOnlyComps...>();
+                return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
         };
 

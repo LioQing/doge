@@ -379,9 +379,11 @@ namespace doge
         struct EntityContainer : public std::vector<EntityID>
         {
         private:
+        
             using VecIterator = std::vector<EntityID>::const_iterator;
 
         public:
+
             struct Iterator : public VecIterator
             {
                 Iterator(const VecIterator& iter) : VecIterator(iter) {}

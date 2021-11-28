@@ -25,6 +25,7 @@ set(SRC_FILES
     Velocity.cpp
     Scale.cpp
     Position.cpp
+    Entity.cpp
 )
 
 message(STATUS "${SFML_LIBRARIES}")

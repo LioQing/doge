@@ -31,7 +31,7 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        for (auto [pos, vel] : e.Select<doge::Position, doge::Velocity>().Components())
+        for (auto [ett, pos, vel] : e.Select<doge::Position, doge::Velocity>().EntitiesAndComponents())
         {
             pos.position += vel.velocity * dt;
 

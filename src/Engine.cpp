@@ -1,5 +1,6 @@
 #include <doge/core/Engine.hpp>
 
+#include <vector>
 #include <doge/utils.hpp>
 #include <doge/components.hpp>
 
@@ -117,5 +118,51 @@ namespace doge
     void Engine::DestroyEntity(lic::EntityID eid) const
     {
         lic::DestroyEntity(eid);
+    }
+
+    void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
+    {
+        parental_tree.emplace(parent, eid);
+    }
+
+    void Engine::RemoveParent(lic::EntityID eid) 
+    {
+        auto itr = parental_tree.find(GetParent(eid));
+        
+    }
+
+    Entity Engine::GetParent(lic::EntityID eid) 
+    {
+        
+    }
+
+    bool Engine::HasParent(lic::EntityID eid) 
+    {
+        
+    }
+
+    Entity Engine::EntityContainer::Iterator::operator*() const
+    {
+        return Entity(lic::GetEntity(VecIterator::operator*()).id);
+    }
+
+    Engine::EntityContainer::Iterator Engine::EntityContainer::begin() const
+    {
+        return Iterator(std::vector<lic::EntityID>::cbegin());
+    }
+
+    Engine::EntityContainer::Iterator Engine::EntityContainer::end() const
+    {
+        return Iterator(std::vector<lic::EntityID>::cend());
+    }
+
+    Engine::EntityContainer::Iterator Engine::EntityContainer::cbegin() const
+    {
+        return Iterator(std::vector<lic::EntityID>::cbegin());
+    }
+
+    Engine::EntityContainer::Iterator Engine::EntityContainer::cend() const
+    {
+        return Iterator(std::vector<lic::EntityID>::cend());
     }
 }
