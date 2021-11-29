@@ -5,6 +5,7 @@
 #include <functional>
 #include <iostream>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "../utils.hpp"
 #include "../components/SceneInfo.hpp"
@@ -13,6 +14,7 @@
 #include "VideoSettings.hpp"
 #include "Entity.hpp"
 #include "default_functions.hpp"
+#include "PCNode.hpp"
 
 namespace doge
 {
@@ -25,7 +27,7 @@ namespace doge
         std::string title = "";
 
         std::unordered_map<std::string, Scene> scenes;
-        std::unordered_multimap<lic::EntityID, lic::EntityID> parental_tree;
+        PCNode top_level_parent;
         std::string current_scene_id;
         std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
@@ -87,10 +89,10 @@ namespace doge
             return e;
         }
 
-        // void SetParent(lic::EntityID eid, lic::EntityID parent);
-        // void RemoveParent(lic::EntityID eid);
-        // Entity GetParent(lic::EntityID eid);
-        // bool HasParent(lic::EntityID eid);
+        void SetParent(lic::EntityID eid, lic::EntityID parent);
+        void RemoveParent(lic::EntityID eid);
+        Entity GetParent(lic::EntityID eid) const;
+        bool HasParent(lic::EntityID eid) const;
 
         struct EntityContainer : public std::vector<lic::EntityID>
         {

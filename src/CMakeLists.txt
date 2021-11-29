@@ -27,6 +27,7 @@ set(SRC_FILES
     Position.cpp
     Entity.cpp
     default_functions.cpp
+    PCNode.cpp
 )
 
 message(STATUS "${SFML_LIBRARIES}")

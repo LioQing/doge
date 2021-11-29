@@ -132,23 +132,24 @@ namespace doge
         lic::DestroyEntity(eid);
     }
 
-    // void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
-    // {
-    // }
-
-    // void Engine::RemoveParent(lic::EntityID eid) 
-    // {
-    // }
-
-    // Entity Engine::GetParent(lic::EntityID eid) 
-    // {
+    void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
+    {
         
-    // }
+    }
 
-    // bool Engine::HasParent(lic::EntityID eid) 
-    // {
+    void Engine::RemoveParent(lic::EntityID eid) 
+    {
+    }
+
+    Entity Engine::GetParent(lic::EntityID eid) const
+    {
         
-    // }
+    }
+
+    bool Engine::HasParent(lic::EntityID eid) const
+    {
+        
+    }
 
     Entity Engine::EntityContainer::Iterator::operator*() const
     {
