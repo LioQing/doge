@@ -12,6 +12,7 @@
 #include "Scene.hpp"
 #include "VideoSettings.hpp"
 #include "Entity.hpp"
+#include "default_functions.hpp"
 
 namespace doge
 {
@@ -25,7 +26,8 @@ namespace doge
 
         std::unordered_map<std::string, Scene> scenes;
         std::unordered_multimap<lic::EntityID, lic::EntityID> parental_tree;
-        std::string current_scene;
+        std::string current_scene_id;
+        std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
         uint32_t fps = 60;
         bool is_running = false;
@@ -43,16 +45,21 @@ namespace doge
 
         void SetFixedTimeStep(float millisec);
 
-        template <typename TStartFunctor, typename TUpdateFunctor>
-        requires std::invocable<TStartFunctor, Engine&> && std::invocable<TUpdateFunctor, Engine&, DeltaTime>
-        void AddScene(const std::string& id, TStartFunctor start, TUpdateFunctor update, TUpdateFunctor fixed_update = [](Engine&, DeltaTime){})
+        template <typename TCallFunctor, typename TUpdateFunctor>
+        requires std::invocable<TCallFunctor, Engine&> && std::invocable<TUpdateFunctor, Engine&, DeltaTime>
+        void AddScene(const std::string& id, 
+            TCallFunctor start, 
+            TUpdateFunctor update, 
+            TUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
+            TCallFunctor finish = default_functions::Finish)
         {
-            scenes.emplace(id, Scene(start, update, fixed_update));
+            scenes.emplace(id, Scene(start, update, fixed_update, finish));
         }
 
-        void SetScene(const std::string& id);
+        void SetCurrentScene(const std::string& id);
 
         const std::string& GetCurrentScene() const;
+        const std::string& GetActiveScene() const;
 
         void SetVideoSettings(const VideoSettings& video_settings);
 
@@ -80,10 +87,10 @@ namespace doge
             return e;
         }
 
-        void SetParent(lic::EntityID eid, lic::EntityID parent);
-        void RemoveParent(lic::EntityID eid);
-        Entity GetParent(lic::EntityID eid);
-        bool HasParent(lic::EntityID eid);
+        // void SetParent(lic::EntityID eid, lic::EntityID parent);
+        // void RemoveParent(lic::EntityID eid);
+        // Entity GetParent(lic::EntityID eid);
+        // bool HasParent(lic::EntityID eid);
 
         struct EntityContainer : public std::vector<lic::EntityID>
         {
@@ -146,7 +153,7 @@ namespace doge
         template <typename... TComps>
         struct Range : public lic::Range<SceneInfo, TComps...>
         {
-            std::string current_scene = "";
+            std::string active_scene_id = "";
 
             template <std::convertible_to<std::string>... TSceneID>
             Range<TComps...> InAnyOf(TSceneID&&... scene_ids) const
@@ -201,68 +208,68 @@ namespace doge
 
             EntityContainer Entities() const
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).Entities();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).Entities();
                 return EntityContainer(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             ComponentContainer<false, TComps...> Components()
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).Components();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).Components();
                 return ComponentContainer<false, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             const ComponentContainer<false, TComps...> Components() const
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).Components();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).Components();
                 return ComponentContainer<false, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
             ComponentContainer<false, TOnlyComps...> OnlyComponents()
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).OnlyComponents<TOnlyComps...>();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).OnlyComponents<TOnlyComps...>();
                 return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
             const ComponentContainer<false, TOnlyComps...> OnlyComponents() const
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).OnlyComponents<TOnlyComps...>();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).OnlyComponents<TOnlyComps...>();
                 return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             ComponentContainer<true, TComps...> EntitiesAndComponents()
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).EntitiesAndComponents();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).EntitiesAndComponents();
                 return ComponentContainer<true, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             const ComponentContainer<true, TComps...> EntitiesAndComponents() const
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).EntitiesAndComponents();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).EntitiesAndComponents();
                 return ComponentContainer<true, TComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
             ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents()
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).EntitiesAndOnlyComponents<TOnlyComps...>();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
                 return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
 
             template <typename... TOnlyComps>
             const ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents() const
             {
-                if (!current_scene.empty())
-                    return InAnyOf(current_scene).EntitiesAndOnlyComponents<TOnlyComps...>();
+                if (!active_scene_id.empty())
+                    return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
                 return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
             }
         };
@@ -270,7 +277,7 @@ namespace doge
         template <typename... TComps>
         Range<TComps...> Select() const
         {
-            return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), current_scene);
+            return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), active_scene_id);
         }
     };
 }

@@ -60,8 +60,10 @@ namespace doge
             return;
         }
 
-        auto& entity = entities.at(eid);
         auto cind = entities.at(eid).component_indices.at(cid);
+        
+        if (destroyed_components.at(cid).empty())
+            destroyed_components.at(cid) = std::vector<size_t>();
 
         destroyed_components.at(cid).push_back(cind);
         entities.at(eid).component_field.set(cid, false);

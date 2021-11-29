@@ -26,6 +26,7 @@ set(SRC_FILES
     Scale.cpp
     Position.cpp
     Entity.cpp
+    default_functions.cpp
 )
 
 message(STATUS "${SFML_LIBRARIES}")

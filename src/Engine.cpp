@@ -8,8 +8,8 @@ namespace doge
 {
     void Engine::Main()
     {
-        auto running_scene = current_scene;
-        auto active_scene = scenes.at(current_scene);
+        active_scene_id = current_scene_id;
+        auto active_scene = scenes.at(current_scene_id);
 
         active_scene.start(*this);
 
@@ -17,7 +17,7 @@ namespace doge
         DeltaTime dt;
         sfml_impl.SetFrameRate(fps);
         sfml_impl.StartDeltaClock();
-        while (running_scene == current_scene && is_running)
+        while (active_scene_id == current_scene_id && is_running)
         {
             dt = sfml_impl.GetDeltaTime();
             acc_fixed_dt += dt;
@@ -44,11 +44,13 @@ namespace doge
             sfml_impl.Render(*this);
             sfml_impl.Display();
         }
+
+        active_scene.finish(*this);
     }
 
     void Engine::Start(const std::string& id)
     {
-        SetScene(id);
+        SetCurrentScene(id);
 
         sfml_impl.CreateWindow(video_settings, title);
 
@@ -79,14 +81,24 @@ namespace doge
         fixed_time_step = millisec;
     }
 
-    void Engine::SetScene(const std::string& id)
+    void Engine::SetCurrentScene(const std::string& id)
     {
         if (scenes.find(id) == scenes.end())
         {
             throw std::out_of_range("Scene ID \"" + id + "\" not found");
         }
 
-        current_scene = id;
+        current_scene_id = id;
+    }
+
+    const std::string& Engine::GetCurrentScene() const 
+    {
+        return current_scene_id;
+    }
+
+    const std::string& Engine::GetActiveScene() const 
+    {
+        return active_scene_id;
     }
 
     void Engine::SetVideoSettings(const VideoSettings& video_settings)
@@ -111,7 +123,7 @@ namespace doge
         if (all_scenes)
             e.AddComponent<SceneInfo>();
         else
-            e.AddComponent<SceneInfo>(std::vector<std::string>({ current_scene }));
+            e.AddComponent<SceneInfo>(std::vector<std::string>({ current_scene_id }));
         return e;
     }
 
@@ -120,26 +132,23 @@ namespace doge
         lic::DestroyEntity(eid);
     }
 
-    void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
-    {
-        parental_tree.emplace(parent, eid);
-    }
+    // void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
+    // {
+    // }
 
-    void Engine::RemoveParent(lic::EntityID eid) 
-    {
-        auto itr = parental_tree.find(GetParent(eid));
-        
-    }
+    // void Engine::RemoveParent(lic::EntityID eid) 
+    // {
+    // }
 
-    Entity Engine::GetParent(lic::EntityID eid) 
-    {
+    // Entity Engine::GetParent(lic::EntityID eid) 
+    // {
         
-    }
+    // }
 
-    bool Engine::HasParent(lic::EntityID eid) 
-    {
+    // bool Engine::HasParent(lic::EntityID eid) 
+    // {
         
-    }
+    // }
 
     Entity Engine::EntityContainer::Iterator::operator*() const
     {

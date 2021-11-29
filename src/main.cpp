@@ -5,6 +5,8 @@
 
 namespace TestScene
 {
+    int count = 0;
+
     void Start(doge::Engine& e)
     {
         e.AddCamera(doge::Camera{ .port = doge::Rectf(0, 0, 0.5, 0.5)     , .scale = doge::Vec2f(2, 2) });
@@ -14,7 +16,7 @@ namespace TestScene
 
         // e.AddCamera();
 
-        for (auto i = 0; i < 10; ++i)
+        for (auto i = 0; i < 50; ++i)
         {
             auto& my_shape = e.AddEntity("Test", "test");
             my_shape.AddComponent<doge::Position>();
@@ -31,6 +33,10 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
+        ++count;
+        if (count > 300) e.Stop();
+
+        std::vector<doge::Entity> to_be_destroyed;
         for (auto [ett, pos, vel] : e.Select<doge::Position, doge::Velocity>().EntitiesAndComponents())
         {
             pos.position += vel.velocity * dt;
@@ -63,6 +69,8 @@ int main()
     e.SetFrameRate(60);
     e.AddScene("Test", TestScene::Start, TestScene::Update);
     e.Start("Test", doge::VideoSettings(1280, 720, doge::VideoSettings::Mode::Windowed));
+
+    while(true) {}
 
     return 0;
 }
