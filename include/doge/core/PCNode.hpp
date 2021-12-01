@@ -9,11 +9,13 @@ namespace doge
 {
     struct PCNode
     {
-        std::shared_ptr<PCNode> parent = nullptr;
+        PCNode* parent;
         lic::EntityID eid;
-        std::unordered_set<PCNode> children;
+        std::unordered_set<std::unique_ptr<PCNode>> children;
 
         bool HasDescendent(lic::EntityID id) const;
-        std::shared_ptr<PCNode> GetDescendent(lic::EntityID id) const;
+        PCNode* GetDescendent(lic::EntityID id);
+
+        std::strong_ordering operator<=>(const PCNode& other) const;
     };
 }

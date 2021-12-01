@@ -93,8 +93,8 @@ namespace doge
 
         void SetParent(lic::EntityID eid, lic::EntityID parent);
         void RemoveParent(lic::EntityID eid);
-        const Entity GetParent(lic::EntityID eid) const;
-        bool HasParent(lic::EntityID eid) const;
+        const Entity GetParent(lic::EntityID eid);
+        bool HasParent(lic::EntityID eid);
 
         struct EntityContainer : public std::vector<lic::EntityID>
         {

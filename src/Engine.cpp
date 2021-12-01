@@ -1,5 +1,7 @@
 #include <doge/core/Engine.hpp>
 
+#include <algorithm>
+#include <stdexcept>
 #include <vector>
 #include <doge/utils.hpp>
 #include <doge/components.hpp>
@@ -125,9 +127,9 @@ namespace doge
         else
             e.AddComponent<SceneInfo>(std::vector<std::string>({ active_scene_id }));
         
-        auto node = std::make_shared<PCNode>();
-        node->parent = std::shared_ptr<PCNode>(&root_parent);
-        root_parent.children.emplace(node);
+        auto node = new PCNode();
+        node->parent = &root_parent;
+        root_parent.children.emplace(std::make_unique<PCNode>(node));
 
         return e;
     }
@@ -146,7 +148,12 @@ namespace doge
     {
         auto node = root_parent.GetDescendent(eid);
         auto parent_node = root_parent.GetDescendent(parent);
-        node->parent->children.erase(*node);
+        if (node->parent)
+            node->parent->children.erase(
+                std::find_if(node->parent->children.begin(), node->parent->children.end(), 
+                [&](const std::unique_ptr<PCNode>& child)
+                { return child.get() == node; })
+            );
         node->parent = parent_node;
         parent_node->children.emplace(node);
     }
@@ -157,20 +164,28 @@ namespace doge
             return;
 
         auto node = root_parent.GetDescendent(eid);
-        node->parent->children.erase(*node);
-        node->parent = std::shared_ptr<PCNode>(&root_parent);
+        if (node->parent)
+            node->parent->children.erase(
+                std::find_if(node->parent->children.begin(), node->parent->children.end(), 
+                [&](const std::unique_ptr<PCNode>& child)
+                { return child.get() == node; })
+            );
+        node->parent = &root_parent;
         root_parent.children.emplace(node);
     }
 
-    const Entity Engine::GetParent(lic::EntityID eid) const
+    const Entity Engine::GetParent(lic::EntityID eid)
     {
-        return GetEntity(root_parent.GetDescendent(eid)->parent->eid);
+        auto parent = root_parent.GetDescendent(eid)->parent;
+        if (parent)
+            return GetEntity(parent->eid);
+        throw std::bad_weak_ptr();
     }
 
-    bool Engine::HasParent(lic::EntityID eid) const
+    bool Engine::HasParent(lic::EntityID eid)
     {
-        auto node = root_parent.GetDescendent(eid);
-        if (node->parent.get() == &root_parent)
+        auto parent = root_parent.GetDescendent(eid)->parent;
+        if (!parent || parent == &root_parent)
             return false;
         return true;
     }
