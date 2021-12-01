@@ -117,38 +117,62 @@ namespace doge
         this->title = title;
     }
 
-    const Entity Engine::AddEntity(bool all_scenes) const
+    const Entity Engine::AddEntity(bool all_scenes)
     {
         auto e = Entity(lic::AddEntity());
         if (all_scenes)
             e.AddComponent<SceneInfo>();
         else
-            e.AddComponent<SceneInfo>(std::vector<std::string>({ current_scene_id }));
+            e.AddComponent<SceneInfo>(std::vector<std::string>({ active_scene_id }));
+        
+        auto node = std::make_shared<PCNode>();
+        node->parent = std::shared_ptr<PCNode>(&root_parent);
+        root_parent.children.emplace(node);
+
         return e;
     }
 
-    void Engine::DestroyEntity(lic::EntityID eid) const
+    const Entity Engine::GetEntity(lic::EntityID id) const
+    {
+        return Entity(lic::GetEntity(id));
+    }
+
+    void Engine::DestroyEntity(lic::EntityID eid)
     {
         lic::DestroyEntity(eid);
     }
 
     void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
     {
-        
+        auto node = root_parent.GetDescendent(eid);
+        auto parent_node = root_parent.GetDescendent(parent);
+        node->parent->children.erase(*node);
+        node->parent = parent_node;
+        parent_node->children.emplace(node);
     }
 
     void Engine::RemoveParent(lic::EntityID eid) 
     {
+        if (!HasParent(eid))
+            return;
+
+        auto node = root_parent.GetDescendent(eid);
+        node->parent->children.erase(*node);
+        node->parent = std::shared_ptr<PCNode>(&root_parent);
+        root_parent.children.emplace(node);
     }
 
-    Entity Engine::GetParent(lic::EntityID eid) const
+    const Entity Engine::GetParent(lic::EntityID eid) const
     {
-        
+        return GetEntity(root_parent.GetDescendent(eid)->parent->eid);
     }
 
     bool Engine::HasParent(lic::EntityID eid) const
     {
-        
+        auto node = root_parent.GetDescendent(eid);
+        if (node->parent.get() == &root_parent)
+            return false;
+        return true;
     }
 
     Entity Engine::EntityContainer::Iterator::operator*() const

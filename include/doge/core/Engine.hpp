@@ -27,7 +27,7 @@ namespace doge
         std::string title = "";
 
         std::unordered_map<std::string, Scene> scenes;
-        PCNode top_level_parent;
+        PCNode root_parent;
         std::string current_scene_id;
         std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
@@ -69,20 +69,22 @@ namespace doge
 
         void SetTitle(const std::string& title);
 
-        const Entity AddEntity(bool all_scenes = false) const;
+        const Entity AddEntity(bool all_scenes = false);
 
         template <std::convertible_to<std::string>... T>
-        const Entity AddEntity(T... scene_ids) const
+        const Entity AddEntity(T... scene_ids)
         {
             auto e = Entity(lic::AddEntity());
             e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
             return e;
         }
 
-        void DestroyEntity(lic::EntityID eid) const;
+        const Entity GetEntity(lic::EntityID id) const;
+
+        void DestroyEntity(lic::EntityID eid);
 
         template <typename... TArgs>
-        const Entity AddCamera(TArgs&&... args) const
+        const Entity AddCamera(TArgs&&... args)
         {
             auto e = this->AddEntity();
             e.AddComponent<Camera>(std::forward<TArgs>(args)...);
@@ -91,7 +93,7 @@ namespace doge
 
         void SetParent(lic::EntityID eid, lic::EntityID parent);
         void RemoveParent(lic::EntityID eid);
-        Entity GetParent(lic::EntityID eid) const;
+        const Entity GetParent(lic::EntityID eid) const;
         bool HasParent(lic::EntityID eid) const;
 
         struct EntityContainer : public std::vector<lic::EntityID>

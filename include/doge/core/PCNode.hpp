@@ -14,5 +14,6 @@ namespace doge
         std::unordered_set<PCNode> children;
 
         bool HasDescendent(lic::EntityID id) const;
+        std::shared_ptr<PCNode> GetDescendent(lic::EntityID id) const;
     };
 }
