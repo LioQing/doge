@@ -31,12 +31,11 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        std::vector<doge::Entity> to_be_destroyed;
         for (auto [ett, pos, vel] : e.Select<doge::Position, doge::Velocity>().EntitiesAndComponents())
         {
             pos.position += vel.velocity * dt;
 
-            if (pos.position.x < -(float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = std::abs(vel.velocity.x);
+            if (pos.position.x < -(float)e.GetVideoSettings().resolution.x / 2) e.DestroyEntity(ett);//vel.velocity.x = std::abs(vel.velocity.x);
             else if (pos.position.x > (float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = -std::abs(vel.velocity.x);
             if (pos.position.y < -(float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = std::abs(vel.velocity.y);
             else if (pos.position.y > (float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = -std::abs(vel.velocity.y);

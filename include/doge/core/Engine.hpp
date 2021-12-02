@@ -27,7 +27,6 @@ namespace doge
         std::string title = "";
 
         std::unordered_map<std::string, Scene> scenes;
-        PCNode root_parent;
         std::string current_scene_id;
         std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
@@ -76,6 +75,9 @@ namespace doge
         {
             auto e = Entity(lic::AddEntity());
             e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
+        
+            PCNode::AddNode(e);
+
             return e;
         }
 
@@ -90,11 +92,6 @@ namespace doge
             e.AddComponent<Camera>(std::forward<TArgs>(args)...);
             return e;
         }
-
-        void SetParent(lic::EntityID eid, lic::EntityID parent);
-        void RemoveParent(lic::EntityID eid);
-        const Entity GetParent(lic::EntityID eid);
-        bool HasParent(lic::EntityID eid);
 
         struct EntityContainer : public std::vector<lic::EntityID>
         {

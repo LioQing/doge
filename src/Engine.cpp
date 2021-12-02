@@ -122,14 +122,13 @@ namespace doge
     const Entity Engine::AddEntity(bool all_scenes)
     {
         auto e = Entity(lic::AddEntity());
+
         if (all_scenes)
             e.AddComponent<SceneInfo>();
         else
             e.AddComponent<SceneInfo>(std::vector<std::string>({ active_scene_id }));
         
-        auto node = new PCNode();
-        node->parent = &root_parent;
-        root_parent.children.emplace(std::make_unique<PCNode>(node));
+        PCNode::AddNode(e);
 
         return e;
     }
@@ -139,55 +138,10 @@ namespace doge
         return Entity(lic::GetEntity(id));
     }
 
-    void Engine::DestroyEntity(lic::EntityID eid)
+    void Engine::DestroyEntity(lic::EntityID id)
     {
-        lic::DestroyEntity(eid);
-    }
-
-    void Engine::SetParent(lic::EntityID eid, lic::EntityID parent) 
-    {
-        auto node = root_parent.GetDescendent(eid);
-        auto parent_node = root_parent.GetDescendent(parent);
-        if (node->parent)
-            node->parent->children.erase(
-                std::find_if(node->parent->children.begin(), node->parent->children.end(), 
-                [&](const std::unique_ptr<PCNode>& child)
-                { return child.get() == node; })
-            );
-        node->parent = parent_node;
-        parent_node->children.emplace(node);
-    }
-
-    void Engine::RemoveParent(lic::EntityID eid) 
-    {
-        if (!HasParent(eid))
-            return;
-
-        auto node = root_parent.GetDescendent(eid);
-        if (node->parent)
-            node->parent->children.erase(
-                std::find_if(node->parent->children.begin(), node->parent->children.end(), 
-                [&](const std::unique_ptr<PCNode>& child)
-                { return child.get() == node; })
-            );
-        node->parent = &root_parent;
-        root_parent.children.emplace(node);
-    }
-
-    const Entity Engine::GetParent(lic::EntityID eid)
-    {
-        auto parent = root_parent.GetDescendent(eid)->parent;
-        if (parent)
-            return GetEntity(parent->eid);
-        throw std::bad_weak_ptr();
-    }
-
-    bool Engine::HasParent(lic::EntityID eid)
-    {
-        auto parent = root_parent.GetDescendent(eid)->parent;
-        if (!parent || parent == &root_parent)
-            return false;
-        return true;
+        lic::DestroyEntity(id);
+        PCNode::root.GetDescendent(id)->parent->RemoveChild(id);
     }
 
     Entity Engine::EntityContainer::Iterator::operator*() const
