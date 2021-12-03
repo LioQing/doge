@@ -13,13 +13,14 @@ namespace doge
         active_scene_id = current_scene_id;
         auto active_scene = scenes.at(current_scene_id);
 
+        is_running = true;
         active_scene.start(*this);
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
         sfml_impl.SetFrameRate(fps);
         sfml_impl.StartDeltaClock();
-        while (active_scene_id == current_scene_id && is_running)
+        while (active_scene_id == current_scene_id && is_running && is_open)
         {
             dt = sfml_impl.GetDeltaTime();
             acc_fixed_dt += dt;
@@ -29,6 +30,7 @@ namespace doge
                 if (event.type == sf::Event::Closed)
                 {
                     is_running = false;
+                    is_open = false;
                 }
                 else if (event.type == sf::Event::Resized)
                 {
@@ -48,28 +50,35 @@ namespace doge
         }
 
         active_scene.finish(*this);
+        is_running = false;
     }
 
-    void Engine::Start(const std::string& id)
+    void Engine::StartScene(const std::string& id)
     {
         SetCurrentScene(id);
 
         sfml_impl.CreateWindow(video_settings, title);
 
-        is_running = true;
-        while (is_running)
+        is_open = true;
+        while (is_open)
             Main();
     }
 
-    void Engine::Start(const std::string& id, const VideoSettings& video_settings)
+    void Engine::StartScene(const std::string& id, const VideoSettings& video_settings)
     {
         SetVideoSettings(video_settings);
-        Start(id);
+        StartScene(id);
     }
 
-    void Engine::Stop()
+    void Engine::StopScene()
     {
         sfml_impl.CloseWindow();
+        is_open = false;
+        is_running = false;
+    }
+
+    void Engine::RestartScene()
+    {
         is_running = false;
     }
 

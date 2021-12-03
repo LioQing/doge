@@ -31,16 +31,19 @@ namespace doge
         std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
         uint32_t fps = 60;
+        bool is_open = false;
         bool is_running = false;
 
         void Main();
 
     public:
 
-        void Start(const std::string& id);
-        void Start(const std::string& id, const VideoSettings& video_settings);
+        void StartScene(const std::string& id);
+        void StartScene(const std::string& id, const VideoSettings& video_settings);
 
-        void Stop();
+        void StopScene();
+
+        void RestartScene();
 
         void SetFrameRate(uint32_t frame_rate);
 
