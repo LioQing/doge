@@ -35,6 +35,7 @@ namespace doge
         bool is_running = false;
 
         void Main();
+        const std::shared_ptr<PCNode> GetPCNode(lic::EntityID eid) const;
 
     public:
 
@@ -84,9 +85,9 @@ namespace doge
             return e;
         }
 
-        const Entity GetEntity(lic::EntityID id) const;
+        const Entity GetEntity(EntityID eid) const;
 
-        void DestroyEntity(lic::EntityID eid);
+        void DestroyEntity(EntityID eid);
 
         template <typename... TArgs>
         const Entity AddCamera(TArgs&&... args)
@@ -96,11 +97,17 @@ namespace doge
             return e;
         }
 
-        struct EntityContainer : public std::vector<lic::EntityID>
+        const Entity GetParent(EntityID eid) const;
+        bool HasParent(EntityID eid) const;
+        bool IsParent(EntityID eid, EntityID parent) const;
+        void SetParent(EntityID eid, EntityID parent);
+        void RemoveParent(EntityID eid);
+
+        struct EntityContainer : public std::vector<EntityID>
         {
         private:
 
-            using VecIterator = std::vector<lic::EntityID>::const_iterator;
+            using VecIterator = std::vector<EntityID>::const_iterator;
 
         public:
 
@@ -118,7 +125,7 @@ namespace doge
         };
 
         template <bool IncludeEntities, typename... TComps>
-        struct ComponentContainer : public std::vector<lic::EntityID>
+        struct ComponentContainer : public std::vector<EntityID>
         {
             template <std::contiguous_iterator TBackingIter>
             struct BaseIterator : public TBackingIter
@@ -129,14 +136,14 @@ namespace doge
                 {
                     if constexpr (IncludeEntities == true)
                     {
-                        if constexpr (std::is_same<TBackingIter, std::vector<lic::EntityID>::const_iterator>::value)
+                        if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
                             return std::tuple<Entity, const lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
                         else
                             return std::tuple<Entity, lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
                     }
                     else
                     {
-                        if constexpr (std::is_same<TBackingIter, std::vector<lic::EntityID>::const_iterator>::value)
+                        if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
                             return std::tie<const lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
                         else
                             return std::tie<lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
@@ -144,14 +151,14 @@ namespace doge
                 }
             };
 
-            using Iterator = BaseIterator<std::vector<lic::EntityID>::iterator>;
-            using ConstIterator = BaseIterator<std::vector<lic::EntityID>::const_iterator>;
+            using Iterator = BaseIterator<std::vector<EntityID>::iterator>;
+            using ConstIterator = BaseIterator<std::vector<EntityID>::const_iterator>;
 
-            Iterator begin() { return Iterator(std::vector<lic::EntityID>::begin()); }
-            Iterator end() { return Iterator(std::vector<lic::EntityID>::end()); }
+            Iterator begin() { return Iterator(std::vector<EntityID>::begin()); }
+            Iterator end() { return Iterator(std::vector<EntityID>::end()); }
 
-            ConstIterator begin() const { return ConstIterator(std::vector<lic::EntityID>::cbegin()); }
-            ConstIterator end() const { return ConstIterator(std::vector<lic::EntityID>::cend()); }
+            ConstIterator begin() const { return ConstIterator(std::vector<EntityID>::cbegin()); }
+            ConstIterator end() const { return ConstIterator(std::vector<EntityID>::cend()); }
         };
 
         template <typename... TComps>

@@ -243,11 +243,19 @@ namespace doge
         static Entity AddEntity();
 
         /**
-         * @brief Destroy a entity (including its components)
+         * @brief Destroy an entity (including its components)
          * 
          * @param eid ID of the entity to be destroyed
          */
         static void DestroyEntity(EntityID eid);
+
+        /**
+         * @brief Check whether an entity is alive (added and not destroyed)
+         * 
+         * @param eid ID of the entity
+         * @return boolean indicating whether the entity is alive
+         */
+        static bool HasEntity(EntityID eid);
 
         /**
          * @brief Get a entity

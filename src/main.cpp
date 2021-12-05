@@ -17,9 +17,16 @@ namespace TestScene
 
         auto cam = e.AddCamera(doge::Camera{ .scale = doge::Vec2f(2, 2) });
 
+        int king = -1;
         for (auto i = 0; i < 50; ++i)
         {
             auto my_shape = e.AddEntity("Test", "test");
+
+            if (king == -1)
+                king = my_shape.id;
+            else
+                e.SetParent(my_shape.id, king);
+
             my_shape.AddComponent<doge::Position>(0, 0);
             my_shape.AddComponent<doge::Velocity>(rand() % 100 / 100.f - 0.5f, rand() % 100 / 100.f - 0.5f);
 
@@ -34,14 +41,20 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
+        std::vector<doge::EntityID> to_be_destroyed;
         for (auto [ett, pos, vel] : e.Select<doge::Position, doge::Velocity>().EntitiesAndComponents())
         {
             pos.position += vel.velocity * dt;
 
-            if (pos.position.x < -(float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = std::abs(vel.velocity.x);
+            if (pos.position.x < -(float)e.GetVideoSettings().resolution.x / 2) {to_be_destroyed.push_back(ett); std::cout << ett << std::endl; } //vel.velocity.x = std::abs(vel.velocity.x);
             else if (pos.position.x > (float)e.GetVideoSettings().resolution.x / 2) vel.velocity.x = -std::abs(vel.velocity.x);
             if (pos.position.y < -(float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = std::abs(vel.velocity.y);
             else if (pos.position.y > (float)e.GetVideoSettings().resolution.y / 2) vel.velocity.y = -std::abs(vel.velocity.y);
+        }
+
+        for (auto id : to_be_destroyed)
+        {
+            e.DestroyEntity(id);
         }
 
         if (++count > 300)

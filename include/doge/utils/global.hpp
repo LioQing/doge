@@ -4,6 +4,7 @@
 #include <doge/components.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/lic.hpp>
+#include <doge/utils/aliases.hpp>
 
 namespace doge
 {
@@ -11,11 +12,11 @@ namespace doge
     {
         global(const global&) = delete;
 
-        static Vec2f GetPosition(lic::EntityID eid);
+        static Vec2f GetPosition(EntityID eid);
 
-        static Vec2f GetScale(lic::EntityID eid);
+        static Vec2f GetScale(EntityID eid);
 
-        static float GetRotation(lic::EntityID eid);
+        static float GetRotation(EntityID eid);
 
         template <typename TComp>
         requires requires (TComp c) {

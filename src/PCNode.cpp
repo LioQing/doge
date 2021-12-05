@@ -6,7 +6,7 @@ namespace doge
 {
     PCNode PCNode::root;
 
-    std::shared_ptr<PCNode> PCNode::AddNode(lic::EntityID eid)
+    const std::shared_ptr<PCNode> PCNode::AddNode(EntityID eid)
     {
         auto node = std::shared_ptr<PCNode>(new PCNode());
         node->id = eid;
@@ -15,23 +15,21 @@ namespace doge
         return node;
     }
 
-    bool PCNode::HasDescendent(lic::EntityID eid) const
+    bool PCNode::HasDescendent(EntityID eid) const
     {
-        std::deque<std::shared_ptr<PCNode>> descendents;
-        
-        for (auto& child : children)
-        {
-            descendents.push_back(child);
-        }
+        if (HasChild(eid))
+            return true;
+
+        std::deque<std::shared_ptr<PCNode>> descendents(children.begin(), children.end());
 
         while (!descendents.empty())
         {
-            auto descendent = descendents.front();
-            if (descendent->id == eid)
-                return true;
+            auto& descendent = descendents.front();
 
             for (auto& child_of_descendent : descendent->children)
             {
+                if (child_of_descendent->id == eid)
+                    return true;
                 descendents.push_back(child_of_descendent);
             }
             
@@ -41,23 +39,21 @@ namespace doge
         return false;
     }
 
-    const std::shared_ptr<PCNode>& PCNode::GetDescendent(lic::EntityID eid) const
+    const std::shared_ptr<PCNode> PCNode::GetDescendent(lic::EntityID eid) const
     {
-        std::deque<std::shared_ptr<PCNode>> descendents;
-        
-        for (auto& child : children)
-        {
-            descendents.push_back(child);
-        }
+        if (HasChild(eid))
+            return GetChild(eid);
+
+        std::deque<std::shared_ptr<PCNode>> descendents(children.begin(), children.end());
 
         while (!descendents.empty())
         {
-            auto descendent = descendents.front();
-            if (descendent->id == eid)
-                return *descendent->parent->children.find(descendent);
+            auto& descendent = descendents.front();
 
             for (auto& child_of_descendent : descendent->children)
             {
+                if (child_of_descendent->id == eid)
+                    return child_of_descendent;
                 descendents.push_back(child_of_descendent);
             }
             
@@ -67,18 +63,43 @@ namespace doge
         throw std::invalid_argument(std::to_string(eid) + " not found in parent-child node of " + std::to_string(id) + ".");
     }
 
+    const std::vector<std::shared_ptr<PCNode>> PCNode::GetDescendents() const
+    {
+        std::vector<std::shared_ptr<PCNode>> descendents(children.begin(), children.end());
+        std::deque<std::shared_ptr<PCNode>> to_be_searched(children.begin(), children.end());
+
+        while (!to_be_searched.empty())
+        {
+            auto& searching = to_be_searched.front();
+
+            for (auto& child_of_searching : searching->children)
+            {
+                descendents.push_back(child_of_searching);
+            }
+
+            to_be_searched.pop_front();
+        }
+
+        return descendents;
+    }
+
     bool PCNode::HasParent() const
     {
         return this->parent != &root;
     }
 
-    void PCNode::SetParent(lic::EntityID eid)
+    bool PCNode::IsParent(EntityID eid) const
+    {
+        return this->parent->id == eid;
+    }
+
+    void PCNode::SetParent(EntityID eid)
     {
         auto parent_node = root.GetDescendent(eid);
+        parent_node->children.insert(this->parent->GetChild(this->id));
         if (this->parent)
             this->parent->RemoveChild(this->id);
         this->parent = parent_node.get();
-        parent_node->children.insert(std::shared_ptr<PCNode>(this));
     }
 
     void PCNode::RemoveParent()
@@ -92,7 +113,28 @@ namespace doge
         root.children.insert(std::shared_ptr<PCNode>(this));
     }
 
-    void PCNode::RemoveChild(lic::EntityID eid)
+    bool PCNode::HasChild(EntityID eid) const
+    {
+        return std::find_if(children.begin(), children.end(),
+            [&](const std::shared_ptr<PCNode>& child)
+            { return child->id == eid; })
+            != children.end();
+    }
+
+    const std::shared_ptr<PCNode> PCNode::GetChild(EntityID eid) const
+    {
+        return *std::find_if(children.begin(), children.end(),
+            [&](const std::shared_ptr<PCNode>& child)
+            { return child->id == eid; }
+        );
+    }
+
+    const std::vector<std::shared_ptr<PCNode>> PCNode::GetChildren() const
+    {
+        return std::vector<std::shared_ptr<PCNode>>(children.begin(), children.end());
+    }
+
+    void PCNode::RemoveChild(EntityID eid)
     {
         std::erase_if(children,
             [&](const std::shared_ptr<PCNode>& child)

@@ -8,13 +8,13 @@ namespace doge
 {
     struct Entity : public lic::Entity
     {
-        Entity(lic::EntityID id);
+        Entity(EntityID id);
 
-        // void SetParent(lic::EntityID id) const;
-        // void RemoveParent(lic::EntityID id) const;
+        // void SetParent(EntityID id) const;
+        // void RemoveParent(EntityID id) const;
         // Entity GetParent() const;
         // bool HasParent() const;
 
-        operator lic::EntityID() const;
+        operator EntityID() const;
     };
 }

@@ -4,16 +4,16 @@
 
 namespace doge
 {
-    Entity::Entity(lic::EntityID id) : lic::Entity(lic::Entity(id))
+    Entity::Entity(EntityID id) : lic::Entity(lic::Entity(id))
     {
     }
 
-    // void Entity::SetParent(lic::EntityID id) const
+    // void Entity::SetParent(EntityID id) const
     // {
         
     // }
 
-    // void Entity::RemoveParent(lic::EntityID id) const
+    // void Entity::RemoveParent(EntityID id) const
     // {
         
     // }
@@ -28,7 +28,7 @@ namespace doge
         
     // }
 
-    Entity::operator lic::EntityID() const 
+    Entity::operator EntityID() const 
     {
         return lic::Entity::id;
     }

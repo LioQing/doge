@@ -142,15 +142,55 @@ namespace doge
         return e;
     }
 
-    const Entity Engine::GetEntity(lic::EntityID id) const
+    const Entity Engine::GetEntity(EntityID eid) const
     {
-        return Entity(lic::GetEntity(id));
+        return Entity(lic::GetEntity(eid));
     }
 
-    void Engine::DestroyEntity(lic::EntityID id)
+    void Engine::DestroyEntity(EntityID eid)
     {
-        lic::DestroyEntity(id);
-        PCNode::root.GetDescendent(id)->parent->RemoveChild(id);
+        if (!lic::HasEntity(eid))
+            return;
+
+        auto node = GetPCNode(eid);
+        for (auto& descendents : node->GetDescendents())
+            lic::DestroyEntity(descendents->id);
+        lic::DestroyEntity(eid);
+        node->parent->RemoveChild(eid);
+    }
+
+    const std::shared_ptr<PCNode> Engine::GetPCNode(EntityID eid) const
+    {
+        return PCNode::root.GetDescendent(eid);
+    }
+
+    const Entity Engine::GetParent(EntityID eid) const
+    {
+        auto node = GetPCNode(eid);
+        if (!node->HasParent())
+            throw std::invalid_argument(std::string("Entity ") + std::to_string(eid) + " has no parent.");
+
+        return GetEntity(node->parent->id);
+    }
+
+    bool Engine::HasParent(EntityID eid) const
+    {
+        return GetPCNode(eid)->HasParent();
+    }
+
+    bool Engine::IsParent(EntityID eid, EntityID parent) const
+    {
+        return GetPCNode(eid)->IsParent(parent);
+    }
+    
+    void Engine::SetParent(EntityID eid, EntityID parent)
+    {
+        GetPCNode(eid)->SetParent(parent);
+    }
+    
+    void Engine::RemoveParent(EntityID eid)
+    {
+        GetPCNode(eid)->RemoveParent();
     }
 
     Entity Engine::EntityContainer::Iterator::operator*() const
@@ -160,21 +200,21 @@ namespace doge
 
     Engine::EntityContainer::Iterator Engine::EntityContainer::begin() const
     {
-        return Iterator(std::vector<lic::EntityID>::cbegin());
+        return Iterator(std::vector<EntityID>::cbegin());
     }
 
     Engine::EntityContainer::Iterator Engine::EntityContainer::end() const
     {
-        return Iterator(std::vector<lic::EntityID>::cend());
+        return Iterator(std::vector<EntityID>::cend());
     }
 
     Engine::EntityContainer::Iterator Engine::EntityContainer::cbegin() const
     {
-        return Iterator(std::vector<lic::EntityID>::cbegin());
+        return Iterator(std::vector<EntityID>::cbegin());
     }
 
     Engine::EntityContainer::Iterator Engine::EntityContainer::cend() const
     {
-        return Iterator(std::vector<lic::EntityID>::cend());
+        return Iterator(std::vector<EntityID>::cend());
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_set>
+#include <vector>
 #include <memory>
 
 #include "../utils.hpp"
@@ -9,26 +10,26 @@ namespace doge
 {
     struct PCNode
     {
-        static std::shared_ptr<PCNode> AddNode(lic::EntityID eid);
+        static const std::shared_ptr<PCNode> AddNode(EntityID eid);
 
         PCNode* parent = nullptr;
-        lic::EntityID id;
+        EntityID id;
         std::unordered_set<std::shared_ptr<PCNode>> children;
         static PCNode root;
 
-        bool HasDescendent(lic::EntityID id) const;
-        const std::shared_ptr<PCNode>& GetDescendent(lic::EntityID id) const;
+        bool HasDescendent(EntityID eid) const;
+        const std::shared_ptr<PCNode> GetDescendent(EntityID eid) const;
+        const std::vector<std::shared_ptr<PCNode>> GetDescendents() const;
 
         bool HasParent() const;
-        void SetParent(lic::EntityID id);
+        bool IsParent(EntityID eid) const;
+        void SetParent(EntityID eid);
         void RemoveParent();
 
-        void RemoveChild(lic::EntityID id);
-
-        // ~PCNode()
-        // {
-        //     std::cout << id << std::endl;
-        // }
+        bool HasChild(EntityID eid) const;
+        const std::shared_ptr<PCNode> GetChild(EntityID eid) const;
+        const std::vector<std::shared_ptr<PCNode>> GetChildren() const;
+        void RemoveChild(EntityID eid);
 
     private:
 
