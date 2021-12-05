@@ -1,6 +1,7 @@
 #include <doge/core/Entity.hpp>
 
 #include <stdexcept>
+#include <doge/core/Engine.hpp>
 
 namespace doge
 {

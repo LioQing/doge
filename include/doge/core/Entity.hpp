@@ -6,9 +6,11 @@
 
 namespace doge
 {
+    struct Engine;
+
     struct Entity : public lic::Entity
     {
-        Entity(EntityID id);
+        Entity(EntityID EntityID);
 
         // void SetParent(EntityID id) const;
         // void RemoveParent(EntityID id) const;

@@ -258,7 +258,7 @@ namespace doge
         static bool HasEntity(EntityID eid);
 
         /**
-         * @brief Get a entity
+         * @brief Get an entity
          * 
          * @param eid ID of the entity to be returned
          * @return The entity

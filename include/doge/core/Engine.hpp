@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <concepts>
 #include <functional>
 #include <iostream>
@@ -27,6 +28,7 @@ namespace doge
         std::string title = "";
 
         std::unordered_map<std::string, Scene> scenes;
+        std::vector<EntityID> to_be_destroyed;
         std::string current_scene_id;
         std::string active_scene_id;
         DeltaTime fixed_time_step = 10.f;
@@ -35,6 +37,7 @@ namespace doge
         bool is_running = false;
 
         void Main();
+        void DestroyEntities();
         const std::shared_ptr<PCNode> GetPCNode(lic::EntityID eid) const;
 
     public:
@@ -72,10 +75,10 @@ namespace doge
 
         void SetTitle(const std::string& title);
 
-        const Entity AddEntity(bool all_scenes = false);
+        Entity AddEntity(bool all_scenes = false);
 
         template <std::convertible_to<std::string>... T>
-        const Entity AddEntity(T... scene_ids)
+        Entity AddEntity(T... scene_ids)
         {
             auto e = Entity(lic::AddEntity());
             e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
@@ -85,23 +88,27 @@ namespace doge
             return e;
         }
 
-        const Entity GetEntity(EntityID eid) const;
+        Entity GetEntity(EntityID eid) const;
 
         void DestroyEntity(EntityID eid);
 
         template <typename... TArgs>
-        const Entity AddCamera(TArgs&&... args)
+        Entity AddCamera(TArgs&&... args)
         {
             auto e = this->AddEntity();
             e.AddComponent<Camera>(std::forward<TArgs>(args)...);
             return e;
         }
 
-        const Entity GetParent(EntityID eid) const;
+        Entity GetParent(EntityID eid) const;
         bool HasParent(EntityID eid) const;
         bool IsParent(EntityID eid, EntityID parent) const;
         void SetParent(EntityID eid, EntityID parent);
         void RemoveParent(EntityID eid);
+
+        bool HasChild(EntityID eid, EntityID child) const;
+        const std::vector<Entity> GetChildren(EntityID eid) const;
+        void RemoveChild(EntityID eid, EntityID child);
 
         struct EntityContainer : public std::vector<EntityID>
         {

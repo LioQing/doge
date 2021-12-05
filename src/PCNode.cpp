@@ -24,7 +24,7 @@ namespace doge
 
         while (!descendents.empty())
         {
-            auto& descendent = descendents.front();
+            auto descendent = descendents.front();
 
             for (auto& child_of_descendent : descendent->children)
             {
@@ -48,7 +48,7 @@ namespace doge
 
         while (!descendents.empty())
         {
-            auto& descendent = descendents.front();
+            auto descendent = descendents.front();
 
             for (auto& child_of_descendent : descendent->children)
             {
@@ -70,7 +70,7 @@ namespace doge
 
         while (!to_be_searched.empty())
         {
-            auto& searching = to_be_searched.front();
+            auto searching = to_be_searched.front();
 
             for (auto& child_of_searching : searching->children)
             {
@@ -96,8 +96,8 @@ namespace doge
     void PCNode::SetParent(EntityID eid)
     {
         auto parent_node = root.GetDescendent(eid);
-        parent_node->children.insert(this->parent->GetChild(this->id));
         if (this->parent)
+            parent_node->children.insert(this->parent->GetChild(this->id));
             this->parent->RemoveChild(this->id);
         this->parent = parent_node.get();
     }
@@ -108,9 +108,9 @@ namespace doge
             return;
 
         if (this->parent)
+            root.children.insert(this->parent->GetChild(this->id));
             this->parent->RemoveChild(id);
         this->parent = &root;
-        root.children.insert(std::shared_ptr<PCNode>(this));
     }
 
     bool PCNode::HasChild(EntityID eid) const

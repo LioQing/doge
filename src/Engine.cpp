@@ -45,12 +45,31 @@ namespace doge
 
             active_scene.update(*this, dt);
 
+            DestroyEntities();
+
             sfml_impl.Render(*this);
             sfml_impl.Display();
         }
 
         active_scene.finish(*this);
         is_running = false;
+    }
+
+    void Engine::DestroyEntities()
+    {
+        for (auto id : to_be_destroyed)
+        {
+            if (!lic::HasEntity(id))
+                continue;
+
+            auto node = GetPCNode(id);
+            for (auto& descendents : node->GetDescendents())
+                lic::DestroyEntity(descendents->id);
+            lic::DestroyEntity(id);
+            node->parent->RemoveChild(id);
+        }
+
+        to_be_destroyed.clear();
     }
 
     void Engine::StartScene(const std::string& id)
@@ -128,7 +147,7 @@ namespace doge
         this->title = title;
     }
 
-    const Entity Engine::AddEntity(bool all_scenes)
+    Entity Engine::AddEntity(bool all_scenes)
     {
         auto e = Entity(lic::AddEntity());
 
@@ -142,21 +161,17 @@ namespace doge
         return e;
     }
 
-    const Entity Engine::GetEntity(EntityID eid) const
+    Entity Engine::GetEntity(EntityID eid) const
     {
         return Entity(lic::GetEntity(eid));
     }
 
     void Engine::DestroyEntity(EntityID eid)
     {
-        if (!lic::HasEntity(eid))
-            return;
+        to_be_destroyed.push_back(eid);
 
-        auto node = GetPCNode(eid);
-        for (auto& descendents : node->GetDescendents())
-            lic::DestroyEntity(descendents->id);
-        lic::DestroyEntity(eid);
-        node->parent->RemoveChild(eid);
+        if (!is_running)
+            DestroyEntities();
     }
 
     const std::shared_ptr<PCNode> Engine::GetPCNode(EntityID eid) const
@@ -164,7 +179,7 @@ namespace doge
         return PCNode::root.GetDescendent(eid);
     }
 
-    const Entity Engine::GetParent(EntityID eid) const
+    Entity Engine::GetParent(EntityID eid) const
     {
         auto node = GetPCNode(eid);
         if (!node->HasParent())
@@ -191,6 +206,25 @@ namespace doge
     void Engine::RemoveParent(EntityID eid)
     {
         GetPCNode(eid)->RemoveParent();
+    }
+
+    bool Engine::HasChild(EntityID eid, EntityID child) const
+    {
+        return GetPCNode(eid)->HasChild(child);
+    }
+
+    const std::vector<Entity> Engine::GetChildren(EntityID eid) const
+    {
+        auto children_nodes = GetPCNode(eid)->GetChildren();
+        std::vector<Entity> children;
+        for (auto& child_node : children_nodes)
+            children.push_back(GetEntity(child_node->id));
+        return children;
+    }
+
+    void Engine::RemoveChild(EntityID eid, EntityID child)
+    {
+        return GetPCNode(eid)->RemoveChild(child);
     }
 
     Entity Engine::EntityContainer::Iterator::operator*() const
