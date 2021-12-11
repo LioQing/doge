@@ -14,6 +14,8 @@ set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system graphics window REQUIRED)
 
+set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Release)
+
 set(SRC_FILES
     lic.cpp
     Engine.cpp
@@ -31,11 +33,6 @@ set(SRC_FILES
     Range.cpp
 )
 
-message(STATUS "${SFML_LIBRARIES}")
-foreach (_variableName ${SFML_LIBRARIES})
-    message(STATUS variableName)
-endforeach()
-
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
 
@@ -45,8 +42,10 @@ set(SFML_LIBS
     sfml-system
 )
 
-target_link_libraries(${PROJECT_NAME} ${SFML_LIBS})
-target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS})
+set(BOX2D_LIB ${BOX2D_DIR}/box2d.lib)
+
+target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
+target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
 
 add_executable(test
     main.cpp
