@@ -75,6 +75,7 @@ namespace doge
             for (auto& child_of_searching : searching->children)
             {
                 descendents.push_back(child_of_searching);
+                to_be_searched.push_back(child_of_searching);
             }
 
             to_be_searched.pop_front();

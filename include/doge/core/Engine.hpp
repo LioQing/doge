@@ -80,12 +80,12 @@ namespace doge
         template <std::convertible_to<std::string>... T>
         Entity AddEntity(T... scene_ids)
         {
-            auto e = Entity(lic::AddEntity());
+            auto e = lic::AddEntity();
             e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
         
-            PCNode::AddNode(e);
+            auto node = PCNode::AddNode(e);
 
-            return e;
+            return Entity(e, node.get());
         }
 
         Entity GetEntity(EntityID eid) const;
@@ -107,8 +107,7 @@ namespace doge
         void RemoveParent(EntityID eid);
 
         bool HasChild(EntityID eid, EntityID child) const;
-        const std::vector<Entity> GetChildren(EntityID eid) const;
-        void RemoveChild(EntityID eid, EntityID child);
+        std::vector<Entity> GetChildren(EntityID eid) const;
 
         struct EntityContainer : public std::vector<EntityID>
         {
@@ -141,19 +140,21 @@ namespace doge
 
                 auto operator*()
                 {
+                    EntityID eid = lic::GetEntity(TBackingIter::operator*()).id;
+
                     if constexpr (IncludeEntities == true)
                     {
                         if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
-                            return std::tuple<Entity, const lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                            return std::tuple<Entity, const lic::Component<TComps>&...>(Entity(eid, PCNode::root.GetDescendent(eid).get()), lic::GetComponent<TComps>(eid)...);
                         else
-                            return std::tuple<Entity, lic::Component<TComps>&...>(lic::GetEntity(TBackingIter::operator*()), lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                            return std::tuple<Entity, lic::Component<TComps>&...>(Entity(eid, PCNode::root.GetDescendent(eid).get()), lic::GetComponent<TComps>(eid)...);
                     }
                     else
                     {
                         if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
-                            return std::tie<const lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                            return std::tie<const lic::Component<TComps>...>(lic::GetComponent<TComps>(eid)...);
                         else
-                            return std::tie<lic::Component<TComps>...>(lic::GetComponent<TComps>(TBackingIter::operator*())...);
+                            return std::tie<lic::Component<TComps>...>(lic::GetComponent<TComps>(eid)...);
                     }
                 }
             };

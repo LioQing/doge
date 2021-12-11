@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    Entity::Entity(EntityID id) : lic::Entity(lic::Entity(id))
+    Entity::Entity(EntityID id, PCNode* pcnode) : lic::Entity(lic::Entity(id)), pcnode(pcnode)
     {
     }
 
