@@ -1,4 +1,4 @@
-#include <doge/core/SFMLImpl.hpp>
+#include <doge/core/IOBus.hpp>
 
 #include <memory>
 #include <doge/core/Engine.hpp>
@@ -7,7 +7,7 @@
 
 namespace doge
 {
-    void SFMLImpl::CreateWindow(const VideoSettings& video_settings, const std::string& title)
+    void IOBus::CreateWindow(const VideoSettings& video_settings, const std::string& title)
     {
         if (video_settings.mode == VideoSettings::Mode::FullScreen)
         {
@@ -25,12 +25,12 @@ namespace doge
         }
     }
 
-    void SFMLImpl::CloseWindow()
+    void IOBus::CloseWindow()
     {
         window.close();
     }
 
-    void SFMLImpl::Render(const Engine& e)
+    void IOBus::Render(const Engine& e)
     {
         std::vector<std::tuple<sf::View, std::vector<sf::CircleShape>, std::vector<sf::ConvexShape>, std::vector<sf::RectangleShape>>> views_shapes;
         for (auto [entity, camera] : e.Select<Camera>().EntitiesAndComponents())
@@ -115,22 +115,22 @@ namespace doge
         }
     }
 
-    void SFMLImpl::Display()
+    void IOBus::Display()
     {
         window.display();
     }
 
-    void SFMLImpl::SetFrameRate(uint32_t frame_rate)
+    void IOBus::SetFrameRate(uint32_t frame_rate)
     {
         window.setFramerateLimit(frame_rate);
     }
 
-    void SFMLImpl::StartDeltaClock()
+    void IOBus::StartDeltaClock()
     {
         clock.restart();
     }
 
-    float SFMLImpl::GetDeltaTime()
+    float IOBus::GetDeltaTime()
     {
         return clock.restart().asMicroseconds() / 1000.f;
     }

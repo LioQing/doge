@@ -23,11 +23,12 @@ namespace doge
         };
 
         VideoSettings() = default;
-        VideoSettings(uint32_t width, uint32_t height, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
-        VideoSettings(Vec2u size, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
+        VideoSettings(uint32_t width, uint32_t height, uint32_t fps = 60, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
+        VideoSettings(Vec2u size, uint32_t fps = 60, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
 
         Vec2u resolution = Vec2u(800, 600);
         WindowStyle window_style = WindowStyle::All;
         Mode mode = Mode::Windowed;
+        uint32_t fps = 60;
     };
 }

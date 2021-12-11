@@ -13,16 +13,14 @@ namespace doge
     {
         Entity(EntityID EntityID, PCNode* pcnode);
 
-        // const Entity GetParent(EntityID eid) const;
-        // Entity GetParent(EntityID eid);
-        // bool HasParent(EntityID eid) const;
-        // bool IsParent(EntityID eid, EntityID parent) const;
-        // void SetParent(EntityID eid, EntityID parent);
-        // void RemoveParent(EntityID eid);
+        Entity GetParent() const;
+        bool HasParent() const;
+        bool IsParent(EntityID parent) const;
+        void SetParent(EntityID parent) const;
+        void RemoveParent() const;
 
-        // bool HasChild(EntityID eid, EntityID child) const;
-        // const std::vector<Entity> GetChildren(EntityID eid) const;
-        // std::vector<Entity> GetChildren(EntityID eid);
+        bool HasChild(EntityID child) const;
+        std::vector<Entity> GetChildren() const;
 
         operator EntityID() const;
     

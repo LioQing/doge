@@ -24,7 +24,7 @@ namespace TestScene
 
             if (last != -1)
             {
-                e.SetParent(my_shape.id, last);
+                my_shape.SetParent(last);
             }
             last = my_shape.id;
 
@@ -67,7 +67,7 @@ int main()
     e.SetFrameRate(60);
     e.AddScene("Test", TestScene::Start, TestScene::Update);
 
-    e.StartScene("Test", doge::VideoSettings(1280, 720, doge::VideoSettings::Mode::Windowed));
+    e.StartScene("Test", doge::VideoSettings(1280, 720, 60, doge::VideoSettings::Mode::Windowed));
 
     return 0;
 }

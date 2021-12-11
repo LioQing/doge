@@ -18,14 +18,14 @@ namespace doge
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
-        sfml_impl.SetFrameRate(fps);
-        sfml_impl.StartDeltaClock();
+        io_bus.SetFrameRate(video_settings.fps);
+        io_bus.StartDeltaClock();
         while (active_scene_id == current_scene_id && is_running && is_open)
         {
-            dt = sfml_impl.GetDeltaTime();
+            dt = io_bus.GetDeltaTime();
             acc_fixed_dt += dt;
 
-            sfml_impl.PollEvent([&](const sf::Event& event)
+            io_bus.PollEvent([&](const sf::Event& event)
             {
                 if (event.type == sf::Event::Closed)
                 {
@@ -47,8 +47,8 @@ namespace doge
 
             DestroyEntities();
 
-            sfml_impl.Render(*this);
-            sfml_impl.Display();
+            io_bus.Render(*this);
+            io_bus.Display();
         }
 
         active_scene.finish(*this);
@@ -81,7 +81,7 @@ namespace doge
     {
         SetCurrentScene(id);
 
-        sfml_impl.CreateWindow(video_settings, title);
+        io_bus.CreateWindow(video_settings, title);
 
         is_open = true;
         while (is_open)
@@ -96,7 +96,7 @@ namespace doge
 
     void Engine::StopScene()
     {
-        sfml_impl.CloseWindow();
+        io_bus.CloseWindow();
         is_open = false;
         is_running = false;
     }
@@ -108,7 +108,7 @@ namespace doge
 
     void Engine::SetFrameRate(uint32_t frame_rate)
     {
-        fps = frame_rate;
+        video_settings.fps = frame_rate;
     }
 
     void Engine::SetFixedTimeStep(float millisec)
@@ -139,7 +139,7 @@ namespace doge
     void Engine::SetVideoSettings(const VideoSettings& video_settings)
     {
         this->video_settings = video_settings;
-        sfml_impl.CreateWindow(video_settings, title);
+        io_bus.CreateWindow(video_settings, title);
     }
 
     const VideoSettings& Engine::GetVideoSettings() const
@@ -222,31 +222,5 @@ namespace doge
         for (auto& child_node : children_nodes)
             children.push_back(GetEntity(child_node->id));
         return children;
-    }
-
-    Entity Engine::EntityContainer::Iterator::operator*() const
-    {
-        EntityID eid = lic::GetEntity(VecIterator::operator*()).id;
-        return Entity(eid, PCNode::root.GetDescendent(eid).get());
-    }
-
-    Engine::EntityContainer::Iterator Engine::EntityContainer::begin() const
-    {
-        return Iterator(std::vector<EntityID>::cbegin());
-    }
-
-    Engine::EntityContainer::Iterator Engine::EntityContainer::end() const
-    {
-        return Iterator(std::vector<EntityID>::cend());
-    }
-
-    Engine::EntityContainer::Iterator Engine::EntityContainer::cbegin() const
-    {
-        return Iterator(std::vector<EntityID>::cbegin());
-    }
-
-    Engine::EntityContainer::Iterator Engine::EntityContainer::cend() const
-    {
-        return Iterator(std::vector<EntityID>::cend());
     }
 }

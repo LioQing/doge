@@ -17,7 +17,7 @@ find_package(SFML 2.5 COMPONENTS system graphics window REQUIRED)
 set(SRC_FILES
     lic.cpp
     Engine.cpp
-    SFMLImpl.cpp
+    IOBus.cpp
     cast.cpp
     Color.cpp
     VideoSettings.cpp
@@ -28,6 +28,7 @@ set(SRC_FILES
     Entity.cpp
     default_functions.cpp
     PCNode.cpp
+    Range.cpp
 )
 
 message(STATUS "${SFML_LIBRARIES}")

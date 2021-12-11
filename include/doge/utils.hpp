@@ -7,3 +7,4 @@
 #include "utils/global.hpp"
 #include "utils/Rect.hpp"
 #include "utils/aliases.hpp"
+#include "utils/default_functions.hpp"

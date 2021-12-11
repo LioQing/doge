@@ -1,4 +1,4 @@
-#include <doge/core/default_functions.hpp>
+#include <doge/utils/default_functions.hpp>
 
 #include <vector>
 #include <doge/core/Engine.hpp>

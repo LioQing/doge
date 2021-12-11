@@ -9,7 +9,7 @@ namespace doge
 {
     struct Engine;
 
-    struct SFMLImpl
+    struct IOBus
     {
         sf::RenderWindow window;
         sf::Clock clock;

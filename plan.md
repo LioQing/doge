@@ -8,7 +8,7 @@ Description: Data oriented game design is encouraged, but is not fully required.
 
 # Architecture
 
-![image-20211211105432852](C:\Users\Lio\AppData\Roaming\Typora\typora-user-images\image-20211211105432852.png)
+![image-20211211205543684](C:\Users\Lio\AppData\Roaming\Typora\typora-user-images\image-20211211205543684.png)
 
 # Data Types
 
@@ -38,6 +38,8 @@ Contains:
 
 Contains:
 
+- Entity ID
+
 - Methods, i.e. Start, Update, FixedUpdate, Finish.
 
 # Class
@@ -59,3 +61,10 @@ Contains:
 - Raw pointer to parent
 - Unordered set of shared pointer to children
 - Methods to manipulate parent-child nodes
+
+## IOBus
+
+Contains:
+
+- Input and output functions
+- For now, SFML is used
