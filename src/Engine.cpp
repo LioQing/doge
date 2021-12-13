@@ -63,11 +63,9 @@ namespace doge
             if (!lic::HasEntity(id))
                 continue;
 
-            std::cout << "releasing " << id << std::endl;
             auto node = GetPCNode(id);
             for (auto& descendent : node->GetDescendents())
             {
-                std::cout << "releasing descendent " << descendent->id << std::endl;
                 lic::DestroyEntity(descendent->id);
             }
             lic::DestroyEntity(id);
