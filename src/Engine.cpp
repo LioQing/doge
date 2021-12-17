@@ -8,6 +8,36 @@
 
 namespace doge
 {
+    // IO
+
+    void Engine::SetVideoSettings(const VideoSettings& video_settings)
+    {
+        this->video_settings = video_settings;
+        io_bus.CreateWindow(video_settings, title);
+    }
+
+    const VideoSettings& Engine::GetVideoSettings() const
+    {
+        return this->video_settings;
+    }
+
+    void Engine::SetFrameRate(uint32_t frame_rate)
+    {
+        video_settings.fps = frame_rate;
+    }
+
+    void Engine::SetFixedTimeStep(float millisec)
+    {
+        fixed_time_step = millisec;
+    }
+
+    void Engine::SetTitle(const std::string& title)
+    {
+        this->title = title;
+    }
+
+    // Game Loop
+
     void Engine::Main()
     {
         active_scene_id = current_scene_id;
@@ -15,6 +45,10 @@ namespace doge
 
         is_running = true;
         active_scene.start(*this);
+        for (auto [id, extension] : extensions)
+        {
+            extension.start(*this);
+        }
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
@@ -41,9 +75,17 @@ namespace doge
             for (; acc_fixed_dt > fixed_time_step; acc_fixed_dt -= fixed_time_step)
             {
                 active_scene.fixed_update(*this, fixed_time_step);
+                for (auto [id, extension] : extensions)
+                {
+                    extension.fixed_update(*this, fixed_time_step);
+                }
             }
 
             active_scene.update(*this, dt);
+            for (auto [id, extension] : extensions)
+            {
+                extension.update(*this, dt);
+            }
 
             DestroyEntities();
 
@@ -51,28 +93,14 @@ namespace doge
             io_bus.Display();
         }
 
+        
+        for (auto [id, extension] : extensions)
+        {
+            extension.finish(*this);
+        }
         active_scene.finish(*this);
         is_running = false;
         DestroyEntities();
-    }
-
-    void Engine::DestroyEntities()
-    {
-        for (auto id : to_be_destroyed)
-        {
-            if (!lic::HasEntity(id))
-                continue;
-
-            auto node = GetPCNode(id);
-            for (auto& descendent : node->GetDescendents())
-            {
-                lic::DestroyEntity(descendent->id);
-            }
-            lic::DestroyEntity(id);
-            node->parent->RemoveChild(id);
-        }
-
-        to_be_destroyed.clear();
     }
 
     void Engine::StartScene(const std::string& id)
@@ -104,16 +132,6 @@ namespace doge
         is_running = false;
     }
 
-    void Engine::SetFrameRate(uint32_t frame_rate)
-    {
-        video_settings.fps = frame_rate;
-    }
-
-    void Engine::SetFixedTimeStep(float millisec)
-    {
-        fixed_time_step = millisec;
-    }
-
     void Engine::SetCurrentScene(const std::string& id)
     {
         if (scenes.find(id) == scenes.end())
@@ -122,6 +140,11 @@ namespace doge
         }
 
         current_scene_id = id;
+    }
+
+    bool Engine::HasScene(const std::string& id) const
+    {
+        return scenes.find(id) != scenes.end();
     }
 
     const std::string& Engine::GetCurrentScene() const 
@@ -134,20 +157,35 @@ namespace doge
         return active_scene_id;
     }
 
-    void Engine::SetVideoSettings(const VideoSettings& video_settings)
+    void Engine::EraseExtension(const std::string& id)
     {
-        this->video_settings = video_settings;
-        io_bus.CreateWindow(video_settings, title);
+        extensions.erase(id);
     }
 
-    const VideoSettings& Engine::GetVideoSettings() const
+    bool Engine::HasExtension(const std::string& id) const
     {
-        return this->video_settings;
+        return extensions.find(id) != extensions.end();
     }
 
-    void Engine::SetTitle(const std::string& title)
+    // Entities
+
+    void Engine::DestroyEntities()
     {
-        this->title = title;
+        for (auto id : to_be_destroyed)
+        {
+            if (!lic::HasEntity(id))
+                continue;
+
+            auto node = GetPCNode(id);
+            for (auto& descendent : node->GetDescendents())
+            {
+                lic::DestroyEntity(descendent->id);
+            }
+            lic::DestroyEntity(id);
+            node->parent->RemoveChild(id);
+        }
+
+        to_be_destroyed.clear();
     }
 
     Entity Engine::AddEntity(bool all_scenes)

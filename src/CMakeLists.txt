@@ -14,7 +14,7 @@ set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
 set(SFML_STATIC_LIBRARIES TRUE)
 find_package(SFML 2.5 COMPONENTS system graphics window REQUIRED)
 
-set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Release)
+set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Debug)
 
 set(SRC_FILES
     lic.cpp
@@ -31,6 +31,7 @@ set(SRC_FILES
     default_functions.cpp
     PCNode.cpp
     Range.cpp
+    physics.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

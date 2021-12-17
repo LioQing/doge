@@ -12,9 +12,5 @@ namespace doge
         
         // size of camera in window (in ratio to the window)
         Rectf port = Rectf(0, 0, 1, 1);
-
-        Vec2f position = Vec2f::Zero();
-        float rotation = 0.f; // in radian
-        Vec2f scale = Vec2f::One();
     };
 }

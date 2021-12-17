@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
 #include "Vec2.hpp"
 #include "Rect.hpp"
 #include "Color.hpp"
@@ -37,6 +38,9 @@ namespace doge
 
         static Color FromSfColor(const sf::Color& color);
         static sf::Color ToSfColor(const Color& color);
+
+        static Vec2f FromB2Vec2(const b2Vec2& v);
+        static b2Vec2 ToB2Vec2(const Vec2f& v);
 
         static float ToDegree(float radian);
         static float ToRadian(float degree);

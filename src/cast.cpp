@@ -11,6 +11,16 @@ namespace doge
     {
         return sf::Color(color.r, color.g, color.b, color.a);
     }
+    
+    Vec2f cast::FromB2Vec2(const b2Vec2& v)
+    {
+        return Vec2f(v.x, v.y);
+    }
+
+    b2Vec2 cast::ToB2Vec2(const Vec2f& v)
+    {
+        return b2Vec2(v.x, v.y);
+    }
 
     float cast::ToDegree(float radian)
     {

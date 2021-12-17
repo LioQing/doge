@@ -1,13 +1,14 @@
 #include <iostream>
 
 #include <doge/doge.hpp>
+#include <doge/extensions/physics.hpp>
 #include <box2d/box2d.h>
 #include <ctime>
 
 namespace TestScene
 {
     int count = 0;
-    b2World world(b2Vec2(0.f, 10.f));
+    b2World world(b2Vec2(0.f, 50.f));
     std::vector<b2Body*> bodies;
     b2Body* groundBody;
 
@@ -20,16 +21,18 @@ namespace TestScene
         // e.AddCamera(doge::Camera{ .port = doge::Rectf(0.5, 0.5, 0.5, 0.5) , .scale = doge::Vec2f(2, 2) });
 
         auto cam = e.AddCamera();
+        cam.AddComponent<doge::Position>();
+        cam.AddComponent<doge::Rotation>();
 
         b2BodyDef groundBodyDef;
-        groundBodyDef.position.Set(0.f, e.GetVideoSettings().resolution.y / 2.f - 5.f);
+        groundBodyDef.position.Set(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
         groundBody = world.CreateBody(&groundBodyDef);
         b2PolygonShape groundBox;
         groundBox.SetAsBox(e.GetVideoSettings().resolution.x / 2.f, 5.0f);
         groundBody->CreateFixture(&groundBox, 0.0f);
 
         auto ground = e.AddEntity();
-        ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 5.f);
+        ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
 
         ground.AddComponent<doge::RectangleShape>(doge::RectangleShape
         {
@@ -79,7 +82,7 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        if (++count > 1500)
+        if (++count > 500)
         {
             e.RestartScene();
         }
@@ -89,11 +92,24 @@ namespace TestScene
     {
         world.Step(dt / 1000.f, 1, 1);
         int i = 0;
+        bool isFirst = true;
         for (auto [pos, rot, rect] : e.Select<doge::Position, doge::Rotation, doge::RectangleShape>().Components())
         {
-            pos.position.x = bodies.at(i)->GetPosition().x;
-            pos.position.y = bodies.at(i)->GetPosition().y;
+            pos.position = doge::cast::FromB2Vec2(bodies.at(i)->GetPosition());
             rot.rotation = bodies.at(i)->GetAngle();
+
+            if (isFirst)
+            {
+                auto camContainer = e.Select<doge::Camera, doge::Position, doge::Rotation>().Components();
+                if (camContainer.size() >= 1)
+                {
+                    auto [camera, pos1, rot1] = *camContainer.begin();
+                    pos1.position = pos.position;
+                    rot1.rotation = rot.rotation;
+                    isFirst = false;
+                }
+            }
+
             i++;
         }
     }
@@ -119,7 +135,11 @@ int main()
     e.SetFixedTimeStep(2);
     e.AddScene("Test", TestScene::Start, TestScene::Update, TestScene::FixedUpdate, TestScene::Finish);
 
+    doge::physics::Enable(e);
+
     e.StartScene("Test", doge::VideoSettings(1280, 720, 60, doge::VideoSettings::Mode::Windowed));
+
+    doge::physics::Disable(e);
 
     return 0;
 }

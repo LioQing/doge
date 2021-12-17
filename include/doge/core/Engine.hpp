@@ -11,7 +11,7 @@
 #include "../utils.hpp"
 #include "../components/SceneInfo.hpp"
 #include "IOBus.hpp"
-#include "Scene.hpp"
+#include "GameLoopFunctions.hpp"
 #include "VideoSettings.hpp"
 #include "Entity.hpp"
 #include "PCNode.hpp"
@@ -30,14 +30,15 @@ namespace doge
 
         // Game Loop
         DeltaTime fixed_time_step = 10.f;
-        std::unordered_map<std::string, Scene> scenes;
+        std::unordered_map<std::string, GameLoopFunctions> extensions;
+        std::unordered_map<std::string, GameLoopFunctions> scenes;
+        std::string current_scene_id;
+        std::string active_scene_id;
         bool is_open = false;
         bool is_running = false;
 
         // Entities
         std::vector<EntityID> to_be_destroyed;
-        std::string current_scene_id;
-        std::string active_scene_id;
 
         // Helper functions
         void Main();
@@ -67,21 +68,46 @@ namespace doge
 
         void RestartScene();
 
-        template <typename TCallFunctor, typename TUpdateFunctor>
-        requires std::invocable<TCallFunctor, Engine&> && std::invocable<TUpdateFunctor, Engine&, DeltaTime>
+        template <typename TStartFunctor, typename TUpdateFunctor, typename TFixedUpdateFunctor, typename TFinishFunctor>
+        requires 
+            std::invocable<TStartFunctor, Engine&> && 
+            std::invocable<TUpdateFunctor, Engine&, DeltaTime> &&
+            std::invocable<TFixedUpdateFunctor, Engine&, DeltaTime> &&
+            std::invocable<TFinishFunctor, Engine&>
         void AddScene(const std::string& id, 
-            TCallFunctor start, 
+            TStartFunctor start, 
             TUpdateFunctor update, 
-            TUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
-            TCallFunctor finish = default_functions::Finish)
+            TFixedUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
+            TFinishFunctor finish = default_functions::Finish)
         {
-            scenes.emplace(id, Scene(start, update, fixed_update, finish));
+            scenes.emplace(id, GameLoopFunctions(start, update, fixed_update, finish));
         }
 
         void SetCurrentScene(const std::string& id);
 
+        bool HasScene(const std::string& id) const;
+
         const std::string& GetCurrentScene() const;
         const std::string& GetActiveScene() const;
+
+        template <typename TStartFunctor, typename TUpdateFunctor, typename TFixedUpdateFunctor, typename TFinishFunctor>
+        requires 
+            std::invocable<TStartFunctor, Engine&> && 
+            std::invocable<TUpdateFunctor, Engine&, DeltaTime> &&
+            std::invocable<TFixedUpdateFunctor, Engine&, DeltaTime> &&
+            std::invocable<TFinishFunctor, Engine&>
+        void AddExtension(const std::string& id, 
+            TStartFunctor start, 
+            TUpdateFunctor update, 
+            TFixedUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
+            TFinishFunctor finish = [](Engine&){})
+        {
+            extensions.emplace(id, GameLoopFunctions(start, update, fixed_update, finish));
+        }
+
+        void EraseExtension(const std::string& id);
+
+        bool HasExtension(const std::string& id) const;
 
         // Entities
 

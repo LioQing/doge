@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    struct Scene
+    struct GameLoopFunctions
     {
         std::function<void(Engine&)> start;
         std::function<void(Engine&, DeltaTime)> update;
