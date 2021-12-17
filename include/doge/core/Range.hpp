@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Entity.hpp"
+#include "Component.hpp"
 #include "../utils.hpp"
 
 namespace doge
@@ -43,16 +44,18 @@ namespace doge
                 if constexpr (IncludeEntities == true)
                 {
                     if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
-                        return std::tuple<Entity, const lic::Component<TComps>&...>(Entity(eid, PCNode::root.GetDescendent(eid).get()), lic::GetComponent<TComps>(eid)...);
+                        return std::tuple<Entity, const Component<TComps>&...>
+                        (Entity(eid, PCNode::root.GetDescendent(eid).get()), static_cast<const Component<TComps>&>(lic::GetComponent<TComps>(eid))...);
                     else
-                        return std::tuple<Entity, lic::Component<TComps>&...>(Entity(eid, PCNode::root.GetDescendent(eid).get()), lic::GetComponent<TComps>(eid)...);
+                        return std::tuple<Entity, Component<TComps>&...>
+                        (Entity(eid, PCNode::root.GetDescendent(eid).get()), static_cast<Component<TComps>&>(lic::GetComponent<TComps>(eid))...);
                 }
                 else
                 {
                     if constexpr (std::is_same<TBackingIter, std::vector<EntityID>::const_iterator>::value)
-                        return std::tie<const lic::Component<TComps>...>(lic::GetComponent<TComps>(eid)...);
+                        return std::tie<const Component<TComps>...>(static_cast<Component<TComps>&>(lic::GetComponent<TComps>(eid))...);
                     else
-                        return std::tie<lic::Component<TComps>...>(lic::GetComponent<TComps>(eid)...);
+                        return std::tie<Component<TComps>...>(static_cast<Component<TComps>&>(lic::GetComponent<TComps>(eid))...);
                 }
             }
         };

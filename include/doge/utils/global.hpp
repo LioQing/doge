@@ -8,14 +8,16 @@
 
 namespace doge
 {
+    struct Entity;
+
     struct global
     {
         global(const global&) = delete;
 
-        static Vec2f GetPosition(EntityID eid);
+        static Vec2f GetPosition(Entity& entity);
 
-        static Vec2f GetScale(EntityID eid);
+        static Vec2f GetScale(Entity& entity);
 
-        static float GetRotation(EntityID eid);
+        static float GetRotation(Entity& entity);
     };
 }

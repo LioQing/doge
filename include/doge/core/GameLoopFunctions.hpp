@@ -1,7 +1,7 @@
 #pragma once
 
 #include <functional>
-#include <doge/utils.hpp>
+#include "../utils.hpp"
 
 namespace doge
 {

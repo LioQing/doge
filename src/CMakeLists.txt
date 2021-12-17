@@ -32,6 +32,7 @@ set(SRC_FILES
     PCNode.cpp
     Range.cpp
     physics.cpp
+    math.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

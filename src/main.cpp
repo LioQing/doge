@@ -23,6 +23,7 @@ namespace TestScene
         auto cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
+        cam.AddComponent<doge::Scale>(0.5, 0.5);
 
         b2BodyDef groundBodyDef;
         groundBodyDef.position.Set(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
@@ -97,6 +98,8 @@ namespace TestScene
         {
             pos.position = doge::cast::FromB2Vec2(bodies.at(i)->GetPosition());
             rot.rotation = bodies.at(i)->GetAngle();
+
+            rot.GetEntity();
 
             if (isFirst)
             {

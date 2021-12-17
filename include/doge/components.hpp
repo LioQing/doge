@@ -9,3 +9,4 @@
 #include "components/Scale.hpp"
 #include "components/SceneInfo.hpp"
 #include "components/Camera.hpp"
+#include "components/RigidBody.hpp"

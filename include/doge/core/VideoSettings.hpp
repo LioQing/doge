@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/Vec2.hpp"
+#include <doge/utils/Vec2.hpp>
 
 namespace doge
 {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <box2d/box2d.h>
+
 namespace doge
 {
     struct RigidBody
@@ -10,5 +12,8 @@ namespace doge
             Kinematic,
             Dynamic,
         };
+
+        Type type = Type::Static;
+        b2Body* body_ptr = nullptr;
     };
 }

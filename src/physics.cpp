@@ -24,7 +24,11 @@ namespace doge
 
     void physics::Update(Engine& engine, DeltaTime dt)
     {
-        
+        for (auto [rgbd] : engine.Select<RigidBody>().Components())
+        {
+            // if (bodies.find(rgbd.entity_id) == bodies.end())
+            //     bodies.emplace(rgbd.entity_id, world->CreateBody());
+        }
     }
 
     void physics::FixedUpdate(Engine& engine, DeltaTime dt)

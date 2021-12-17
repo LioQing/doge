@@ -8,10 +8,30 @@ namespace doge
 {
     struct Engine;
     struct PCNode;
+    template <typename TComp>
+    struct Component;
 
     struct Entity : public lic::Entity
     {
         Entity(EntityID EntityID, PCNode* pcnode);
+
+        template <typename TComp, typename... TArgs>
+        Component<TComp>& AddComponent(TArgs&&... args) const
+        {
+            return static_cast<Component<TComp>&>(lic::Entity::AddComponent<TComp>(args...));
+        }
+
+        template <typename TComp>
+        Component<TComp>& AddComponent(const TComp& c) const
+        {
+            return static_cast<Component<TComp>&>(lic::Entity::AddComponent<TComp>(c));
+        }
+        
+        template <typename TComp>
+        Component<TComp>& GetComponent() const
+        {
+            return static_cast<Component<TComp>&>(lic::Entity::GetComponent<TComp>());
+        }
 
         Entity GetParent() const;
         bool HasParent() const;
