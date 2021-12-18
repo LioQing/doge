@@ -32,6 +32,16 @@ namespace doge
 
     void IOBus::Render(const Engine& e)
     {
+        auto ToSfShape = []<typename TSf, typename TComp>(const TComp& comp) -> TSf
+        {
+            auto sf_shape = TSf();
+            sf_shape.setOrigin(cast::ToSfVec2(comp.origin));
+            sf_shape.setScale(cast::ToSfVec2(global::GetScale(comp.GetEntity())));
+            sf_shape.setPosition(cast::ToSfVec2(global::GetPosition(comp.GetEntity())));
+            sf_shape.setFillColor(cast::ToSfColor(comp.color));
+            return sf_shape;
+        };
+
         std::vector<std::tuple<sf::View, std::vector<sf::CircleShape>, std::vector<sf::ConvexShape>, std::vector<sf::RectangleShape>>> views_shapes;
         for (auto [cam_entity, camera] : e.Select<Camera>().EntitiesAndComponents())
         {
@@ -49,11 +59,8 @@ namespace doge
 
             for (auto [entity, circle_comp] : e.Select<CircleShape>().EntitiesAndComponents())
             {
-                auto circle_shape = sf::CircleShape(circle_comp.radius);
-                circle_shape.setOrigin(cast::ToSfVec2(circle_comp.origin));
-                circle_shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
-                circle_shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
-                circle_shape.setFillColor(cast::ToSfColor(circle_comp.color));
+                auto circle_shape = ToSfShape.template operator()<sf::CircleShape>(circle_comp);
+                circle_shape.setRadius(circle_comp.radius);
                 circle_shape.setPointCount(circle_comp.point_count);
                 circle_shapes.emplace_back(circle_shape);
             }
@@ -63,16 +70,13 @@ namespace doge
 
             for (auto [entity, convex_comp] : e.Select<ConvexShape>().EntitiesAndComponents())
             {
-                auto convex_shape = sf::ConvexShape(convex_comp.points.size());
+                auto convex_shape = ToSfShape.template operator()<sf::ConvexShape>(convex_comp);
+                convex_shape.setPointCount(convex_comp.points.size());
                 for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
                 {
                     convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
                 }
-                convex_shape.setOrigin(cast::ToSfVec2(convex_comp.origin));
-                convex_shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
-                convex_shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
                 convex_shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
-                convex_shape.setFillColor(cast::ToSfColor(convex_comp.color));
                 convex_shapes.emplace_back(convex_shape);
             }
 
@@ -81,12 +85,9 @@ namespace doge
 
             for (auto [entity, rectangle_comp] : e.Select<RectangleShape>().EntitiesAndComponents())
             {
-                auto rectangle_shape = sf::RectangleShape(cast::ToSfVec2(rectangle_comp.size));
-                rectangle_shape.setOrigin(cast::ToSfVec2(rectangle_comp.origin));
-                rectangle_shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
-                rectangle_shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
+                auto rectangle_shape = ToSfShape.template operator()<sf::RectangleShape>(rectangle_comp);
+                rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
                 rectangle_shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
-                rectangle_shape.setFillColor(cast::ToSfColor(rectangle_comp.color));
                 rectangle_shapes.emplace_back(rectangle_shape);
             }
 
