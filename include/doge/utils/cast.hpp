@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
+#include "../components/RigidBody.hpp"
 #include "Vec2.hpp"
 #include "Rect.hpp"
 #include "Color.hpp"
@@ -41,6 +42,8 @@ namespace doge
 
         static Vec2f FromB2Vec2(const b2Vec2& v);
         static b2Vec2 ToB2Vec2(const Vec2f& v);
+
+        static b2BodyType ToB2BodyType(RigidBody::Type type);
 
         static float ToDegree(float radian);
         static float ToRadian(float degree);

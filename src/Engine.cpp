@@ -44,10 +44,12 @@ namespace doge
         auto active_scene = scenes.at(current_scene_id);
 
         is_running = true;
-        active_scene.start(*this);
+        if (active_scene.start)
+            active_scene.start(*this);
         for (auto [id, extension] : extensions)
         {
-            extension.start(*this);
+            if (extension.start)
+                extension.start(*this);
         }
 
         DeltaTime acc_fixed_dt = 0;
@@ -74,17 +76,29 @@ namespace doge
             
             for (; acc_fixed_dt > fixed_time_step; acc_fixed_dt -= fixed_time_step)
             {
-                active_scene.fixed_update(*this, fixed_time_step);
+                if (active_scene.fixed_update)
+                    active_scene.fixed_update(*this, fixed_time_step);
                 for (auto [id, extension] : extensions)
                 {
-                    extension.fixed_update(*this, fixed_time_step);
+                    if (extension.fixed_update)
+                        extension.fixed_update(*this, fixed_time_step);
                 }
             }
 
-            active_scene.update(*this, dt);
+            if (active_scene.early_update)
+                active_scene.early_update(*this, dt);
             for (auto [id, extension] : extensions)
             {
-                extension.update(*this, dt);
+                if (extension.early_update)
+                    extension.early_update(*this, dt);
+            }
+
+            if (active_scene.update)
+                active_scene.update(*this, dt);
+            for (auto [id, extension] : extensions)
+            {
+                if(extension.update)
+                    extension.update(*this, dt);
             }
 
             DestroyEntities();
@@ -96,9 +110,11 @@ namespace doge
         
         for (auto [id, extension] : extensions)
         {
-            extension.finish(*this);
+            if (extension.finish)
+                extension.finish(*this);
         }
-        active_scene.finish(*this);
+        if (active_scene.finish)
+            active_scene.finish(*this);
         is_running = false;
         DestroyEntities();
     }
@@ -132,6 +148,11 @@ namespace doge
         is_running = false;
     }
 
+    void Engine::AddScene(const std::string& id, const GameLoopFunctions& glf)
+    {
+        scenes.emplace(id, glf);
+    }
+
     void Engine::SetCurrentScene(const std::string& id)
     {
         if (scenes.find(id) == scenes.end())
@@ -155,6 +176,11 @@ namespace doge
     const std::string& Engine::GetActiveScene() const 
     {
         return active_scene_id;
+    }
+
+    void Engine::AddExtension(const std::string& id, const GameLoopFunctions& glf)
+    {
+        extensions.emplace(id, glf);
     }
 
     void Engine::EraseExtension(const std::string& id)

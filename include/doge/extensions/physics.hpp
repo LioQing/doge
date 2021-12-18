@@ -2,6 +2,7 @@
 
 #include <box2d/box2d.h>
 #include <doge/core/Entity.hpp>
+#include <doge/components/RigidBody.hpp>
 #include <memory>
 #include <unordered_map>
 
@@ -22,10 +23,9 @@ namespace doge
     private:
 
         static void Start(Engine& engine);
+        static void EarlyUpdate(Engine& engine, DeltaTime dt);
         static void Update(Engine& engine, DeltaTime dt);
         static void FixedUpdate(Engine& engine, DeltaTime dt);
         static void Finish(Engine& engine);
-
-        static void SyncRigidBodies(Engine& engine);
     };
 }

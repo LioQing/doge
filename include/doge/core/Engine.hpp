@@ -68,20 +68,7 @@ namespace doge
 
         void RestartScene();
 
-        template <typename TStartFunctor, typename TUpdateFunctor, typename TFixedUpdateFunctor, typename TFinishFunctor>
-        requires 
-            std::invocable<TStartFunctor, Engine&> && 
-            std::invocable<TUpdateFunctor, Engine&, DeltaTime> &&
-            std::invocable<TFixedUpdateFunctor, Engine&, DeltaTime> &&
-            std::invocable<TFinishFunctor, Engine&>
-        void AddScene(const std::string& id, 
-            TStartFunctor start, 
-            TUpdateFunctor update, 
-            TFixedUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
-            TFinishFunctor finish = default_functions::Finish)
-        {
-            scenes.emplace(id, GameLoopFunctions(start, update, fixed_update, finish));
-        }
+        void AddScene(const std::string& id, const GameLoopFunctions& glf);
 
         void SetCurrentScene(const std::string& id);
 
@@ -90,20 +77,7 @@ namespace doge
         const std::string& GetCurrentScene() const;
         const std::string& GetActiveScene() const;
 
-        template <typename TStartFunctor, typename TUpdateFunctor, typename TFixedUpdateFunctor, typename TFinishFunctor>
-        requires 
-            std::invocable<TStartFunctor, Engine&> && 
-            std::invocable<TUpdateFunctor, Engine&, DeltaTime> &&
-            std::invocable<TFixedUpdateFunctor, Engine&, DeltaTime> &&
-            std::invocable<TFinishFunctor, Engine&>
-        void AddExtension(const std::string& id, 
-            TStartFunctor start, 
-            TUpdateFunctor update, 
-            TFixedUpdateFunctor fixed_update = [](Engine&, DeltaTime){}, 
-            TFinishFunctor finish = [](Engine&){})
-        {
-            extensions.emplace(id, GameLoopFunctions(start, update, fixed_update, finish));
-        }
+        void AddExtension(const std::string& id, const GameLoopFunctions& glf);
 
         void EraseExtension(const std::string& id);
 

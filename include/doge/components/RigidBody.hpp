@@ -6,7 +6,7 @@ namespace doge
 {
     struct RigidBody
     {
-        enum class Type
+        enum Type
         {
             Static,
             Kinematic,
@@ -14,6 +14,8 @@ namespace doge
         };
 
         Type type = Type::Static;
-        b2Body* body_ptr = nullptr;
+        float density = 0.f;
+        float restitution = 0.f;
+        float friction = 0.2f;
     };
 }

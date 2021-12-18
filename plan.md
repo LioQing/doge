@@ -34,13 +34,15 @@ Contains:
 - Entity ID
 - Method for getting the entity
 
-## Scene
+## GameLoopFunctions
 
 Contains:
 
-- Entity ID
-
-- Methods, i.e. Start, Update, FixedUpdate, Finish.
+- Start
+- Update
+- FixedUpdate
+- EarlyUpdate
+- Finish
 
 # Class
 
@@ -51,7 +53,7 @@ Provide programmer main control of program, such as defining scenes, retrieving 
 Contains:
 
 - Scenes
-- Methods for SFMLImpl, LIC, PCNode.
+- Methods for IOBus, LIC, PCNode.
 
 ## PCNode
 
@@ -67,4 +69,14 @@ Contains:
 Contains:
 
 - Input and output functions
-- For now, SFML is used
+- [SFML]([SFML (sfml-dev.org)](https://www.sfml-dev.org/)) is used
+
+# Extensions
+
+## Physics
+
+Contains:
+
+- Static, kinematic, dynamic rigid body simulation
+- [Box2D](https://box2d.org/) is used
+- **SHOULD NOT** be used with the parent-child system

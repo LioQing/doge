@@ -33,15 +33,15 @@ namespace doge
     void IOBus::Render(const Engine& e)
     {
         std::vector<std::tuple<sf::View, std::vector<sf::CircleShape>, std::vector<sf::ConvexShape>, std::vector<sf::RectangleShape>>> views_shapes;
-        for (auto [entity, camera] : e.Select<Camera>().EntitiesAndComponents())
+        for (auto [cam_entity, camera] : e.Select<Camera>().EntitiesAndComponents())
         {
             // view
-            sf::View view(cast::ToSfVec2(global::GetPosition(entity)), cast::ToSfVec2(camera.size * global::GetScale(entity)));
+            sf::View view(cast::ToSfVec2(global::GetPosition(cam_entity)), cast::ToSfVec2(camera.size * global::GetScale(cam_entity)));
             if (camera.size == Vec2f::Zero())
             {
-                view.setSize(cast::ToSfVec2(e.GetVideoSettings().resolution * Vec2f(camera.port.width, camera.port.height) * global::GetScale(entity)));
+                view.setSize(cast::ToSfVec2(e.GetVideoSettings().resolution * Vec2f(camera.port.width, camera.port.height) * global::GetScale(cam_entity)));
             }
-            view.setRotation(cast::ToDegree(global::GetRotation(entity)));
+            view.setRotation(cast::ToDegree(global::GetRotation(cam_entity)));
             view.setViewport(cast::ToSfRect(camera.port));
 
             // circles
