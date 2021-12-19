@@ -26,7 +26,7 @@ namespace doge
 
     void physics::Start(Engine& engine)
     {
-        world = std::make_unique<b2World>(b2Vec2(0.f, 50.f));
+        world = std::make_unique<b2World>(b2Vec2(0.f, 40.f));
     }
 
     void physics::EarlyUpdate(Engine& engine, DeltaTime dt)
@@ -52,31 +52,70 @@ namespace doge
 
     void physics::Update(Engine& engine, DeltaTime dt)
     {
+        auto ToBody = [](const Entity& entity, const RigidBody& rgbd, const b2Shape* shape) -> b2Body*
+        {
+            b2BodyDef body_def;
+            body_def.type = cast::ToB2BodyType(rgbd.type);
+            auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
+            body_def.position.Set(pos.x, pos.y);
+            body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
+            auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
+            body_def.linearVelocity.Set(vel.x, vel.y);
+
+            b2FixtureDef fixture_def;
+            fixture_def.shape = shape;
+            fixture_def.density = rgbd.density;
+            fixture_def.restitution = rgbd.restitution;
+            fixture_def.friction = rgbd.friction;
+
+            b2Body* body = world->CreateBody(&body_def);
+            body->CreateFixture(&fixture_def);
+            return body;
+        };
+
+        // rectangle collider
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, RectangleCollider>().EntitiesAndComponents())
         {
             if (bodies.find(entity.id) == bodies.end())
             {
-                b2BodyDef body_def;
-                body_def.type = cast::ToB2BodyType(rgbd.type);
-                auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
-                body_def.position.Set(pos.x, pos.y);
-                body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
-
                 b2PolygonShape rect;
                 rect.SetAsBox(
                     coll.size.x / 2.f, coll.size.y / 2.f, 
-                    cast::ToB2Vec2(coll.origin * Vec2f(1, -1) + Vec2f(-coll.size.x / 2.f, coll.size.y / 2.f)), 
+                    cast::ToB2Vec2(coll.origin), 
                     0
                 );
 
-                b2FixtureDef fixture_def;
-                fixture_def.shape = &rect;
-                fixture_def.density = rgbd.density;
-                fixture_def.restitution = rgbd.restitution;
-                fixture_def.friction = rgbd.friction;
+                auto* body = ToBody(entity, rgbd, &rect);
+                bodies.emplace(entity.id, body);
+            }
+        }
 
-                b2Body* body = world->CreateBody(&body_def);
-                body->CreateFixture(&fixture_def);
+        // convex collider
+        for (auto [entity, rgbd, coll] : engine.Select<RigidBody, ConvexCollider>().EntitiesAndComponents())
+        {
+            if (bodies.find(entity.id) == bodies.end())
+            {
+                b2PolygonShape convex;
+                std::vector<b2Vec2> vertices;
+                std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+                [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
+                convex.Set(vertices.data(), vertices.size());
+
+                auto* body = ToBody(entity, rgbd, &convex);
+                bodies.emplace(entity.id, body);
+            }
+        }
+
+        // circle collider
+        for (auto [entity, rgbd, coll] : engine.Select<RigidBody, CircleCollider>().EntitiesAndComponents())
+        {
+            if (bodies.find(entity.id) == bodies.end())
+            {
+                b2CircleShape circle;
+                circle.m_radius = coll.radius;
+                circle.m_p = cast::ToB2Vec2(coll.origin);
+
+                auto* body = ToBody(entity, rgbd, &circle);
                 bodies.emplace(entity.id, body);
             }
         }

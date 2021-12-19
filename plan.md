@@ -80,3 +80,31 @@ Contains:
 - Static, kinematic, dynamic rigid body simulation
 - [Box2D](https://box2d.org/) is used
 - **SHOULD NOT** be used with the parent-child system
+
+# Built-In Components
+
+## Shapes
+
+Includes:
+
+- RectangleShape
+- CircleShape
+- ConvexShape
+
+Usage:
+
+- Rendered and drawn by engine on screen
+- Top-left is origin (0, 0), except ConvexShape
+
+## Colliders
+
+Includes:
+
+- RectangleCollider
+- CircleCollider
+- ConvexCollider
+
+Usage:
+
+- Use with RigidBody to simulate collisions
+- Centroid is origin (0, 0), except ConvexCollider

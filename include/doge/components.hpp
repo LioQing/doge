@@ -11,3 +11,5 @@
 #include "components/Camera.hpp"
 #include "components/RigidBody.hpp"
 #include "components/RectangleCollider.hpp"
+#include "components/CircleCollider.hpp"
+#include "components/ConvexCollider.hpp"

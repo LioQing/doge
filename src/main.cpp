@@ -19,14 +19,12 @@ namespace TestScene
         auto cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
-        cam.AddComponent<doge::Scale>(0.5, 0.5);
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
         ground.AddComponent<doge::RectangleCollider>(doge::RectangleCollider
         {
             .size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
-            .origin = doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f, 5.f),
         });
         ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
 
@@ -49,24 +47,32 @@ namespace TestScene
             }
             else
             {
-                cam.SetParent(my_shape);
+                //cam.SetParent(my_shape);
             }
             last = my_shape.id;
 
-            my_shape.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Dynamic, 1.f);
-            my_shape.AddComponent<doge::RectangleCollider>(doge::RectangleCollider
+            my_shape.AddComponent<doge::RigidBody>(doge::RigidBody
             {
-                .size = doge::Vec2f(10, 10),
-                .origin = doge::Vec2f(5, 5),
+                .type = doge::RigidBody::Type::Dynamic, 
+                .density = 1.f,
+                .restitution = .5f,
+            });
+            my_shape.AddComponent<doge::ConvexCollider>(doge::ConvexCollider
+            {
+                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(5, 10), doge::Vec2f(0, 10) },
+                .points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(10, 10), doge::Vec2f(0, 10) },
+                //.points = { doge::Vec2f(0, 10), doge::Vec2f(5, 10), doge::Vec2f(7, -10), doge::Vec2f(-7, -10) },
             });
 
-            my_shape.AddComponent<doge::Position>(i * 15, 0);
-            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), 3.1415 * 2));
+            my_shape.AddComponent<doge::Position>(i * 30, 0);
+            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
+            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
 
-            my_shape.AddComponent<doge::RectangleShape>(doge::RectangleShape
+            my_shape.AddComponent<doge::ConvexShape>(doge::ConvexShape
             {
-                .size = doge::Vec2f(10, 10),
-                .origin = doge::Vec2f(5, 5),
+                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(5, 10), doge::Vec2f(0, 10) },
+                .points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(10, 10), doge::Vec2f(0, 10) },
+                //.points = { doge::Vec2f(0, 10), doge::Vec2f(5, 10), doge::Vec2f(7, -10), doge::Vec2f(-7, -10) },
                 .color = doge::Color(0x00FF0088),
             });
         }
@@ -74,7 +80,7 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        if (++count > 500)
+        if (++count > 1000)
         {
             e.RestartScene();
         }
