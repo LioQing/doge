@@ -13,3 +13,4 @@
 #include "components/RectangleCollider.hpp"
 #include "components/CircleCollider.hpp"
 #include "components/ConvexCollider.hpp"
+#include "components/EdgeCollider.hpp"

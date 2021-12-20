@@ -79,7 +79,7 @@ namespace doge
         Range<TComps...> InAnyOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](SceneInfo scene_info, TComps... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 { 
                     for (auto& scene_id : { scene_ids... })
                         if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) != scene_info.scene_ids.end())
@@ -92,7 +92,7 @@ namespace doge
         Range<TComps...> InAllOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](SceneInfo scene_info, TComps... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 { 
                     for (auto& scene_id : { scene_ids... })
                         if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) == scene_info.scene_ids.end())
@@ -105,7 +105,7 @@ namespace doge
         Range<TComps...> InNoneOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](SceneInfo scene_info, TComps... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 {
                     for (auto& scene_id : { scene_ids... })
                         if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) != scene_info.scene_ids.end())
@@ -120,10 +120,11 @@ namespace doge
             return Range(lic::Range<SceneInfo, TComps...>::Select<TSelectComps...>());
         }
 
-        template <std::predicate<TComps...> TPred>
+        template <std::predicate<Entity, TComps...> TPred>
         Range<TComps...> Where(TPred predicate) const
         {
-            return Range(lic::Range<SceneInfo, TComps...>::Where([&](SceneInfo _, TComps... c){ return predicate(c...); }));
+            return Range(lic::Range<SceneInfo, TComps...>::Where([&](lic::Entity entity, SceneInfo _, TComps... c)
+            { return predicate(Entity(entity, PCNode::root.GetDescendent(entity).get()), c...); }));
         }
 
         EntityContainer Entities() const

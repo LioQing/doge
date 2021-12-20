@@ -483,17 +483,18 @@ namespace doge
             /**
              * @brief Apply a function to selected entities' components, to which only entities with components that fufill the condition in the function are further selected
              * 
-             * @param predicate a function that takes all selected components as parameter and returns a boolean value indicating whether the entity will be further selected
+             * @param predicate a function that takes all selected entity and components as parameter and returns a boolean value indicating whether the entity will be further selected
              * @return Range of entities with selected components
              */
-            template <std::predicate<TComps...> TPred>
+            template <std::predicate<Entity, TComps...> TPred>
             Range<TComps...> Where(TPred predicate) const
             {
                 auto temp_entities = entities;
                 std::erase_if(temp_entities,
                     [&](EntityID eid) -> bool
                     {
-                        return !predicate(GetEntity(eid).GetComponent<TComps>()...);
+                        auto entity = GetEntity(eid);
+                        return !predicate(entity, entity.GetComponent<TComps>()...);
                     });
                 return Range<TComps...>(temp_entities);
             }

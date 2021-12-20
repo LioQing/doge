@@ -52,7 +52,7 @@ namespace doge
 
     void physics::Update(Engine& engine, DeltaTime dt)
     {
-        auto ToBody = [](const Entity& entity, const RigidBody& rgbd, const b2Shape* shape) -> b2Body*
+        auto CreateBody = [](const Entity& entity, const RigidBody& rgbd, const b2Shape* shape) -> b2Body*
         {
             b2BodyDef body_def;
             body_def.type = cast::ToB2BodyType(rgbd.type);
@@ -85,7 +85,7 @@ namespace doge
                     0
                 );
 
-                auto* body = ToBody(entity, rgbd, &rect);
+                b2Body* body = CreateBody(entity, rgbd, &rect);
                 bodies.emplace(entity.id, body);
             }
         }
@@ -101,7 +101,7 @@ namespace doge
                 [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
                 convex.Set(vertices.data(), vertices.size());
 
-                auto* body = ToBody(entity, rgbd, &convex);
+                b2Body* body = CreateBody(entity, rgbd, &convex);
                 bodies.emplace(entity.id, body);
             }
         }
@@ -115,7 +115,44 @@ namespace doge
                 circle.m_radius = coll.radius;
                 circle.m_p = cast::ToB2Vec2(coll.origin);
 
-                auto* body = ToBody(entity, rgbd, &circle);
+                b2Body* body = CreateBody(entity, rgbd, &circle);
+                bodies.emplace(entity.id, body);
+            }
+        }
+
+        // edge collider
+        for (auto [entity, rgbd, coll] : engine.Select<RigidBody, EdgeCollider>().EntitiesAndComponents())
+        {
+            if (bodies.find(entity.id) == bodies.end())
+            {
+                b2ChainShape chain;
+                std::vector<b2Vec2> vertices;
+                std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+                [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
+                if (coll.is_loop)
+                    chain.CreateLoop(vertices.data(), vertices.size());
+                else
+                    chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+
+                b2Body* body = CreateBody(entity, rgbd, &chain);
+                bodies.emplace(entity.id, body);
+            }
+        }
+
+        // rigid body only
+        for (auto [entity, rgbd] : engine.Select<RigidBody>().EntitiesAndComponents())
+        {
+            if (bodies.find(entity.id) == bodies.end())
+            {
+                b2BodyDef body_def;
+                body_def.type = cast::ToB2BodyType(rgbd.type);
+                auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
+                body_def.position.Set(pos.x, pos.y);
+                body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
+                auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
+                body_def.linearVelocity.Set(vel.x, vel.y);
+
+                b2Body* body = world->CreateBody(&body_def);
                 bodies.emplace(entity.id, body);
             }
         }
