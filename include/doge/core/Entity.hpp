@@ -13,6 +13,7 @@ namespace doge
 
     struct Entity : public lic::Entity
     {
+        Entity() = default;
         Entity(EntityID EntityID, PCNode* pcnode);
 
         template <typename TComp, typename... TArgs>

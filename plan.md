@@ -83,6 +83,19 @@ Contains:
 
 # Built-In Components
 
+## Physical Quantities
+
+Includes:
+
+- Position
+- Rotation
+- Velocity
+- AngularVelocity
+
+Usage:
+
+- Can be used with the physics engine
+
 ## Shapes
 
 Includes:
@@ -103,8 +116,19 @@ Includes:
 - RectangleCollider
 - CircleCollider
 - ConvexCollider
+- EdgeCollider
 
 Usage:
 
 - Use with RigidBody to simulate collisions
-- Centroid is origin (0, 0), except ConvexCollider
+- Centroid is origin (0, 0), except ConvexCollider & EdgeCollider
+
+## Miscellaneous
+
+Includes:
+
+- SceneInfo - stores which scene(s) this entity belongs to
+
+- Scale - an extra way to increase or decrease size of object
+- RigidBody - make physics engine to calculate physics for this entity
+- Camera - make this entity a camera

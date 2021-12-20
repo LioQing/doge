@@ -26,6 +26,7 @@ namespace TestScene
                 .type = doge::RigidBody::Type::Dynamic, 
                 .density = 1.f,
                 .restitution = .5f,
+                .friction = .3f,
             });
 
             my_shape.AddComponent(doge::ConvexCollider
@@ -38,7 +39,7 @@ namespace TestScene
             my_shape.AddComponent<doge::Position>(i * 30, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
-            my_shape.AddComponent<doge::AngularVelocity>(std::fmod(rand() / 1000.f, doge::math::pi * 4) - doge::math::pi * 2);
+            my_shape.AddComponent<doge::AngularVelocity>(20);
 
             my_shape.AddComponent(doge::ConvexShape
             {
@@ -51,12 +52,13 @@ namespace TestScene
     }
 
     int count = 0;
+    doge::Entity cam;
 
     void Start(doge::Engine& e)
     {
         count = 0;
 
-        auto cam = e.AddCamera();
+        cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
 
@@ -64,21 +66,17 @@ namespace TestScene
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
         ground.AddComponent(doge::EdgeCollider
         {
-            // .points = shape: \/
+            // .points = // shape: \/
             // { 
-            //     doge::Vec2f(600, 0), 
-            //     doge::Vec2f(600, 1), 
-            //     doge::Vec2f(300, 100), 
-            //     doge::Vec2f(0, 1),
-            //     doge::Vec2f(0, 0),
+            //     doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, -100), 
+            //     doge::Vec2f(0, 0), 
+            //     doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, -100),
             // },
-            .points = // shape: |/\|
+            .points = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f, -100),
-                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f, 0),
-                doge::Vec2f(0, -50), 
-                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f, 0), 
-                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f, -100), 
+                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(0, -100), 
+                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
             },
             //.size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
         });
@@ -96,15 +94,19 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        if (++count > 300)
+        if (++count > 100)
         {
             AddBlocks(e);
-            // for (auto [vel] : e.Select<doge::Velocity>().Components())
-            //     vel.velocity += doge::Vec2f(0, -50);
             count = 0;
         }
 
-        std::cout << 1000/dt << std::endl;
+        for (auto [entity, rgbd, position] : e.Select<doge::RigidBody, doge::Position>().EntitiesAndComponents())
+        {
+            if (position.position.y > e.GetVideoSettings().resolution.y / 2.f)
+                e.DestroyEntity(entity);
+        }
+
+        //std::cout << 1000/dt << std::endl;
     }
 
     void FixedUpdate(doge::Engine& e, doge::DeltaTime dt)

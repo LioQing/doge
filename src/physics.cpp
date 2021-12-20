@@ -26,7 +26,7 @@ namespace doge
 
     void physics::Start(Engine& engine)
     {
-        world = std::make_unique<b2World>(b2Vec2(0.f, 40.f));
+        world = std::make_unique<b2World>(b2Vec2(0.f, 98.f));
     }
 
     void physics::EarlyUpdate(Engine& engine, DeltaTime dt)
@@ -46,6 +46,9 @@ namespace doge
 
                 if (entity.HasComponent<Velocity>())
                     entity.GetComponent<Velocity>().velocity = cast::FromB2Vec2(body->GetLinearVelocity());
+
+                if (entity.HasComponent<AngularVelocity>())
+                    entity.GetComponent<AngularVelocity>().angular_velocity = body->GetAngularVelocity();
             }
         }
     }
@@ -108,6 +111,7 @@ namespace doge
 
                 b2Body* body = CreateBody(entity, rgbd, &convex);
                 bodies.emplace(entity.id, body);
+                rgbd.OnRemoval([&, entity](){ bodies.erase(entity.id); std::cout << "erased " << entity.id << " " << bodies.size() << std::endl; });
             }
         }
 
@@ -177,8 +181,13 @@ namespace doge
                 if (entity.HasComponent<Velocity>())
                     vel = cast::ToB2Vec2(entity.GetComponent<Velocity>().velocity);
 
+                auto angular_vel = body->GetAngularVelocity();
+                if (entity.HasComponent<AngularVelocity>())
+                    angular_vel = entity.GetComponent<AngularVelocity>().angular_velocity;
+
                 body->SetTransform(pos, angle);
                 body->SetLinearVelocity(vel);
+                body->SetAngularVelocity(angular_vel);
             }
         }
     }

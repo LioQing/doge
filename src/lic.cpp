@@ -4,6 +4,7 @@ namespace doge
 {
     std::array<std::any, lic::LIC_MAX_COMPONENT> lic::components;
     std::array<std::vector<std::size_t>, lic::LIC_MAX_COMPONENT> lic::destroyed_components;
+    std::array<std::vector<std::vector<std::function<void()>>>, lic::LIC_MAX_COMPONENT> lic::on_component_removals;
     std::vector<lic::EntityInfo> lic::entities;
     std::vector<lic::EntityID> lic::destroyed_entities;
     lic::ComponentID lic::next_component_id;
@@ -17,6 +18,11 @@ namespace doge
     bool lic::Entity::HasComponent(ComponentID cid) const
     {
         return lic::HasComponent(this->id, cid);
+    }
+
+    void lic::Entity::OnComponentRemoval(ComponentID cid, const std::function<void()>& callback) const
+    {
+        lic::OnComponentRemoval(id, cid, callback);
     }
 
     lic::Entity lic::AddEntity()
@@ -70,8 +76,11 @@ namespace doge
 
         auto cind = entities.at(eid).component_indices.at(cid);
         
-        if (destroyed_components.at(cid).empty())
-            destroyed_components.at(cid) = std::vector<size_t>();
+        for (auto callback : on_component_removals.at(cid).at(cind))
+        {
+            callback();
+        }
+        on_component_removals.at(cid).at(cind).clear();
 
         destroyed_components.at(cid).push_back(cind);
         entities.at(eid).component_field.set(cid, false);
@@ -80,6 +89,17 @@ namespace doge
     bool lic::HasComponent(EntityID eid, ComponentID cid)
     {
         return entities.at(eid).component_field.test(cid);
+    }
+
+    void lic::OnComponentRemoval(EntityID eid, ComponentID cid, const std::function<void()>& callback)
+    {
+        if (!HasComponent(eid, cid))
+        {
+            return;
+        }
+
+        auto cind = entities.at(eid).component_indices.at(cid);
+        on_component_removals.at(cid).at(cind).push_back(callback);
     }
 
     lic::Entity lic::EntityContainer::Iterator::operator*() const
