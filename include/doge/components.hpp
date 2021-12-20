@@ -14,3 +14,4 @@
 #include "components/CircleCollider.hpp"
 #include "components/ConvexCollider.hpp"
 #include "components/EdgeCollider.hpp"
+#include "components/AngularVelocity.hpp"

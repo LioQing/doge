@@ -56,11 +56,16 @@ namespace doge
         {
             b2BodyDef body_def;
             body_def.type = cast::ToB2BodyType(rgbd.type);
+
             auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
             body_def.position.Set(pos.x, pos.y);
+
             body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
+
             auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
             body_def.linearVelocity.Set(vel.x, vel.y);
+
+            body_def.angularVelocity = entity.GetIfHasComponentElseDefault<AngularVelocity>().angular_velocity;
 
             b2FixtureDef fixture_def;
             fixture_def.shape = shape;
@@ -113,7 +118,7 @@ namespace doge
             {
                 b2CircleShape circle;
                 circle.m_radius = coll.radius;
-                circle.m_p = cast::ToB2Vec2(coll.origin);
+                circle.m_p.Set(coll.origin.x, coll.origin.y);
 
                 b2Body* body = CreateBody(entity, rgbd, &circle);
                 bodies.emplace(entity.id, body);
@@ -142,7 +147,8 @@ namespace doge
         // rigid body only
         for (auto [entity, rgbd] : engine.Select<RigidBody>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(rgbd.entity_id);
+            if (body_itr == bodies.end())
             {
                 b2BodyDef body_def;
                 body_def.type = cast::ToB2BodyType(rgbd.type);
@@ -154,6 +160,25 @@ namespace doge
 
                 b2Body* body = world->CreateBody(&body_def);
                 bodies.emplace(entity.id, body);
+            }
+            else
+            {
+                b2Body* body = body_itr->second;
+
+                auto pos = body->GetPosition();
+                if (entity.HasComponent<Position>())
+                    pos = cast::ToB2Vec2(entity.GetComponent<Position>().position);
+
+                auto angle = body->GetAngle();
+                if (entity.HasComponent<Rotation>())
+                    angle = entity.GetComponent<Rotation>().rotation;
+
+                auto vel = body->GetLinearVelocity();
+                if (entity.HasComponent<Velocity>())
+                    vel = cast::ToB2Vec2(entity.GetComponent<Velocity>().velocity);
+
+                body->SetTransform(pos, angle);
+                body->SetLinearVelocity(vel);
             }
         }
     }
