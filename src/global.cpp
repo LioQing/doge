@@ -70,15 +70,10 @@ namespace doge
     Rectf global::GetAABB(const Component<RectangleShape>& rectangle)
     {
         Entity entity = rectangle.GetEntity();
-        auto tl = (Vec2f::Zero() - rectangle.origin).HadamardMultiplication(GetScale(entity));
-        auto br = (rectangle.size - rectangle.origin).HadamardMultiplication(GetScale(entity));
-        auto bl = Vec2f(tl.x, br.y);
-        auto tr = Vec2f(br.x, tl.y);
-
-        tl.Rotate(GetRotation(entity));
-        br.Rotate(GetRotation(entity));
-        bl.Rotate(GetRotation(entity));
-        tr.Rotate(GetRotation(entity));
+        auto tl = (Vec2f::Zero() - rectangle.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity));
+        auto br = (rectangle.size - rectangle.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity));
+        auto bl = Vec2f(tl.x, br.y).Rotate(GetRotation(entity));
+        auto tr = Vec2f(br.x, tl.y).Rotate(GetRotation(entity));
 
         Rectf aabb(
             std::min({ tl.x, br.x, bl.x, tr.x }), 
@@ -86,6 +81,30 @@ namespace doge
             std::max({ tl.x, br.x, bl.x, tr.x }), 
             std::max({ tl.y, br.y, bl.y, tr.y })
         );
+
+        aabb.width -= aabb.left;
+        aabb.height -= aabb.top;
+        aabb.left += GetPosition(entity).x;
+        aabb.top += GetPosition(entity).y;
+
+        return aabb;
+    }
+
+    Rectf global::GetAABB(const Component<ConvexShape>& convex)
+    {
+        Entity entity = convex.GetEntity();
+        std::vector<Vec2f> points;
+        std::transform(convex.points.begin(), convex.points.end(), std::back_inserter(points),
+        [&](const Vec2f& v){ return (v - convex.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity)); });
+
+        Rectf aabb(points.front().x, points.front().y, points.front().x, points.front().y);
+        for (auto& point : points)
+        {
+            if (point.x < aabb.left) aabb.left = point.x;
+            if (point.y < aabb.top) aabb.top = point.y;
+            if (point.x > aabb.width) aabb.width = point.x;
+            if (point.y > aabb.height) aabb.height = point.y;
+        }
 
         aabb.width -= aabb.left;
         aabb.height -= aabb.top;

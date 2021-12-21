@@ -30,5 +30,6 @@ namespace doge
         static void SetRotation(Component<Rotation>& rotation, float target);
 
         static Rectf GetAABB(const Component<RectangleShape>& rectangle);
+        static Rectf GetAABB(const Component<ConvexShape>& convex);
     };
 }

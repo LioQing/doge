@@ -30,12 +30,9 @@ namespace TestScene
                 .friction = .3f,
             });
 
-            my_shape.AddComponent(doge::RectangleCollider
+            my_shape.AddComponent(doge::ConvexCollider
             {
-                .size = doge::Vec2f(10, 20),
-                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(5, 10), doge::Vec2f(0, 10) },
-                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(10, 10), doge::Vec2f(0, 10) },
-                //.points = { doge::Vec2f(0, 10), doge::Vec2f(5, 10), doge::Vec2f(7, -10), doge::Vec2f(-7, -10) },
+                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
             });
 
             my_debugger.AddComponent<doge::Position>();
@@ -51,13 +48,9 @@ namespace TestScene
                 .color = doge::Color(0xFFFFFF44),
             });
 
-            auto& rect = my_shape.AddComponent(doge::RectangleShape
+            auto& rect = my_shape.AddComponent(doge::ConvexShape
             {
-                .size = doge::Vec2f(10, 20),
-                .origin = doge::Vec2f(5, 10),
-                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(5, 10), doge::Vec2f(0, 10) },
-                //.points = { doge::Vec2f(-7, -10), doge::Vec2f(7, -10), doge::Vec2f(10, 10), doge::Vec2f(0, 10) },
-                //.points = { doge::Vec2f(0, 10), doge::Vec2f(5, 10), doge::Vec2f(7, -10), doge::Vec2f(-7, -10) },
+                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
                 .color = doge::Color(0x00FF0088),
             });
 
@@ -156,7 +149,7 @@ namespace TestScene
 
         for (auto [tag, position, shape] : e.Select<doge::Tag, doge::Position, doge::RectangleShape>().Components())
         {
-            doge::Rectf aabb = doge::global::GetAABB(e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::RectangleShape>());
+            doge::Rectf aabb = doge::global::GetAABB(e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::ConvexShape>());
             position.position.Set(aabb.left, aabb.top);
             shape.size.Set(aabb.width, aabb.height);
         }
