@@ -49,6 +49,36 @@ namespace TestScene
                 .color = doge::Color(0x00FF0088),
             });
         }
+
+        for (auto i = 1; i < 21; ++i)
+        {
+            auto my_shape = e.AddEntity();
+
+            my_shape.AddComponent(doge::RigidBody
+            {
+                .type = doge::RigidBody::Type::Dynamic, 
+                .density = 1.f,
+                .restitution = .5f,
+                .friction = .3f,
+            });
+
+            my_shape.AddComponent(doge::CircleCollider
+            {
+                .radius = 10.f,
+            });
+
+            my_shape.AddComponent<doge::Position>(-i * 30, 0);
+            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
+            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
+            my_shape.AddComponent<doge::AngularVelocity>(20);
+
+            my_shape.AddComponent(doge::CircleShape
+            {
+                .radius = 10.f,
+                .origin = doge::Vec2f(10.f, 10.f),
+                .color = doge::Color(0x0000FF88),
+            });
+        }
     }
 
     int count = 0;
@@ -82,10 +112,14 @@ namespace TestScene
         });
         ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
 
-        ground.AddComponent(doge::RectangleShape
+        ground.AddComponent(doge::ConvexShape
         {
-            .size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
-            .origin = doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f, 5.f),
+            .points = // shape: /\.
+            { 
+                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(0, -100), 
+                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
+            },
             .color = doge::Color::Red(),
         });
 

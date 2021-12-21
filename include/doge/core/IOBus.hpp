@@ -1,9 +1,11 @@
 #pragma once
 
 #include <concepts>
+#include <unordered_map>
+#include <memory>
 #include <SFML/Graphics.hpp>
-
-#include "VideoSettings.hpp"
+#include <doge/core/VideoSettings.hpp>
+#include <doge/utils/aliases.hpp>
 
 namespace doge
 {
@@ -13,6 +15,8 @@ namespace doge
     {
         sf::RenderWindow window;
         sf::Clock clock;
+        std::unordered_map<EntityID, std::unique_ptr<sf::View>> views;
+        std::unordered_map<EntityID, std::unique_ptr<sf::Drawable>> drawables;
 
         void CreateWindow(const VideoSettings& video_settings, const std::string& title);
 
@@ -34,7 +38,7 @@ namespace doge
             }
         }
 
-        void Render(const Engine& e);
+        void Render(const Engine& engine);
 
         void Display();
 

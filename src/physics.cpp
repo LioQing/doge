@@ -17,6 +17,7 @@ namespace doge
         glf.finish = Finish;
         
         engine.AddExtension("doge_box2d", glf);
+        world = std::make_unique<b2World>(b2Vec2(0.f, 98.f));
     }
 
     void physics::Disable(Engine& engine)
@@ -26,6 +27,8 @@ namespace doge
 
     void physics::Start(Engine& engine)
     {
+        if (world)
+            world.reset();
         world = std::make_unique<b2World>(b2Vec2(0.f, 98.f));
     }
 
@@ -55,6 +58,7 @@ namespace doge
 
     void physics::Update(Engine& engine, DeltaTime dt)
     {
+        // helper functions
         auto CreateBody = [](const Entity& entity, const RigidBody& rgbd, const b2Shape* shape) -> b2Body*
         {
             b2BodyDef body_def;
@@ -81,6 +85,17 @@ namespace doge
             return body;
         };
 
+        auto SaveBody = [&](EntityID eid, const Component<RigidBody>& rgbd, b2Body* body) -> void
+        {
+            bodies.emplace(eid, body);
+            rgbd.OnRemoval([&, eid]()
+            {
+                if (world)
+                    world->DestroyBody(bodies.at(eid));
+                bodies.erase(eid);
+            });
+        };
+
         // rectangle collider
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, RectangleCollider>().EntitiesAndComponents())
         {
@@ -93,8 +108,7 @@ namespace doge
                     0
                 );
 
-                b2Body* body = CreateBody(entity, rgbd, &rect);
-                bodies.emplace(entity.id, body);
+                SaveBody(entity, rgbd, CreateBody(entity, rgbd, &rect));
             }
         }
 
@@ -109,9 +123,7 @@ namespace doge
                 [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
                 convex.Set(vertices.data(), vertices.size());
 
-                b2Body* body = CreateBody(entity, rgbd, &convex);
-                bodies.emplace(entity.id, body);
-                rgbd.OnRemoval([&, entity](){ bodies.erase(entity.id); std::cout << "erased " << entity.id << " " << bodies.size() << std::endl; });
+                SaveBody(entity, rgbd, CreateBody(entity, rgbd, &convex));
             }
         }
 
@@ -124,8 +136,7 @@ namespace doge
                 circle.m_radius = coll.radius;
                 circle.m_p.Set(coll.origin.x, coll.origin.y);
 
-                b2Body* body = CreateBody(entity, rgbd, &circle);
-                bodies.emplace(entity.id, body);
+                SaveBody(entity, rgbd, CreateBody(entity, rgbd, &circle));
             }
         }
 
@@ -143,8 +154,7 @@ namespace doge
                 else
                     chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
 
-                b2Body* body = CreateBody(entity, rgbd, &chain);
-                bodies.emplace(entity.id, body);
+                SaveBody(entity, rgbd, CreateBody(entity, rgbd, &chain));
             }
         }
 
@@ -162,8 +172,7 @@ namespace doge
                 auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
                 body_def.linearVelocity.Set(vel.x, vel.y);
 
-                b2Body* body = world->CreateBody(&body_def);
-                bodies.emplace(entity.id, body);
+                SaveBody(entity, rgbd, world->CreateBody(&body_def));
             }
             else
             {
@@ -199,7 +208,7 @@ namespace doge
 
     void physics::Finish(Engine& engine)
     {
-        world.release();
+        world.reset();
         bodies.clear();
     }
 }
