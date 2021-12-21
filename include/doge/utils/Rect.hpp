@@ -34,6 +34,21 @@ namespace doge
             return *this;
         }
 
+        template <typename U = T>
+        static bool Overlap(const Rect& r1, const Rect<U>& r2)
+        {
+            return r1.Overlap(r2);
+        }
+        template <typename U>
+        bool Overlap(const Rect<U>& r) const
+        {
+            return 
+                this->left  < r.left + r.width &&
+                r.left      < this->left + this->width &&
+                this->top   < r.top + r.height &&
+                r.top       < this->top + this->height;
+        }
+
         bool operator==(const Rect&) const = default;
     };
 

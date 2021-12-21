@@ -66,4 +66,32 @@ namespace doge
         rotation.rotation += target - GetRotation(rotation);
         rotation.rotation = math::ConstrainAngle(rotation.rotation);
     }
+
+    Rectf global::GetAABB(const Component<RectangleShape>& rectangle)
+    {
+        Entity entity = rectangle.GetEntity();
+        auto tl = (Vec2f::Zero() - rectangle.origin).HadamardMultiplication(GetScale(entity));
+        auto br = (rectangle.size - rectangle.origin).HadamardMultiplication(GetScale(entity));
+        auto bl = Vec2f(tl.x, br.y);
+        auto tr = Vec2f(br.x, tl.y);
+
+        tl.Rotate(GetRotation(entity));
+        br.Rotate(GetRotation(entity));
+        bl.Rotate(GetRotation(entity));
+        tr.Rotate(GetRotation(entity));
+
+        Rectf aabb(
+            std::min({ tl.x, br.x, bl.x, tr.x }), 
+            std::min({ tl.y, br.y, bl.y, tr.y }), 
+            std::max({ tl.x, br.x, bl.x, tr.x }), 
+            std::max({ tl.y, br.y, bl.y, tr.y })
+        );
+
+        aabb.width -= aabb.left;
+        aabb.height -= aabb.top;
+        aabb.left += GetPosition(entity).x;
+        aabb.top += GetPosition(entity).y;
+
+        return aabb;
+    }
 }

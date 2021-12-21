@@ -3,6 +3,7 @@
 #include <concepts>
 #include <doge/components.hpp>
 #include <doge/utils/Vec2.hpp>
+#include <doge/utils/Rect.hpp>
 #include <doge/utils/lic.hpp>
 #include <doge/utils/aliases.hpp>
 
@@ -27,5 +28,7 @@ namespace doge
         static float GetRotation(const Entity& entity);
         static float GetRotation(const Component<Rotation>& rotation);
         static void SetRotation(Component<Rotation>& rotation, float target);
+
+        static Rectf GetAABB(const Component<RectangleShape>& rectangle);
     };
 }

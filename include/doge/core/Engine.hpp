@@ -5,6 +5,7 @@
 #include <concepts>
 #include <functional>
 #include <iostream>
+#include <deque>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -38,7 +39,7 @@ namespace doge
         bool is_running = false;
 
         // Entities
-        std::vector<EntityID> to_be_destroyed;
+        std::deque<EntityID> to_be_destroyed;
 
         // Helper functions
         void Main();

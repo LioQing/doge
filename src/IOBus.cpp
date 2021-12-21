@@ -42,6 +42,8 @@ namespace doge
         };
 
         // view
+        std::unordered_map<EntityID, std::vector<EntityID>> views_draws;
+
         for (auto [entity, cam] : engine.Select<Camera>().EntitiesAndComponents())
         {
             auto view_itr = views.find(entity.id);
@@ -64,6 +66,8 @@ namespace doge
             }
             view->setRotation(cast::ToDegree(global::GetRotation(entity)));
             view->setViewport(cast::ToSfRect(cam.port));
+
+            views_draws.emplace(entity.id, std::vector<EntityID>());
         }
 
         // circle shape
@@ -108,7 +112,7 @@ namespace doge
             auto draw_itr = drawables.find(entity.id);
             if (draw_itr == drawables.end())
             {
-                draw_itr = drawables.emplace(entity.id, std::make_unique<sf::ConvexShape>()).first;
+                draw_itr = drawables.emplace(entity.id, std::make_unique<sf::RectangleShape>()).first;
                 rectangle_comp.OnRemoval([&, eid = entity.id](){ drawables.erase(eid); });
             }
 

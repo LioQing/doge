@@ -197,10 +197,15 @@ namespace doge
 
     void Engine::DestroyEntities()
     {
-        for (auto id : to_be_destroyed)
+        while (!to_be_destroyed.empty())
         {
+            auto id = to_be_destroyed.front();
+
             if (!lic::HasEntity(id))
+            {
+                to_be_destroyed.pop_front();
                 continue;
+            }
 
             auto node = GetPCNode(id);
             for (auto& descendent : node->GetDescendents())
@@ -209,9 +214,9 @@ namespace doge
             }
             lic::DestroyEntity(id);
             node->parent->RemoveChild(id);
-        }
 
-        to_be_destroyed.clear();
+            to_be_destroyed.pop_front();
+        }
     }
 
     Entity Engine::AddEntity(bool all_scenes)

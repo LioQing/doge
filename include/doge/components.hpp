@@ -15,3 +15,4 @@
 #include "components/ConvexCollider.hpp"
 #include "components/EdgeCollider.hpp"
 #include "components/AngularVelocity.hpp"
+#include "components/Tag.hpp"
