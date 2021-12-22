@@ -35,25 +35,25 @@ namespace doge
         // helper functions
         auto SyncShape = []<typename TComp>(sf::Shape& shape, const Component<TComp>& comp)
         {
+            auto entity = comp.GetEntity();
             shape.setOrigin(cast::ToSfVec2(comp.origin));
-            shape.setScale(cast::ToSfVec2(global::GetScale(comp.GetEntity())));
-            shape.setPosition(cast::ToSfVec2(global::GetPosition(comp.GetEntity())));
+            shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
+            shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
+            shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
             shape.setFillColor(cast::ToSfColor(comp.color));
         };
 
         // view
-        std::unordered_map<EntityID, std::vector<EntityID>> views_draws;
-
         for (auto [entity, cam] : engine.Select<Camera>().EntitiesAndComponents())
         {
-            auto view_itr = views.find(entity.id);
-            if (view_itr == views.end())
+            auto view_itr = views_draws.find(entity.id);
+            if (view_itr == views_draws.end())
             {
-                view_itr = views.emplace(entity.id, std::make_unique<sf::View>()).first;
-                cam.OnRemoval([&, eid = entity.id](){ views.erase(eid); });
+                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::vector<EntityID>())).first;
+                cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
-            auto& view = view_itr->second;
+            auto& view = view_itr->second.first;
             
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
@@ -66,8 +66,12 @@ namespace doge
             }
             view->setRotation(cast::ToDegree(global::GetRotation(entity)));
             view->setViewport(cast::ToSfRect(cam.port));
+        }
 
-            views_draws.emplace(entity.id, std::vector<EntityID>());
+        // clearing views_draws
+        for (auto& [entity, view_draw] : views_draws)
+        {
+            view_draw.second.clear();
         }
 
         // circle shape
@@ -103,7 +107,6 @@ namespace doge
             {
                 convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
             }
-            convex_shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
         }
 
         // rectangle shape
@@ -119,13 +122,14 @@ namespace doge
             auto& rectangle_shape = static_cast<sf::RectangleShape&>(*draw_itr->second);
             SyncShape(rectangle_shape, rectangle_comp);
             rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
-            rectangle_shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
         }
 
         // draw
         window.clear();
-        for (auto& [eid, view] : views)
+        for (auto& [eid, view_draw] : views_draws)
         {
+            auto& [view, draws] = view_draw;
+
             window.setView(*view);
 
             // draw

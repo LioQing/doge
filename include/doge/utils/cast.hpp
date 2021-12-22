@@ -13,6 +13,8 @@ namespace doge
     {
         cast(const cast&) = delete;
 
+        static constexpr float ToB2Scale = .01f;
+
         template <typename T>
         static Vec2<T> FromSfVec2(const sf::Vector2<T>& v)
         {
@@ -42,6 +44,9 @@ namespace doge
 
         static Vec2f FromB2Vec2(const b2Vec2& v);
         static b2Vec2 ToB2Vec2(const Vec2f& v);
+
+        static float FromB2Length(float l);
+        static float ToB2Length(float l);
 
         static b2BodyType ToB2BodyType(RigidBody::Type type);
 

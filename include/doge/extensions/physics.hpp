@@ -13,14 +13,14 @@ namespace doge
     struct physics
     {
         physics(const physics&) = delete;
-
-        static std::unique_ptr<b2World> world;
-        static std::unordered_map<EntityID, b2Body*> bodies;
-
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
 
     private:
+
+        static std::unique_ptr<b2World> world;
+        static std::unordered_map<EntityID, b2Body*> bodies;
+        static Vec2f gravity;
 
         static void Start(Engine& engine);
         static void EarlyUpdate(Engine& engine, DeltaTime dt);

@@ -44,6 +44,10 @@ Contains:
 - EarlyUpdate
 - Finish
 
+## DeltaTime
+
+Contains delta time for update functions, unit in millisecond.
+
 # Class
 
 ## Engine
@@ -79,6 +83,7 @@ Contains:
 
 - Static, kinematic, dynamic rigid body simulation
 - [Box2D](https://box2d.org/) is used
+- 1 unit length in doge (1 cm) = 0.1 unit length in Box2D (0.1 m)
 - **SHOULD NOT** be used with the parent-child system
 
 # Built-In Components
@@ -128,7 +133,7 @@ Usage:
 Includes:
 
 - SceneInfo - stores which scene(s) this entity belongs to
-
+- Tag - stores strings
 - Scale - an extra way to increase or decrease size of object
 - RigidBody - make physics engine to calculate physics for this entity
 - Camera - make this entity a camera

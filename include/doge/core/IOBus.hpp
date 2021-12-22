@@ -15,7 +15,7 @@ namespace doge
     {
         sf::RenderWindow window;
         sf::Clock clock;
-        std::unordered_map<EntityID, std::unique_ptr<sf::View>> views;
+        std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::vector<EntityID>>> views_draws;
         std::unordered_map<EntityID, std::unique_ptr<sf::Drawable>> drawables;
 
         void CreateWindow(const VideoSettings& video_settings, const std::string& title);

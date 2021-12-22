@@ -16,12 +16,22 @@ namespace doge
     
     Vec2f cast::FromB2Vec2(const b2Vec2& v)
     {
-        return Vec2f(v.x, v.y);
+        return Vec2f(v.x / ToB2Scale, v.y / ToB2Scale);
     }
 
     b2Vec2 cast::ToB2Vec2(const Vec2f& v)
     {
-        return b2Vec2(v.x, v.y);
+        return b2Vec2(v.x * ToB2Scale, v.y * ToB2Scale);
+    }
+
+    float cast::FromB2Length(float l)
+    {
+        return l / ToB2Scale;
+    }
+
+    float cast::ToB2Length(float l)
+    {
+        return l * ToB2Scale;
     }
 
     b2BodyType cast::ToB2BodyType(RigidBody::Type type)

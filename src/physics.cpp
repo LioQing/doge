@@ -6,6 +6,7 @@ namespace doge
 {
     std::unique_ptr<b2World> physics::world;
     std::unordered_map<EntityID, b2Body*> physics::bodies;
+    Vec2f physics::gravity = Vec2f(0.f, 98.f);
 
     void physics::Enable(Engine& engine)
     {
@@ -17,7 +18,7 @@ namespace doge
         glf.finish = Finish;
         
         engine.AddExtension("doge_box2d", glf);
-        world = std::make_unique<b2World>(b2Vec2(0.f, 98.f));
+        world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
     }
 
     void physics::Disable(Engine& engine)
@@ -29,7 +30,7 @@ namespace doge
     {
         if (world)
             world.reset();
-        world = std::make_unique<b2World>(b2Vec2(0.f, 98.f));
+        world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
     }
 
     void physics::EarlyUpdate(Engine& engine, DeltaTime dt)
@@ -65,12 +66,12 @@ namespace doge
             body_def.type = cast::ToB2BodyType(rgbd.type);
 
             auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
-            body_def.position.Set(pos.x, pos.y);
+            body_def.position = cast::ToB2Vec2(pos);
 
             body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
 
             auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
-            body_def.linearVelocity.Set(vel.x, vel.y);
+            body_def.linearVelocity = cast::ToB2Vec2(vel);
 
             body_def.angularVelocity = entity.GetIfHasComponentElseDefault<AngularVelocity>().angular_velocity;
 
@@ -101,9 +102,10 @@ namespace doge
         {
             if (bodies.find(entity.id) == bodies.end())
             {
+                auto scale = global::GetScale(entity);
                 b2PolygonShape rect;
                 rect.SetAsBox(
-                    coll.size.x / 2.f, coll.size.y / 2.f, 
+                    cast::ToB2Length(coll.size.x * scale.x) / 2.f, cast::ToB2Length(coll.size.y * scale.y) / 2.f, 
                     cast::ToB2Vec2(coll.origin), 
                     0
                 );
@@ -117,10 +119,11 @@ namespace doge
         {
             if (bodies.find(entity.id) == bodies.end())
             {
+                auto scale = global::GetScale(entity);
                 b2PolygonShape convex;
                 std::vector<b2Vec2> vertices;
                 std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-                [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
+                [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
                 convex.Set(vertices.data(), vertices.size());
 
                 SaveBody(entity, rgbd, CreateBody(entity, rgbd, &convex));
@@ -133,8 +136,8 @@ namespace doge
             if (bodies.find(entity.id) == bodies.end())
             {
                 b2CircleShape circle;
-                circle.m_radius = coll.radius;
-                circle.m_p.Set(coll.origin.x, coll.origin.y);
+                circle.m_radius = cast::ToB2Length(coll.radius);
+                circle.m_p = cast::ToB2Vec2(coll.origin);
 
                 SaveBody(entity, rgbd, CreateBody(entity, rgbd, &circle));
             }
@@ -145,10 +148,11 @@ namespace doge
         {
             if (bodies.find(entity.id) == bodies.end())
             {
+                auto scale = global::GetScale(entity);
                 b2ChainShape chain;
                 std::vector<b2Vec2> vertices;
                 std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-                [&](const Vec2f& v) { return cast::ToB2Vec2(v + coll.origin); });
+                [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
                 if (coll.is_loop)
                     chain.CreateLoop(vertices.data(), vertices.size());
                 else
@@ -167,10 +171,10 @@ namespace doge
                 b2BodyDef body_def;
                 body_def.type = cast::ToB2BodyType(rgbd.type);
                 auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
-                body_def.position.Set(pos.x, pos.y);
+                body_def.position = cast::ToB2Vec2(pos);
                 body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
                 auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
-                body_def.linearVelocity.Set(vel.x, vel.y);
+                body_def.linearVelocity = cast::ToB2Vec2(vel);
 
                 SaveBody(entity, rgbd, world->CreateBody(&body_def));
             }
