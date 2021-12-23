@@ -70,46 +70,51 @@ namespace TestScene
             rect.OnRemoval([&, eid = my_debugger.id](){ e.DestroyEntity(eid); });
         }
 
-        for (auto i = 1; i < 21; ++i)
-        {
-            auto my_shape = e.AddEntity();
+        // for (auto i = 1; i < 21; ++i)
+        // {
+        //     auto my_shape = e.AddEntity();
 
-            my_shape.AddComponent(doge::RigidBody
-            {
-                .type = doge::RigidBody::Type::Dynamic, 
-                .density = 1.f,
-                .restitution = .5f,
-                .friction = .3f,
-            });
+        //     my_shape.AddComponent(doge::RigidBody
+        //     {
+        //         .type = doge::RigidBody::Type::Dynamic, 
+        //         .density = 1.f,
+        //         .restitution = .5f,
+        //         .friction = .3f,
+        //     });
 
-            my_shape.AddComponent(doge::CircleCollider
-            {
-                .radius = 10.f,
-                .origin = { 15, 0 },
-            });
+        //     my_shape.AddComponent(doge::CircleCollider
+        //     {
+        //         .radius = 10.f,
+        //         .origin = { 15, 0 },
+        //     });
 
-            my_shape.AddComponent<doge::Position>(-i * 30, 0);
-            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
-            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
-            my_shape.AddComponent<doge::AngularVelocity>(20);
+        //     my_shape.AddComponent<doge::Position>(-i * 30, 0);
+        //     my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
+        //     my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
+        //     my_shape.AddComponent<doge::AngularVelocity>(20);
 
-            my_shape.AddComponent(doge::CircleShape
-            {
-                .radius = 10.f,
-                .origin = doge::Vec2f(-5.f, 10.f),
-                .color = doge::Color(0x0000FF88),
-            });
-
-            auto my_sub_shape = e.AddEntity();
-            my_sub_shape.SetParent(my_shape);
-
-            my_sub_shape.AddComponent(doge::RectangleShape
-            {
-                .size = { 30, 8 },
-                .origin = { 15, 4 },
-                .color = doge::Color(0x0000FF88),
-            });
-        }
+        //     my_shape.AddComponent(doge::CompoundShape
+        //     {
+        //         .circle_shapes = 
+        //         {
+        //             doge::CircleShape
+        //             {
+        //                 .radius = 10.f,
+        //                 .origin = doge::Vec2f(-5.f, 10.f),
+        //                 .color = doge::Color(0x0000FF88),
+        //             },
+        //         },
+        //         .rectangle_shapes =
+        //         {
+        //             doge::RectangleShape
+        //             {
+        //                 .size = { 30, 8 },
+        //                 .origin = { 15, 4 },
+        //                 .color = doge::Color(0x0000FF88),
+        //             },
+        //         },
+        //     });
+        // }
     }
 
     int count = 0;
@@ -122,7 +127,7 @@ namespace TestScene
         cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
-        cam.AddComponent<doge::Scale>(2, 2);
+        //cam.AddComponent<doge::Scale>(2, 2);
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);

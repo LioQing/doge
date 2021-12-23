@@ -9,14 +9,14 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "../utils.hpp"
-#include "../components/SceneInfo.hpp"
-#include "IOBus.hpp"
-#include "GameLoopFunctions.hpp"
-#include "VideoSettings.hpp"
-#include "Entity.hpp"
-#include "PCNode.hpp"
-#include "Range.hpp"
+#include <doge/utils.hpp>
+#include <doge/components/SceneInfo.hpp>
+#include <doge/core/IOBus.hpp>
+#include <doge/core/GameLoopFunctions.hpp>
+#include <doge/core/VideoSettings.hpp>
+#include <doge/core/Entity.hpp>
+#include <doge/core/PCNode.hpp>
+#include <doge/core/Range.hpp>
 
 namespace doge
 {

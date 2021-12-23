@@ -105,9 +105,9 @@ Usage:
 
 Includes:
 
-- RectangleShape
-- CircleShape
 - ConvexShape
+- CircleShape
+- RectangleShape
 
 Usage:
 

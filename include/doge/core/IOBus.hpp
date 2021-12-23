@@ -3,6 +3,7 @@
 #include <concepts>
 #include <unordered_map>
 #include <memory>
+#include <variant>
 #include <SFML/Graphics.hpp>
 #include <doge/core/VideoSettings.hpp>
 #include <doge/utils/aliases.hpp>
@@ -16,7 +17,7 @@ namespace doge
         sf::RenderWindow window;
         sf::Clock clock;
         std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::vector<EntityID>>> views_draws;
-        std::unordered_map<EntityID, std::unique_ptr<sf::Drawable>> drawables;
+        std::unordered_map<EntityID, std::variant<std::unique_ptr<sf::Drawable>, std::vector<std::unique_ptr<sf::Drawable>>>> drawables;
 
         void CreateWindow(const VideoSettings& video_settings, const std::string& title);
 

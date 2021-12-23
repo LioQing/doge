@@ -16,3 +16,4 @@
 #include "components/EdgeCollider.hpp"
 #include "components/AngularVelocity.hpp"
 #include "components/Tag.hpp"
+#include "components/CompoundShape.hpp"
