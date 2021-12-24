@@ -67,11 +67,53 @@ namespace doge
         rotation.rotation = math::ConstrainAngle(rotation.rotation);
     }
 
-    Rectf global::GetAABB(const Component<RectangleShape>& rectangle)
+    Rectf global::GetAABB(const ConvexShape& convex, const Entity& entity)
     {
-        Entity entity = rectangle.GetEntity();
-        auto tl = (Vec2f::Zero() - rectangle.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity));
-        auto br = (rectangle.size - rectangle.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity));
+        std::vector<Vec2f> points;
+        std::transform(convex.points.begin(), convex.points.end(), std::back_inserter(points),
+        [&](const Vec2f& v){ return ((v - convex.origin) * GetScale(entity)).Rotate(GetRotation(entity)); });
+
+        Rectf aabb(points.front().x, points.front().y, points.front().x, points.front().y);
+        for (auto& point : points)
+        {
+            if (point.x < aabb.left) aabb.left = point.x;
+            if (point.y < aabb.top) aabb.top = point.y;
+            if (point.x > aabb.width) aabb.width = point.x;
+            if (point.y > aabb.height) aabb.height = point.y;
+        }
+
+        aabb.width -= aabb.left;
+        aabb.height -= aabb.top;
+        aabb.left += GetPosition(entity).x;
+        aabb.top += GetPosition(entity).y;
+
+        return aabb;
+    }
+
+    Rectf global::GetAABB(const Component<ConvexShape>& convex)
+    {
+        return GetAABB(convex, convex.GetEntity());
+    }
+
+    Rectf global::GetAABB(const CircleShape& circle, const Entity& entity)
+    {
+        return Rectf(
+            -circle.origin.x * GetScale(entity).x + GetPosition(entity).x,
+            -circle.origin.y * GetScale(entity).y + GetPosition(entity).y,
+            circle.radius * 2.f * GetScale(entity).x,
+            circle.radius * 2.f * GetScale(entity).y
+        );
+    }
+
+    Rectf global::GetAABB(const Component<CircleShape>& circle)
+    {
+        return GetAABB(circle, circle.GetEntity());
+    }
+
+    Rectf global::GetAABB(const RectangleShape& rectangle, const Entity& entity)
+    {
+        auto tl = ((Vec2f::Zero() - rectangle.origin) * GetScale(entity)).Rotate(GetRotation(entity));
+        auto br = ((rectangle.size - rectangle.origin) * GetScale(entity)).Rotate(GetRotation(entity));
         auto bl = Vec2f(tl.x, br.y).Rotate(GetRotation(entity));
         auto tr = Vec2f(br.x, tl.y).Rotate(GetRotation(entity));
 
@@ -90,27 +132,8 @@ namespace doge
         return aabb;
     }
 
-    Rectf global::GetAABB(const Component<ConvexShape>& convex)
+    Rectf global::GetAABB(const Component<RectangleShape>& rectangle)
     {
-        Entity entity = convex.GetEntity();
-        std::vector<Vec2f> points;
-        std::transform(convex.points.begin(), convex.points.end(), std::back_inserter(points),
-        [&](const Vec2f& v){ return (v - convex.origin).HadamardMultiplication(GetScale(entity)).Rotate(GetRotation(entity)); });
-
-        Rectf aabb(points.front().x, points.front().y, points.front().x, points.front().y);
-        for (auto& point : points)
-        {
-            if (point.x < aabb.left) aabb.left = point.x;
-            if (point.y < aabb.top) aabb.top = point.y;
-            if (point.x > aabb.width) aabb.width = point.x;
-            if (point.y > aabb.height) aabb.height = point.y;
-        }
-
-        aabb.width -= aabb.left;
-        aabb.height -= aabb.top;
-        aabb.left += GetPosition(entity).x;
-        aabb.top += GetPosition(entity).y;
-
-        return aabb;
+        return GetAABB(rectangle, rectangle.GetEntity());
     }
 }

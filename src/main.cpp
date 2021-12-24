@@ -127,7 +127,7 @@ namespace TestScene
         cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
-        cam.AddComponent<doge::Scale>(2, 2);
+        // cam.AddComponent<doge::Scale>(2, 2);
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);

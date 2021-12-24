@@ -58,13 +58,44 @@ namespace doge
             return draw_itr;
         };
 
+        auto InAnyViewHelper = [&]<typename TComp>(const TComp& comp, const Entity& entity)
+        {
+            auto is_in_any_view = false;
+
+            for (auto cam_entity : engine.Select<Camera>().Entities())
+            {
+                auto& [view_ptr, draw_ids] = views_draws.at(cam_entity.id);
+
+                Rectf aabb = global::GetAABB(comp, entity);
+                bool is_in_view = 
+                    aabb.left + aabb.width > view_ptr->getCenter().x - view_ptr->getSize().x / 2.f &&
+                    aabb.top + aabb.height > view_ptr->getCenter().y - view_ptr->getSize().y / 2.f &&
+                    aabb.left < view_ptr->getCenter().x + view_ptr->getSize().x / 2.f &&
+                    aabb.top < view_ptr->getCenter().y + view_ptr->getSize().y / 2.f;
+
+                is_in_any_view = is_in_any_view || is_in_view;
+
+                auto draw_id_itr = draw_ids.find(entity.id);
+                if (draw_id_itr != draw_ids.end() && !is_in_view)
+                {
+                    draw_ids.erase(entity.id);
+                }
+                else if (draw_id_itr == draw_ids.end() && is_in_view)
+                {
+                    draw_ids.emplace(entity.id);
+                }
+            }
+
+            return is_in_any_view;
+        };
+
         // view
         for (auto [entity, cam] : engine.Select<Camera>().EntitiesAndComponents())
         {
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::vector<EntityID>())).first;
+                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::unordered_set<EntityID>())).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
@@ -103,7 +134,11 @@ namespace doge
         for (auto [entity, convex_comp] : engine.Select<ConvexShape>().EntitiesAndComponents())
         {
             auto draw_itr = EmplaceDrawables.template operator()<sf::ConvexShape>(entity, convex_comp);
-            SyncConvex(static_cast<sf::ConvexShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), convex_comp, entity);
+
+            if (InAnyViewHelper(convex_comp, entity))
+            {
+                SyncConvex(static_cast<sf::ConvexShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), convex_comp, entity);
+            }
         }
 
         // circle shape
@@ -117,7 +152,11 @@ namespace doge
         for (auto [entity, circle_comp] : engine.Select<CircleShape>().EntitiesAndComponents())
         {
             auto draw_itr = EmplaceDrawables.template operator()<sf::CircleShape>(entity, circle_comp);
-            SyncCircle(static_cast<sf::CircleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), circle_comp, entity);
+            
+            if (InAnyViewHelper(circle_comp, entity))
+            {
+                SyncCircle(static_cast<sf::CircleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), circle_comp, entity);
+            }
         }
 
         // rectangle shape
@@ -130,7 +169,11 @@ namespace doge
         for (auto [entity, rectangle_comp] : engine.Select<RectangleShape>().EntitiesAndComponents())
         {
             auto draw_itr = EmplaceDrawables.template operator()<sf::RectangleShape>(entity, rectangle_comp);
-            SyncRectangle(static_cast<sf::RectangleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), rectangle_comp, entity);
+
+            if (InAnyViewHelper(rectangle_comp, entity))
+            {
+                SyncRectangle(static_cast<sf::RectangleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), rectangle_comp, entity);
+            }
         }
 
         // compound shape
@@ -157,7 +200,11 @@ namespace doge
                 {
                     draw_arr.at(0).at(i) = std::make_unique<sf::ConvexShape>();
                 }
-                SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.convex_shapes.at(i), entity);
+
+                if (InAnyViewHelper(compound_comp.convex_shapes.at(i), entity))
+                {
+                    SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.convex_shapes.at(i), entity);
+                }
             }
 
             draw_arr.at(1).resize(compound_comp.circle_shapes.size());
@@ -167,7 +214,11 @@ namespace doge
                 {
                     draw_arr.at(1).at(i) = std::make_unique<sf::CircleShape>();
                 }
-                SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.circle_shapes.at(i), entity);
+                
+                if (InAnyViewHelper(compound_comp.circle_shapes.at(i), entity))
+                {
+                    SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.circle_shapes.at(i), entity);
+                }
             }
 
             draw_arr.at(2).resize(compound_comp.rectangle_shapes.size());
@@ -177,7 +228,11 @@ namespace doge
                 {
                     draw_arr.at(2).at(i) = std::make_unique<sf::RectangleShape>();
                 }
-                SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.rectangle_shapes.at(i), entity);
+
+                if (InAnyViewHelper(compound_comp.rectangle_shapes.at(i), entity))
+                {
+                    SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.rectangle_shapes.at(i), entity);
+                }
             }
         }
 
@@ -185,20 +240,20 @@ namespace doge
         window.clear();
         for (auto& [eid, view_draw] : views_draws)
         {
-            auto& [view, draws] = view_draw;
+            auto& [view, draw_ids] = view_draw;
 
             window.setView(*view);
 
             // draw
-            for (auto& [eid, draw_var] : drawables)
+            for (auto draw_id : draw_ids)
             {
-                if (draw_var.index() == 0)
+                if (drawables.at(draw_id).index() == 0)
                 {
-                    window.draw(*std::get<std::unique_ptr<sf::Drawable>>(draw_var));
+                    window.draw(*std::get<std::unique_ptr<sf::Drawable>>(drawables.at(draw_id)));
                 }
                 else
                 {
-                    for (auto& draw_vec : std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(draw_var))
+                    for (auto& draw_vec : std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(drawables.at(draw_id)))
                     for (auto& draw_ptr : draw_vec)
                     {
                         window.draw(*draw_ptr);

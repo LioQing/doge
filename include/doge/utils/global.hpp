@@ -29,7 +29,13 @@ namespace doge
         static float GetRotation(const Component<Rotation>& rotation);
         static void SetRotation(Component<Rotation>& rotation, float target);
 
-        static Rectf GetAABB(const Component<RectangleShape>& rectangle);
+        static Rectf GetAABB(const ConvexShape& convex, const Entity& entity);
         static Rectf GetAABB(const Component<ConvexShape>& convex);
+        
+        static Rectf GetAABB(const CircleShape& circle, const Entity& entity);
+        static Rectf GetAABB(const Component<CircleShape>& circle);
+
+        static Rectf GetAABB(const RectangleShape& rectangle, const Entity& entity);
+        static Rectf GetAABB(const Component<RectangleShape>& rectangle);
     };
 }
