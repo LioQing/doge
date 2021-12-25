@@ -58,7 +58,12 @@ namespace doge
             return draw_itr;
         };
 
-        auto InAnyViewHelper = [&]<typename TComp>(const TComp& comp, const Entity& entity)
+        auto InAnyViewHelper = [&]<typename TComp>(
+            const TComp& comp, 
+            const Entity& entity, 
+            std::uint8_t compound_arr_index = 0,
+            std::size_t compound_vec_index = 0
+            )
         {
             auto is_in_any_view = false;
 
@@ -75,14 +80,14 @@ namespace doge
 
                 is_in_any_view = is_in_any_view || is_in_view;
 
-                auto draw_id_itr = draw_ids.find(entity.id);
+                auto draw_id_itr = draw_ids.find(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
                 if (draw_id_itr != draw_ids.end() && !is_in_view)
                 {
-                    draw_ids.erase(entity.id);
+                    draw_ids.erase(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
                 }
                 else if (draw_id_itr == draw_ids.end() && is_in_view)
                 {
-                    draw_ids.emplace(entity.id);
+                    draw_ids.emplace(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
                 }
             }
 
@@ -95,7 +100,7 @@ namespace doge
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::unordered_set<EntityID>())).first;
+                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::set<std::tuple<EntityID, std::uint8_t, std::size_t>>())).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
@@ -201,7 +206,7 @@ namespace doge
                     draw_arr.at(0).at(i) = std::make_unique<sf::ConvexShape>();
                 }
 
-                if (InAnyViewHelper(compound_comp.convex_shapes.at(i), entity))
+                if (InAnyViewHelper(compound_comp.convex_shapes.at(i), entity, 0, i))
                 {
                     SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.convex_shapes.at(i), entity);
                 }
@@ -215,7 +220,7 @@ namespace doge
                     draw_arr.at(1).at(i) = std::make_unique<sf::CircleShape>();
                 }
                 
-                if (InAnyViewHelper(compound_comp.circle_shapes.at(i), entity))
+                if (InAnyViewHelper(compound_comp.circle_shapes.at(i), entity, 1, i))
                 {
                     SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.circle_shapes.at(i), entity);
                 }
@@ -229,7 +234,7 @@ namespace doge
                     draw_arr.at(2).at(i) = std::make_unique<sf::RectangleShape>();
                 }
 
-                if (InAnyViewHelper(compound_comp.rectangle_shapes.at(i), entity))
+                if (InAnyViewHelper(compound_comp.rectangle_shapes.at(i), entity, 2, i))
                 {
                     SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.rectangle_shapes.at(i), entity);
                 }
@@ -247,17 +252,17 @@ namespace doge
             // draw
             for (auto draw_id : draw_ids)
             {
-                if (drawables.at(draw_id).index() == 0)
+                auto eid = std::get<0>(draw_id);
+                if (drawables.at(eid).index() == 0)
                 {
-                    window.draw(*std::get<std::unique_ptr<sf::Drawable>>(drawables.at(draw_id)));
+                    window.draw(*std::get<std::unique_ptr<sf::Drawable>>(drawables.at(eid)));
                 }
                 else
                 {
-                    for (auto& draw_vec : std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(drawables.at(draw_id)))
-                    for (auto& draw_ptr : draw_vec)
-                    {
-                        window.draw(*draw_ptr);
-                    }
+                    window.draw(*std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(drawables.at(eid))
+                        .at(std::get<1>(draw_id))
+                        .at(std::get<2>(draw_id))
+                    );
                 }
             }
         }
