@@ -17,3 +17,4 @@
 #include "components/AngularVelocity.hpp"
 #include "components/Tag.hpp"
 #include "components/CompoundShape.hpp"
+#include "components/CompoundCollider.hpp"

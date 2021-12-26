@@ -198,6 +198,7 @@ namespace doge
 
             auto& draw_arr = std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(draw_itr->second);
 
+            // convex sub shape
             draw_arr.at(0).resize(compound_comp.convex_shapes.size());
             for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)
             {
@@ -212,6 +213,7 @@ namespace doge
                 }
             }
 
+            // circle sub shape
             draw_arr.at(1).resize(compound_comp.circle_shapes.size());
             for (std::size_t i = 0; i < compound_comp.circle_shapes.size(); ++i)
             {
@@ -226,6 +228,7 @@ namespace doge
                 }
             }
 
+            // rectangle sub shape
             draw_arr.at(2).resize(compound_comp.rectangle_shapes.size());
             for (std::size_t i = 0; i < compound_comp.rectangle_shapes.size(); ++i)
             {

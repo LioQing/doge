@@ -14,8 +14,5 @@ namespace doge
         };
 
         Type type = Type::Static;
-        float density = 0.f;
-        float restitution = 0.f;
-        float friction = 0.2f;
     };
 }

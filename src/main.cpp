@@ -13,7 +13,6 @@ namespace TestScene
         for (auto i = 0; i < 20; ++i)
         {
             auto my_shape = e.AddEntity("Test", "test");
-            auto my_debugger = e.AddEntity();
 
             if (last != -1)
             {
@@ -25,14 +24,14 @@ namespace TestScene
             my_shape.AddComponent(doge::RigidBody
             {
                 .type = doge::RigidBody::Type::Dynamic, 
-                .density = 1.f,
-                .restitution = .5f,
-                .friction = .3f,
             });
 
             my_shape.AddComponent(doge::ConvexCollider
             {
                 .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+                .density = 1.f,
+                .restitution = .5f,
+                .friction = .3f,
             });
 
             // my_shape.AddComponent(doge::RectangleCollider
@@ -40,34 +39,17 @@ namespace TestScene
             //     .size = { 5, 10 },
             // });
 
-            my_debugger.AddComponent<doge::Position>();
-            my_debugger.AddComponent<doge::Tag>(std::set{ std::to_string(my_shape.id) });
-
             my_shape.AddComponent<doge::Position>(i * 30, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
             my_shape.AddComponent<doge::AngularVelocity>(20);
             my_shape.AddComponent<doge::Scale>(2, 2);
 
-            my_debugger.AddComponent(doge::RectangleShape
-            {
-                .color = doge::Color(0xFFFFFF44),
-            });
-
             auto& rect = my_shape.AddComponent(doge::ConvexShape
             {
                 .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
                 .color = doge::Color(0x00FF0088),
             });
-
-            // auto& rect = my_shape.AddComponent(doge::RectangleShape
-            // {
-            //     .size = { 5, 10 },
-            //     .origin = { 2.5, 5 },
-            //     .color = doge::Color(0x00FF0088),
-            // });
-
-            rect.OnRemoval([&, eid = my_debugger.id](){ e.DestroyEntity(eid); });
         }
 
         for (auto i = 1; i < 21; ++i)
@@ -77,15 +59,32 @@ namespace TestScene
             my_shape.AddComponent(doge::RigidBody
             {
                 .type = doge::RigidBody::Type::Dynamic, 
-                .density = 1.f,
-                .restitution = .5f,
-                .friction = .3f,
             });
 
-            my_shape.AddComponent(doge::CircleCollider
+            my_shape.AddComponent(doge::CompoundCollider
             {
-                .radius = 10.f,
-                .origin = { 15, 0 },
+                .circle_colliders = 
+                {
+                    doge::CircleCollider
+                    {
+                        .radius = 10.f,
+                        .origin = { 15, 0 },
+                        .density = 1.f,
+                        .restitution = .5f,
+                        .friction = .3f,
+                    }
+                },
+                .rectangle_colliders = 
+                {
+                    doge::RectangleCollider
+                    {
+                        .size = { 30, 8 },
+                        .origin = { 0, 0 },
+                        .density = 1.f,
+                        .restitution = .5f,
+                        .friction = .3f,
+                    }
+                },
             });
 
             my_shape.AddComponent<doge::Position>(-i * 30, 0);
@@ -183,13 +182,6 @@ namespace TestScene
         {
             if (position.position.y - compound.circle_shapes.at(0).radius > e.GetVideoSettings().resolution.y / 2.f)
                 e.DestroyEntity(entity);
-        }
-
-        for (auto [tag, position, shape] : e.Select<doge::Tag, doge::Position, doge::RectangleShape>().Components())
-        {
-            doge::Rectf aabb = doge::global::GetAABB(e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::ConvexShape>());
-            position.position.Set(aabb.left, aabb.top);
-            shape.size.Set(aabb.width, aabb.height);
         }
 
         std::cout << 1000/dt << std::endl;
