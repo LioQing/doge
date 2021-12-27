@@ -129,7 +129,7 @@ namespace doge
             {
                 b2CircleShape circle;
                 circle.m_radius = cast::ToB2Length(coll.radius);
-                circle.m_p = cast::ToB2Vec2(coll.origin);
+                circle.m_p = cast::ToB2Vec2(-coll.origin);
 
                 SaveBody(entity, rgbd, AddFixture(CreateBody(entity, rgbd), coll, &circle));
             }
@@ -178,7 +178,7 @@ namespace doge
             {
                 auto scale = global::GetScale(entity);
 
-                auto body = SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second;
+                auto* body = SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second;
 
                 // convex sub collider
                 for (auto& convex_collider : coll.convex_colliders)
@@ -197,7 +197,7 @@ namespace doge
                 {
                     b2CircleShape circle;
                     circle.m_radius = cast::ToB2Length(circle_collider.radius);
-                    circle.m_p = cast::ToB2Vec2(circle_collider.origin);
+                    circle.m_p = cast::ToB2Vec2(-circle_collider.origin);
 
                     AddFixture(body, circle_collider, &circle);
                 }

@@ -99,7 +99,7 @@ namespace TestScene
                     doge::CircleShape
                     {
                         .radius = 10.f,
-                        .origin = doge::Vec2f(-5.f, 10.f),
+                        .origin = doge::Vec2f(25.f, 10.f),
                         .color = doge::Color(0x0000FF88),
                     },
                 },
@@ -174,11 +174,9 @@ namespace TestScene
         {
             if (doge::global::GetAABB(convex).top > e.GetVideoSettings().resolution.y / 2.f)
                 e.DestroyEntity(entity);
-
-            // std::cout << velocity.velocity.Magnitude() << std::endl;
         }
 
-        for (auto [entity, rgbd, position, compound] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape>().EntitiesAndComponents())
+        for (auto [entity, rgbd, position, compound, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::Velocity>().EntitiesAndComponents())
         {
             if (position.position.y - compound.circle_shapes.at(0).radius > e.GetVideoSettings().resolution.y / 2.f)
                 e.DestroyEntity(entity);
