@@ -12,6 +12,7 @@
 #include <vector>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 namespace doge
 {
@@ -135,7 +136,8 @@ namespace doge
              * @tparam TComp type of the component to be returned
              * @return The component (without wrapper class)
              */
-            template <std::default_initializable TComp>
+            template <typename TComp>
+            requires std::is_default_constructible<TComp>::value
             TComp GetIfHasComponentElseDefault() const;
 
             /**
@@ -710,7 +712,8 @@ namespace doge
         return lic::GetComponent<TComp>(this->id);
     }
 
-    template <std::default_initializable TComp>
+    template <typename TComp>
+    requires std::is_default_constructible<TComp>::value
     TComp lic::Entity::GetIfHasComponentElseDefault() const
     {
         if (HasComponent<TComp>())

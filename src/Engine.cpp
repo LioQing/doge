@@ -85,14 +85,6 @@ namespace doge
                 }
             }
 
-            if (active_scene.early_update)
-                active_scene.early_update(*this, dt);
-            for (auto [id, extension] : extensions)
-            {
-                if (extension.early_update)
-                    extension.early_update(*this, dt);
-            }
-
             if (active_scene.update)
                 active_scene.update(*this, dt);
             for (auto [id, extension] : extensions)

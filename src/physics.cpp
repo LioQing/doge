@@ -13,7 +13,6 @@ namespace doge
     {
         GameLoopFunctions glf;
         glf.start = Start;
-        glf.early_update = EarlyUpdate;
         glf.update = Update;
         glf.fixed_update = FixedUpdate;
         glf.finish = Finish;
@@ -32,30 +31,6 @@ namespace doge
         if (world)
             world.reset();
         world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
-    }
-
-    void physics::EarlyUpdate(Engine& engine, DeltaTime dt)
-    {
-        for (auto [entity, rgbd] : engine.Select<RigidBody>().EntitiesAndComponents())
-        {
-            auto body_itr = bodies.find(rgbd.entity_id);
-            if (body_itr != bodies.end())
-            {
-                b2Body* body = body_itr->second;
-
-                if (entity.HasComponent<Position>())
-                    entity.GetComponent<Position>().position = cast::FromB2Vec2(body->GetPosition());
-
-                if (entity.HasComponent<Rotation>())
-                    entity.GetComponent<Rotation>().rotation = body->GetAngle();
-
-                if (entity.HasComponent<Velocity>())
-                    entity.GetComponent<Velocity>().velocity = cast::FromB2Vec2(body->GetLinearVelocity());
-
-                if (entity.HasComponent<AngularVelocity>())
-                    entity.GetComponent<AngularVelocity>().angular_velocity = body->GetAngularVelocity();
-            }
-        }
     }
 
     void physics::Update(Engine& engine, DeltaTime dt)
@@ -263,6 +238,27 @@ namespace doge
     void physics::FixedUpdate(Engine& engine, DeltaTime dt)
     {
         world->Step(dt / 1000.f, 1, 1);
+
+        for (auto [entity, rgbd] : engine.Select<RigidBody>().EntitiesAndComponents())
+        {
+            auto body_itr = bodies.find(rgbd.entity_id);
+            if (body_itr != bodies.end())
+            {
+                b2Body* body = body_itr->second;
+
+                if (entity.HasComponent<Position>())
+                    entity.GetComponent<Position>().position = cast::FromB2Vec2(body->GetPosition());
+
+                if (entity.HasComponent<Rotation>())
+                    entity.GetComponent<Rotation>().rotation = body->GetAngle();
+
+                if (entity.HasComponent<Velocity>())
+                    entity.GetComponent<Velocity>().velocity = cast::FromB2Vec2(body->GetLinearVelocity());
+
+                if (entity.HasComponent<AngularVelocity>())
+                    entity.GetComponent<AngularVelocity>().angular_velocity = body->GetAngularVelocity();
+            }
+        }
     }
 
     void physics::Finish(Engine& engine)

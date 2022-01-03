@@ -23,7 +23,6 @@ namespace doge
         static Vec2f gravity;
 
         static void Start(Engine& engine);
-        static void EarlyUpdate(Engine& engine, DeltaTime dt);
         static void Update(Engine& engine, DeltaTime dt);
         static void FixedUpdate(Engine& engine, DeltaTime dt);
         static void Finish(Engine& engine);
