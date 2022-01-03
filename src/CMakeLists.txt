@@ -21,34 +21,18 @@ set(SRC_FILES
     Engine.cpp
     IOBus.cpp
     cast.cpp
+    Color.cpp
     VideoSettings.cpp
     global.cpp
+    Velocity.cpp
+    Scale.cpp
+    Position.cpp
     Entity.cpp
     default_functions.cpp
     PCNode.cpp
     Range.cpp
     physics.cpp
     math.cpp
-
-    components/AngularVelocity.cpp
-    components/Camera.cpp
-    components/CircleCollider.cpp
-    components/CircleShape.cpp
-    components/Color.cpp
-    components/CompoundCollider.cpp
-    components/CompoundShape.cpp
-    components/ConvexCollider.cpp
-    components/ConvexShape.cpp
-    components/EdgeCollider.cpp
-    components/Position.cpp
-    components/RectangleCollider.cpp
-    components/RectangleShape.cpp
-    components/RigidBody.cpp
-    components/Rotation.cpp
-    components/Scale.cpp
-    components/SceneInfo.cpp
-    components/Tag.cpp
-    components/Velocity.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

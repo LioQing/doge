@@ -20,17 +20,14 @@ namespace doge
         static Vec2f GetPosition(const Entity& entity);
         static Vec2f GetPosition(const Component<Position>& position);
         static void SetPosition(Component<Position>& position, const Vec2f& target);
-        static void _NoModify_SetPosition(Component<Position>& position, const Vec2f& target);
 
         static Vec2f GetScale(const Entity& entity);
         static Vec2f GetScale(const Component<Scale>& scale);
         static void SetScale(Component<Scale>& scale, const Vec2f& target);
-        static void _NoModify_SetScale(Component<Scale>& scale, const Vec2f& target);
 
         static float GetRotation(const Entity& entity);
         static float GetRotation(const Component<Rotation>& rotation);
         static void SetRotation(Component<Rotation>& rotation, float target);
-        static void _NoModify_SetRotation(Component<Rotation>& rotation, float target);
 
         static Rectf GetAABB(const ConvexShape& convex, const Entity& entity);
         static Rectf GetAABB(const Component<ConvexShape>& convex);

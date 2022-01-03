@@ -4,23 +4,13 @@
 
 namespace doge
 {
-    class Scale
+    struct Scale
     {
-        Vec2f scale = Vec2f::One();
-
-        bool is_modified = true;
-
-    public:
-
+        Scale() = default;
         Scale(const Scale&) = default;
-        Scale(const Vec2f& scale = Vec2f::One());
+        Scale(const Vec2f& scale);
         Scale(float x, float y);
 
-        Vec2f& Get();
-        const Vec2f& Get() const;
-
-        Vec2f& _NoModify_Get();
-        void _ResetModify();
-        bool _IsModified() const;
+        Vec2f scale = Vec2f::One();
     };
 }

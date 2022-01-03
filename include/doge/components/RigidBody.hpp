@@ -4,10 +4,8 @@
 
 namespace doge
 {
-    class RigidBody
+    struct RigidBody
     {
-    public:
-        
         enum Type
         {
             Static,
@@ -15,22 +13,6 @@ namespace doge
             Dynamic,
         };
 
-    private:
-
         Type type = Type::Static;
-
-        bool is_modified = true;
-
-    public:
-
-        RigidBody(const RigidBody&) = default;
-        RigidBody(Type type = Type::Static);
-
-        Type& GetType();
-        Type GetType() const;
-
-        Type& _NoModify_GetType();
-        void _ResetModify();
-        bool _IsModified() const;
     };
 }

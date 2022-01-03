@@ -4,23 +4,13 @@
 
 namespace doge
 {
-    class Position
+    struct Position
     {
-        Vec2f position = Vec2f::Zero();
-
-        bool is_modified = true;
-
-    public:
-
+        Position() = default;
         Position(const Position&) = default;
-        Position(const Vec2f& position = Vec2f::Zero());
+        Position(const Vec2f& position);
         Position(float x, float y);
 
-        Vec2f& Get();
-        const Vec2f& Get() const;
-
-        Vec2f& _NoModify_Get();
-        void _ResetModify();
-        bool _IsModified() const;
+        Vec2f position = Vec2f::Zero();
     };
 }

@@ -79,10 +79,10 @@ namespace doge
         Range<TComps...> InAnyOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](lic::Entity entity, const SceneInfo& scene_info, const TComps&... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 { 
                     for (auto& scene_id : { scene_ids... })
-                        if (std::find(scene_info.GetSceneIDs().begin(), scene_info.GetSceneIDs().end(), scene_id) != scene_info.GetSceneIDs().end())
+                        if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) != scene_info.scene_ids.end())
                             return true;
                     return false;
                 }));
@@ -92,10 +92,10 @@ namespace doge
         Range<TComps...> InAllOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](lic::Entity entity, const SceneInfo& scene_info, const TComps&... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 { 
                     for (auto& scene_id : { scene_ids... })
-                        if (std::find(scene_info.GetSceneIDs().begin(), scene_info.GetSceneIDs().end(), scene_id) == scene_info.GetSceneIDs().end())
+                        if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) == scene_info.scene_ids.end())
                             return false;
                     return true;
                 }));
@@ -105,10 +105,10 @@ namespace doge
         Range<TComps...> InNoneOf(TSceneID&&... scene_ids) const
         {
             return Range(lic::Range<SceneInfo, TComps...>::Where(
-                [&](lic::Entity entity, const SceneInfo& scene_info, const TComps&... _)
+                [&](lic::Entity entity, SceneInfo scene_info, TComps... _)
                 {
                     for (auto& scene_id : { scene_ids... })
-                        if (std::find(scene_info.GetSceneIDs().begin(), scene_info.GetSceneIDs().end(), scene_id) != scene_info.GetSceneIDs().end())
+                        if (std::find(scene_info.scene_ids.begin(), scene_info.scene_ids.end(), scene_id) != scene_info.scene_ids.end())
                             return false;
                     return true;
                 }));
@@ -123,7 +123,7 @@ namespace doge
         template <std::predicate<Entity, TComps...> TPred>
         Range<TComps...> Where(TPred predicate) const
         {
-            return Range(lic::Range<SceneInfo, TComps...>::Where([&](lic::Entity entity, const SceneInfo& _, const TComps&... c)
+            return Range(lic::Range<SceneInfo, TComps...>::Where([&](lic::Entity entity, SceneInfo _, TComps... c)
             { return predicate(Entity(entity, PCNode::root.GetDescendent(entity).get()), c...); }));
         }
 
