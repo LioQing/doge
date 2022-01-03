@@ -8,10 +8,10 @@ namespace doge
 {
     Vec2f global::GetPosition(const Entity& entity)
     {
-        auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
+        auto pos = entity.GetIfHasComponentElseDefault<Position>().Get();
         for (Entity curr = entity; curr.HasParent(); curr = curr.GetParent())
         {
-            pos += curr.GetParent().GetIfHasComponentElseDefault<Position>().position;
+            pos += curr.GetParent().GetIfHasComponentElseDefault<Position>().Get();
         }
         return pos;
     }
@@ -23,15 +23,20 @@ namespace doge
 
     void global::SetPosition(Component<Position>& position, const Vec2f& target)
     {
-        position.position += target - GetPosition(position);
+        position.Get() += target - GetPosition(position);
+    }
+
+    void global::_NoModify_SetPosition(Component<Position>& position, const Vec2f& target)
+    {
+        position._NoModify_Get() += target - GetPosition(position);
     }
 
     Vec2f global::GetScale(const Entity& entity)
     {
-        auto scale = entity.GetIfHasComponentElseDefault<Scale>().scale;
+        auto scale = entity.GetIfHasComponentElseDefault<Scale>().Get();
         for (Entity curr = entity; curr.HasParent(); curr = curr.GetParent())
         {
-            scale *= curr.GetParent().GetIfHasComponentElseDefault<Scale>().scale;
+            scale *= curr.GetParent().GetIfHasComponentElseDefault<Scale>().Get();
         }
         return scale;
     }
@@ -43,15 +48,20 @@ namespace doge
 
     void global::SetScale(Component<Scale>& scale, const Vec2f& target)
     {
-        scale.scale *= target / GetScale(scale);
+        scale.Get() *= target / GetScale(scale);
+    }
+
+    void global::_NoModify_SetScale(Component<Scale>& scale, const Vec2f& target)
+    {
+        scale._NoModify_Get() *= target / GetScale(scale);
     }
 
     float global::GetRotation(const Entity& entity)
     {
-        auto rot = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
+        auto rot = entity.GetIfHasComponentElseDefault<Rotation>().Get();
         for (Entity curr = entity; curr.HasParent(); curr = curr.GetParent())
         {
-            rot += curr.GetParent().GetIfHasComponentElseDefault<Rotation>().rotation;
+            rot += curr.GetParent().GetIfHasComponentElseDefault<Rotation>().Get();
         }
         return math::ConstrainAngle(rot);
     }
@@ -63,15 +73,21 @@ namespace doge
 
     void global::SetRotation(Component<Rotation>& rotation, float target)
     {
-        rotation.rotation += target - GetRotation(rotation);
-        rotation.rotation = math::ConstrainAngle(rotation.rotation);
+        rotation.Get() += target - GetRotation(rotation);
+        rotation.Get() = math::ConstrainAngle(rotation.Get());
+    }
+    
+    void global::_NoModify_SetRotation(Component<Rotation>& rotation, float target)
+    {
+        rotation._NoModify_Get() += target - GetRotation(rotation);
+        rotation._NoModify_Get() = math::ConstrainAngle(rotation._NoModify_Get());
     }
 
     Rectf global::GetAABB(const ConvexShape& convex, const Entity& entity)
     {
         std::vector<Vec2f> points;
-        std::transform(convex.points.begin(), convex.points.end(), std::back_inserter(points),
-        [&](const Vec2f& v){ return ((v - convex.origin) * GetScale(entity)).Rotate(GetRotation(entity)); });
+        std::transform(convex.GetPoints().begin(), convex.GetPoints().end(), std::back_inserter(points),
+        [&](const Vec2f& v){ return ((v - convex.GetOrigin()) * GetScale(entity)).Rotate(GetRotation(entity)); });
 
         Rectf aabb(points.front().x, points.front().y, points.front().x, points.front().y);
         for (auto& point : points)
@@ -98,10 +114,10 @@ namespace doge
     Rectf global::GetAABB(const CircleShape& circle, const Entity& entity)
     {
         return Rectf(
-            -circle.origin.x * GetScale(entity).x + GetPosition(entity).x,
-            -circle.origin.y * GetScale(entity).y + GetPosition(entity).y,
-            circle.radius * 2.f * GetScale(entity).x,
-            circle.radius * 2.f * GetScale(entity).y
+            -circle.GetOrigin().x * GetScale(entity).x + GetPosition(entity).x,
+            -circle.GetOrigin().y * GetScale(entity).y + GetPosition(entity).y,
+            circle.GetRadius() * 2.f * GetScale(entity).x,
+            circle.GetRadius() * 2.f * GetScale(entity).y
         );
     }
 
@@ -112,8 +128,8 @@ namespace doge
 
     Rectf global::GetAABB(const RectangleShape& rectangle, const Entity& entity)
     {
-        auto tl = ((Vec2f::Zero() - rectangle.origin) * GetScale(entity)).Rotate(GetRotation(entity));
-        auto br = ((rectangle.size - rectangle.origin) * GetScale(entity)).Rotate(GetRotation(entity));
+        auto tl = ((Vec2f::Zero() - rectangle.GetOrigin()) * GetScale(entity)).Rotate(GetRotation(entity));
+        auto br = ((rectangle.GetSize() - rectangle.GetOrigin()) * GetScale(entity)).Rotate(GetRotation(entity));
         auto bl = Vec2f(tl.x, br.y).Rotate(GetRotation(entity));
         auto tr = Vec2f(br.x, tl.y).Rotate(GetRotation(entity));
 

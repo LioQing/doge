@@ -35,11 +35,11 @@ namespace doge
         // helper functions
         auto SyncShape = []<typename TComp>(sf::Shape& shape, const TComp& comp, const Entity& entity)
         {
-            shape.setOrigin(cast::ToSfVec2(comp.origin));
+            shape.setOrigin(cast::ToSfVec2(comp.GetOrigin()));
             shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
             shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
             shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
-            shape.setFillColor(cast::ToSfColor(comp.color));
+            shape.setFillColor(cast::ToSfColor(comp.GetColor()));
         };
 
         auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(EntityID eid, Component<TComp>& comp)
@@ -107,16 +107,16 @@ namespace doge
             auto& view = view_itr->second.first;
             
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
-            if (cam.size == Vec2f::Zero())
+            if (cam._NoModify_GetSize() == Vec2f::Zero())
             {
-                view->setSize(cast::ToSfVec2(engine.GetVideoSettings().resolution * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(engine.GetVideoSettings().resolution * Vec2f(cam.GetPort().width, cam.GetPort().height) * global::GetScale(entity)));
             }
             else
             {
-                view->setSize(cast::ToSfVec2(cam.size * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(cam.GetSize() * global::GetScale(entity)));
             }
             view->setRotation(cast::ToDegree(global::GetRotation(entity)));
-            view->setViewport(cast::ToSfRect(cam.port));
+            view->setViewport(cast::ToSfRect(cam.GetPort()));
         }
 
         // clearing views_draws
@@ -129,10 +129,10 @@ namespace doge
         auto SyncConvex = [&](sf::ConvexShape& convex_shape, const ConvexShape& convex_comp, const Entity& entity)
         {
             SyncShape(convex_shape, convex_comp, entity);
-            convex_shape.setPointCount(convex_comp.points.size());
-            for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
+            convex_shape.setPointCount(convex_comp.GetPoints().size());
+            for (std::size_t i = 0; i < convex_comp.GetPoints().size(); ++i)
             {
-                convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
+                convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.GetPoints().at(i)));
             }
         };
 
@@ -150,8 +150,8 @@ namespace doge
         auto SyncCircle = [&](sf::CircleShape& circle_shape, const CircleShape& circle_comp, const Entity& entity)
         {
             SyncShape(circle_shape, circle_comp, entity);
-            circle_shape.setRadius(circle_comp.radius);
-            circle_shape.setPointCount(circle_comp.point_count);
+            circle_shape.setRadius(circle_comp.GetRadius());
+            circle_shape.setPointCount(circle_comp.GetPointCount());
         };
 
         for (auto [entity, circle_comp] : engine.Select<CircleShape>().EntitiesAndComponents())
@@ -168,7 +168,7 @@ namespace doge
         auto SyncRectangle = [&](sf::RectangleShape& rectangle_shape, const RectangleShape& rectangle_comp, const Entity& entity)
         {
             SyncShape(rectangle_shape, rectangle_comp, entity);
-            rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
+            rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.GetSize()));
         };
 
         for (auto [entity, rectangle_comp] : engine.Select<RectangleShape>().EntitiesAndComponents())
@@ -199,47 +199,47 @@ namespace doge
             auto& draw_arr = std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(draw_itr->second);
 
             // convex sub shape
-            draw_arr.at(0).resize(compound_comp.convex_shapes.size());
-            for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)
+            draw_arr.at(0).resize(compound_comp.GetConvexShapes().size());
+            for (std::size_t i = 0; i < compound_comp.GetConvexShapes().size(); ++i)
             {
                 if (!draw_arr.at(0).at(i))
                 {
                     draw_arr.at(0).at(i) = std::make_unique<sf::ConvexShape>();
                 }
 
-                if (InAnyViewHelper(compound_comp.convex_shapes.at(i), entity, 0, i))
+                if (InAnyViewHelper(compound_comp.GetConvexShapes().at(i), entity, 0, i))
                 {
-                    SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.convex_shapes.at(i), entity);
+                    SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.GetConvexShapes().at(i), entity);
                 }
             }
 
             // circle sub shape
-            draw_arr.at(1).resize(compound_comp.circle_shapes.size());
-            for (std::size_t i = 0; i < compound_comp.circle_shapes.size(); ++i)
+            draw_arr.at(1).resize(compound_comp.GetCircleShapes().size());
+            for (std::size_t i = 0; i < compound_comp.GetCircleShapes().size(); ++i)
             {
                 if (!draw_arr.at(1).at(i))
                 {
                     draw_arr.at(1).at(i) = std::make_unique<sf::CircleShape>();
                 }
                 
-                if (InAnyViewHelper(compound_comp.circle_shapes.at(i), entity, 1, i))
+                if (InAnyViewHelper(compound_comp.GetCircleShapes().at(i), entity, 1, i))
                 {
-                    SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.circle_shapes.at(i), entity);
+                    SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.GetCircleShapes().at(i), entity);
                 }
             }
 
             // rectangle sub shape
-            draw_arr.at(2).resize(compound_comp.rectangle_shapes.size());
-            for (std::size_t i = 0; i < compound_comp.rectangle_shapes.size(); ++i)
+            draw_arr.at(2).resize(compound_comp.GetRectangleShapes().size());
+            for (std::size_t i = 0; i < compound_comp.GetRectangleShapes().size(); ++i)
             {
                 if (!draw_arr.at(2).at(i))
                 {
                     draw_arr.at(2).at(i) = std::make_unique<sf::RectangleShape>();
                 }
 
-                if (InAnyViewHelper(compound_comp.rectangle_shapes.at(i), entity, 2, i))
+                if (InAnyViewHelper(compound_comp.GetRectangleShapes().at(i), entity, 2, i))
                 {
-                    SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.rectangle_shapes.at(i), entity);
+                    SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.GetRectangleShapes().at(i), entity);
                 }
             }
         }

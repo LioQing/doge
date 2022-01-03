@@ -4,13 +4,23 @@
 
 namespace doge
 {
-    struct Velocity
+    class Velocity
     {
-        Velocity() = default;
+        Vec2f velocity = Vec2f::Zero();
+
+        bool is_modified = true;
+
+    public:
+
         Velocity(const Velocity&) = default;
-        Velocity(const Vec2f& velocity);
+        Velocity(const Vec2f& velocity = Vec2f::Zero());
         Velocity(float x, float y);
 
-        Vec2f velocity = Vec2f::Zero();
+        Vec2f& Get();
+        const Vec2f& Get() const;
+
+        Vec2f& _NoModify_Get();
+        void _ResetModify();
+        bool _IsModified() const;
     };
 }

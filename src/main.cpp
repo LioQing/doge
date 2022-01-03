@@ -21,18 +21,16 @@ namespace TestScene
             }
             last = my_shape.id;
 
-            my_shape.AddComponent(doge::RigidBody
-            {
-                .type = doge::RigidBody::Type::Dynamic, 
-            });
+            my_shape.AddComponent(doge::RigidBody(doge::RigidBody::Type::Dynamic));
 
             my_shape.AddComponent(doge::ConvexCollider
-            {
-                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
-                .density = 1.f,
-                .restitution = .5f,
-                .friction = .3f,
-            });
+            (
+                { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+                doge::Vec2f::Zero(),
+                1.f,
+                .5f,
+                .3f
+            ));
 
             // my_shape.AddComponent(doge::RectangleCollider
             // {
@@ -46,46 +44,43 @@ namespace TestScene
             my_shape.AddComponent<doge::Scale>(2, 2);
 
             auto& rect = my_shape.AddComponent(doge::ConvexShape
-            {
-                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
-                .color = doge::Color(0x00FF0088),
-            });
+            (
+                { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+                doge::Vec2f::Zero(),
+                doge::Color(0x00FF0088)
+            ));
         }
 
         for (auto i = 1; i < 21; ++i)
         {
             auto my_shape = e.AddEntity();
 
-            my_shape.AddComponent(doge::RigidBody
-            {
-                .type = doge::RigidBody::Type::Dynamic, 
-            });
+            my_shape.AddComponent(doge::RigidBody(doge::RigidBody::Type::Dynamic));
 
             my_shape.AddComponent(doge::CompoundCollider
-            {
-                .circle_colliders = 
+            (
+                {},
                 {
                     doge::CircleCollider
-                    {
-                        .radius = 10.f,
-                        .origin = { 15, 0 },
-                        .density = 1.f,
-                        .restitution = .5f,
-                        .friction = .3f,
-                    }
+                    (
+                        10.f,
+                        { 15, 0 },
+                        1.f,
+                        .5f,
+                        .3f
+                    )
                 },
-                .rectangle_colliders = 
                 {
                     doge::RectangleCollider
-                    {
-                        .size = { 30, 8 },
-                        .origin = { 0, 0 },
-                        .density = 1.f,
-                        .restitution = .5f,
-                        .friction = .3f,
-                    }
-                },
-            });
+                    (
+                        { 30, 8 },
+                        { 0, 0 },
+                        1.f,
+                        .5f,
+                        .3f
+                    )
+                }
+            ));
 
             my_shape.AddComponent<doge::Position>(-i * 30, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
@@ -93,26 +88,31 @@ namespace TestScene
             my_shape.AddComponent<doge::AngularVelocity>(20);
 
             my_shape.AddComponent(doge::CompoundShape
-            {
-                .circle_shapes = 
+            (
+                {},
                 {
                     doge::CircleShape
-                    {
-                        .radius = 10.f,
-                        .origin = doge::Vec2f(25.f, 10.f),
-                        .color = doge::Color(0x0000FF88),
-                    },
+                    (
+                        10.f,
+                        doge::Vec2f(25.f, 10.f),
+                        doge::Color(0x0000FF88)
+                    ),
                 },
-                .rectangle_shapes =
                 {
                     doge::RectangleShape
-                    {
-                        .size = { 30, 8 },
-                        .origin = { 15, 4 },
-                        .color = doge::Color(0x0000FF88),
-                    },
-                },
-            });
+                    (
+                        { 30, 8 },
+                        { 15, 4 },
+                        doge::Color(0x0000FF88)
+                    ),
+                }
+            ));
+
+            // my_shape.AddComponent(doge::RectangleShape(
+            //     { 30, 8 },
+            //     { 15, 4 },
+            //     doge::Color(0x0000FF88)
+            // ));
         }
     }
 
@@ -131,33 +131,34 @@ namespace TestScene
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
         ground.AddComponent(doge::EdgeCollider
-        {
+        (
             // .points = // shape: \/
             // { 
             //     doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, -100), 
             //     doge::Vec2f(0, 0), 
             //     doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, -100),
             // },
-            .points = // shape: /\.
-            { 
+            // shape: /\.
+            {
                 doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
                 doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
-            },
+            }
             //.size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
-        });
+        ));
         ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
 
         ground.AddComponent(doge::ConvexShape
-        {
-            .points = // shape: /\.
+        (
+            // shape: /\.
             { 
                 doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
                 doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
             },
-            .color = doge::Color::Red(),
-        });
+            doge::Vec2f::Zero(),
+            doge::Color::Red()
+        ));
 
         AddBlocks(e);
     }
@@ -178,7 +179,7 @@ namespace TestScene
 
         for (auto [entity, rgbd, position, compound, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::Velocity>().EntitiesAndComponents())
         {
-            if (position.position.y - compound.circle_shapes.at(0).radius > e.GetVideoSettings().resolution.y / 2.f)
+            if (position.Get().y - compound.GetCircleShapes().at(0).GetRadius() > e.GetVideoSettings().resolution.y / 2.f)
                 e.DestroyEntity(entity);
         }
 
