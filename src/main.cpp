@@ -52,7 +52,7 @@ namespace TestScene
             });
         }
 
-        for (auto i = 1; i < 21; ++i)
+        for (auto i = 1; i < 2; ++i)
         {
             auto my_shape = e.AddEntity();
 
@@ -140,21 +140,21 @@ namespace TestScene
             // },
             .points = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(-static_cast<float>(e.window_settings.resolution.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
-                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
+                doge::Vec2f(e.window_settings.resolution.x / 2.f - 100, 0), 
             },
             //.size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
         });
-        ground.AddComponent<doge::Position>(0.f, e.GetVideoSettings().resolution.y / 2.f - 50.f);
+        ground.AddComponent<doge::Position>(0.f, e.window_settings.resolution.y / 2.f - 50.f);
 
         ground.AddComponent(doge::ConvexShape
         {
             .points = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(-static_cast<float>(e.window_settings.resolution.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
-                doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, 0), 
+                doge::Vec2f(e.window_settings.resolution.x / 2.f - 100, 0), 
             },
             .color = doge::Color::Red(),
         });
@@ -172,14 +172,20 @@ namespace TestScene
 
         for (auto [entity, rgbd, velocity, position, convex] : e.Select<doge::RigidBody, doge::Velocity, doge::Position, doge::ConvexShape>().EntitiesAndComponents())
         {
-            if (doge::global::GetAABB(convex).top > e.GetVideoSettings().resolution.y / 2.f)
+            if (doge::global::GetAABB(convex).top > e.window_settings.resolution.y / 2.f)
                 e.DestroyEntity(entity);
         }
 
         for (auto [entity, rgbd, position, compound, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::Velocity>().EntitiesAndComponents())
         {
-            if (position.position.y - compound.circle_shapes.at(0).radius > e.GetVideoSettings().resolution.y / 2.f)
+            if (position.position.y - compound.circle_shapes.at(0).radius > e.window_settings.resolution.y / 2.f)
+            {
                 e.DestroyEntity(entity);
+                if (e.window_settings.fps != 10)
+                {
+                    e.SetFrameRate(10);
+                }
+            }
         }
 
         std::cout << 1000/dt << std::endl;
@@ -199,8 +205,8 @@ int main()
 {
     srand(time(0));
     doge::Engine e;
-    e.SetTitle("doge test");
-    e.SetFrameRate(60);
+    e.window_settings.title = "doge test";
+    e.window_settings.fps = 60;
     e.SetFixedTimeStep(20);
 
     doge::GameLoopFunctions test;
@@ -213,7 +219,7 @@ int main()
 
     doge::physics::Enable(e);
 
-    e.StartScene("Test", doge::VideoSettings(1280, 720, 60, doge::VideoSettings::Mode::Windowed));
+    e.StartScene("Test", doge::WindowSettings(1280, 720, "doge test", 60, doge::WindowSettings::Mode::Windowed));
 
     doge::physics::Disable(e);
 

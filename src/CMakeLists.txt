@@ -22,7 +22,7 @@ set(SRC_FILES
     IOBus.cpp
     cast.cpp
     Color.cpp
-    VideoSettings.cpp
+    WindowSettings.cpp
     global.cpp
     Velocity.cpp
     Scale.cpp
@@ -33,6 +33,7 @@ set(SRC_FILES
     Range.cpp
     physics.cpp
     math.cpp
+    Texture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

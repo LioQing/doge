@@ -7,22 +7,24 @@
 
 namespace doge
 {
-    void IOBus::CreateWindow(const VideoSettings& video_settings, const std::string& title)
+    void IOBus::CreateWindow(const WindowSettings& window_settings)
     {
-        if (video_settings.mode == VideoSettings::Mode::FullScreen)
+        if (window_settings.mode == WindowSettings::Mode::FullScreen)
         {
-            window.create(sf::VideoMode(video_settings.resolution.x, video_settings.resolution.y), title, sf::Style::Fullscreen);
+            window.create(sf::VideoMode(window_settings.resolution.x, window_settings.resolution.y), window_settings.title, sf::Style::Fullscreen);
         }
-        else if (video_settings.mode == VideoSettings::Mode::Borderless)
+        else if (window_settings.mode == WindowSettings::Mode::Borderless)
         {
-            window.create(sf::VideoMode(video_settings.resolution.x, video_settings.resolution.y), title, sf::Style::None);
+            window.create(sf::VideoMode(window_settings.resolution.x, window_settings.resolution.y), window_settings.title, sf::Style::None);
             window.setPosition(sf::Vector2i(0, 0));
             window.setSize(sf::Vector2u(sf::VideoMode::getDesktopMode().width, sf::VideoMode::getDesktopMode().height));
         }
         else
         {
-            window.create(sf::VideoMode(video_settings.resolution.x, video_settings.resolution.y), title, video_settings.window_style);
+            window.create(sf::VideoMode(window_settings.resolution.x, window_settings.resolution.y), window_settings.title, window_settings.window_style);
         }
+
+        window.setFramerateLimit(window_settings.fps);
     }
 
     void IOBus::CloseWindow()
@@ -109,7 +111,7 @@ namespace doge
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
             {
-                view->setSize(cast::ToSfVec2(engine.GetVideoSettings().resolution * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(engine.window_settings.resolution * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
             }
             else
             {

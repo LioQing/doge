@@ -13,7 +13,7 @@
 #include <doge/components/SceneInfo.hpp>
 #include <doge/core/IOBus.hpp>
 #include <doge/core/GameLoopFunctions.hpp>
-#include <doge/core/VideoSettings.hpp>
+#include <doge/core/WindowSettings.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/core/PCNode.hpp>
 #include <doge/core/Range.hpp>
@@ -26,8 +26,6 @@ namespace doge
     
         // IO
         IOBus io_bus;
-        VideoSettings video_settings;
-        std::string title = "";
 
         // Game Loop
         DeltaTime fixed_time_step = 10.f;
@@ -50,20 +48,16 @@ namespace doge
 
         // IO
 
-        void SetVideoSettings(const VideoSettings& video_settings);
+        WindowSettings window_settings;
 
-        const VideoSettings& GetVideoSettings() const;
+        void ApplyWindowSetting();
 
-        void SetFrameRate(uint32_t frame_rate);
-
-        void SetFixedTimeStep(float millisec);
-
-        void SetTitle(const std::string& title);
+        void SetFrameRate(uint32_t fps);
 
         // Game loop
 
         void StartScene(const std::string& id);
-        void StartScene(const std::string& id, const VideoSettings& video_settings);
+        void StartScene(const std::string& id, const WindowSettings& window_settings);
 
         void StopScene();
 
@@ -77,6 +71,8 @@ namespace doge
 
         const std::string& GetCurrentScene() const;
         const std::string& GetActiveScene() const;
+
+        void SetFixedTimeStep(float millisec);
 
         void AddExtension(const std::string& id, const GameLoopFunctions& glf);
 

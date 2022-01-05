@@ -7,7 +7,7 @@
 #include <array>
 #include <set>
 #include <SFML/Graphics.hpp>
-#include <doge/core/VideoSettings.hpp>
+#include <doge/core/WindowSettings.hpp>
 #include <doge/utils/aliases.hpp>
 
 namespace doge
@@ -16,12 +16,15 @@ namespace doge
 
     struct IOBus
     {
+        using Texture = sf::Texture;
+        using Image = sf::Image;
+
         sf::RenderWindow window;
         sf::Clock clock;
         std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<std::tuple<EntityID, std::uint8_t, std::size_t>>>> views_draws;
         std::unordered_map<EntityID, std::variant<std::unique_ptr<sf::Drawable>, std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>> drawables;
 
-        void CreateWindow(const VideoSettings& video_settings, const std::string& title);
+        void CreateWindow(const WindowSettings& window_settings);
 
         void CloseWindow();
 

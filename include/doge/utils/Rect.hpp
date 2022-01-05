@@ -49,8 +49,17 @@ namespace doge
                 r.top       < this->top + this->height;
         }
 
-        bool operator==(const Rect&) const = default;
+        static Rect FromCoordinates(T left, T top, T right, T bottom)
+        {
+            return Rect(left, top, right - left, bottom - top);
+        }
     };
+
+    template <typename T, typename U>
+    bool operator==(const Rect<T>& r1, const Rect<U>& r2)
+    {
+        return r1.left == r2.left && r1.top == r2.top && r1.width == r2.width && r1.height == r2.height;
+    }
 
     template <typename T>
     std::ostream& operator<<(std::ostream& os, const Rect<T>& r)

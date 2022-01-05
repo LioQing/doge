@@ -10,30 +10,15 @@ namespace doge
 {
     // IO
 
-    void Engine::SetVideoSettings(const VideoSettings& video_settings)
+    void Engine::ApplyWindowSetting()
     {
-        this->video_settings = video_settings;
-        io_bus.CreateWindow(video_settings, title);
+        io_bus.CreateWindow(window_settings);
     }
 
-    const VideoSettings& Engine::GetVideoSettings() const
+    void Engine::SetFrameRate(uint32_t fps)
     {
-        return this->video_settings;
-    }
-
-    void Engine::SetFrameRate(uint32_t frame_rate)
-    {
-        video_settings.fps = frame_rate;
-    }
-
-    void Engine::SetFixedTimeStep(float millisec)
-    {
-        fixed_time_step = millisec;
-    }
-
-    void Engine::SetTitle(const std::string& title)
-    {
-        this->title = title;
+        window_settings.fps = fps;
+        io_bus.SetFrameRate(fps);
     }
 
     // Game Loop
@@ -54,7 +39,7 @@ namespace doge
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
-        io_bus.SetFrameRate(video_settings.fps);
+        io_bus.SetFrameRate(window_settings.fps);
         io_bus.StartDeltaClock();
         while (active_scene_id == current_scene_id && is_running && is_open)
         {
@@ -70,7 +55,7 @@ namespace doge
                 }
                 else if (event.type == sf::Event::Resized)
                 {
-                    video_settings.resolution = Vec2u(event.size.width, event.size.height);
+                    window_settings.resolution = Vec2u(event.size.width, event.size.height);
                 }
             });
             
@@ -114,17 +99,16 @@ namespace doge
     void Engine::StartScene(const std::string& id)
     {
         SetCurrentScene(id);
-
-        io_bus.CreateWindow(video_settings, title);
+        ApplyWindowSetting();
 
         is_open = true;
         while (is_open)
             Main();
     }
 
-    void Engine::StartScene(const std::string& id, const VideoSettings& video_settings)
+    void Engine::StartScene(const std::string& id, const WindowSettings& window_settings)
     {
-        SetVideoSettings(video_settings);
+        this->window_settings = window_settings;
         StartScene(id);
     }
 
@@ -168,6 +152,11 @@ namespace doge
     const std::string& Engine::GetActiveScene() const 
     {
         return active_scene_id;
+    }
+
+    void Engine::SetFixedTimeStep(float millisec)
+    {
+        fixed_time_step = millisec;
     }
 
     void Engine::AddExtension(const std::string& id, const GameLoopFunctions& glf)
