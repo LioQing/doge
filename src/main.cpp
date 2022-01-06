@@ -4,6 +4,7 @@
 #include <doge/extensions/physics.hpp>
 #include <box2d/box2d.h>
 #include <ctime>
+#include <algorithm>
 
 namespace TestScene
 {
@@ -52,7 +53,7 @@ namespace TestScene
             });
         }
 
-        for (auto i = 1; i < 2; ++i)
+        for (auto i = 1; i < 21; ++i)
         {
             auto my_shape = e.AddEntity();
 
@@ -170,22 +171,27 @@ namespace TestScene
             count = 0;
         }
 
-        for (auto [entity, rgbd, velocity, position, convex] : e.Select<doge::RigidBody, doge::Velocity, doge::Position, doge::ConvexShape>().EntitiesAndComponents())
+        for (auto [entity, rgbd, scale, velocity, position, convex, coll] : e.Select<doge::RigidBody, doge::Scale, doge::Velocity, doge::Position, doge::ConvexShape, doge::ConvexCollider>().EntitiesAndComponents())
         {
             if (doge::global::GetAABB(convex).top > e.window_settings.resolution.y / 2.f)
                 e.DestroyEntity(entity);
+            
+            scale.scale = doge::Vec2f::One() * std::clamp(100.f / velocity.velocity.Magnitude(), 0.1f, 2.f);
+            coll.apply_changes = true;
         }
 
-        for (auto [entity, rgbd, position, compound, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::Velocity>().EntitiesAndComponents())
+        for (auto [entity, rgbd, position, shape, coll, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::CompoundCollider, doge::Velocity>().EntitiesAndComponents())
         {
-            if (position.position.y - compound.circle_shapes.at(0).radius > e.window_settings.resolution.y / 2.f)
+            if (position.position.y - shape.circle_shapes.at(0).radius > e.window_settings.resolution.y / 2.f)
             {
                 e.DestroyEntity(entity);
-                if (e.window_settings.fps != 10)
-                {
-                    e.SetFrameRate(10);
-                }
             }
+            
+            shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 100.f);
+            shape.circle_shapes.at(0).origin = { shape.circle_shapes.at(0).radius + 15, shape.circle_shapes.at(0).radius };
+
+            coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;
+            coll.circle_colliders.at(0).apply_changes = true;
         }
 
         std::cout << 1000/dt << std::endl;

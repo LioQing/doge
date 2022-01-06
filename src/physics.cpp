@@ -7,6 +7,7 @@ namespace doge
 {
     std::unique_ptr<b2World> physics::world;
     std::unordered_map<EntityID, b2Body*> physics::bodies;
+    std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, 3>> physics::compound_fixtures;
     Vec2f physics::gravity = Vec2f(0.f, 98.f);
 
     void physics::Enable(Engine& engine)
@@ -63,8 +64,8 @@ namespace doge
             fixture_def.restitution = coll_comp.restitution;
             fixture_def.friction = coll_comp.friction;
 
-            body->CreateFixture(&fixture_def);
-            return body;
+            b2Fixture* fixture = body->CreateFixture(&fixture_def);
+            return std::make_pair(body, fixture);
         };
 
         auto SaveBody = [&](EntityID eid, const Component<RigidBody>& rgbd, b2Body* body)
@@ -81,39 +82,90 @@ namespace doge
             return body_itr;
         };
 
+        auto SyncFixture = []<typename TComp>(b2Fixture* fixture, const TComp& coll)
+        {
+            fixture->SetDensity(coll.density);
+            fixture->SetRestitution(coll.restitution);
+            fixture->SetFriction(coll.friction);
+        };
+
         // convex collider
+        auto SyncConvex = [](b2PolygonShape& convex, const Entity& entity, const ConvexCollider& coll)
+        {
+            auto scale = global::GetScale(entity);
+            std::vector<b2Vec2> vertices;
+            std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+            [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
+            convex.Set(vertices.data(), vertices.size());
+        };
+
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, ConvexCollider>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(entity.id);
+            if (body_itr == bodies.end())
             {
-                auto scale = global::GetScale(entity);
                 b2PolygonShape convex;
-                std::vector<b2Vec2> vertices;
-                std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-                [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
-                convex.Set(vertices.data(), vertices.size());
+                SyncConvex(convex, entity, coll);
+                AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &convex);
+            }
+            else if (coll.apply_changes)
+            {
+                auto* body = body_itr->second;
+                auto* fixture = body->GetFixtureList();
+                auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
 
-                SaveBody(entity, rgbd, AddFixture(CreateBody(entity, rgbd), coll, &convex));
+                if (shape->m_count != coll.points.size())
+                {
+                    body->DestroyFixture(fixture);
+                    b2PolygonShape convex;
+                    SyncConvex(convex, entity, coll);
+                    AddFixture(body, coll, &convex);
+                }
+                else
+                {
+                    SyncFixture(fixture, coll);
+                    SyncConvex(*shape, entity, coll);
+                }
+
+                coll.apply_changes = false;
             }
         }
 
         // circle collider
+        auto SyncCircle = [](b2CircleShape& circle, const Entity& entity, const CircleCollider& coll)
+        {
+            circle.m_radius = cast::ToB2Length(coll.radius);
+            circle.m_p = cast::ToB2Vec2(-coll.origin);
+        };
+
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, CircleCollider>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(entity.id);
+            if (body_itr == bodies.end())
             {
                 b2CircleShape circle;
-                circle.m_radius = cast::ToB2Length(coll.radius);
-                circle.m_p = cast::ToB2Vec2(-coll.origin);
+                SyncCircle(circle, entity, coll);
 
-                SaveBody(entity, rgbd, AddFixture(CreateBody(entity, rgbd), coll, &circle));
+                AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &circle);
+            }
+            else if (coll.apply_changes)
+            {
+                auto* body = body_itr->second;
+                auto* fixture = body->GetFixtureList();
+                auto* shape = static_cast<b2CircleShape*>(fixture->GetShape());
+
+                SyncFixture(fixture, coll);
+                SyncCircle(*shape, entity, coll);
+
+                coll.apply_changes = false;
             }
         }
 
         // rectangle collider
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, RectangleCollider>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(entity.id);
+            if (body_itr == bodies.end())
             {
                 auto scale = global::GetScale(entity);
                 b2PolygonShape rect;
@@ -123,14 +175,15 @@ namespace doge
                     0
                 );
 
-                SaveBody(entity, rgbd, AddFixture(CreateBody(entity, rgbd), coll, &rect));
+                AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &rect);
             }
         }
 
         // edge collider
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, EdgeCollider>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(entity.id);
+            if (body_itr == bodies.end())
             {
                 auto scale = global::GetScale(entity);
                 b2ChainShape chain;
@@ -142,52 +195,154 @@ namespace doge
                 else
                     chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
 
-                SaveBody(entity, rgbd, AddFixture(CreateBody(entity, rgbd), coll, &chain));
+                AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &chain);
             }
         }
 
         // compound collider
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, CompoundCollider>().EntitiesAndComponents())
         {
-            if (bodies.find(entity.id) == bodies.end())
+            auto body_itr = bodies.find(entity.id);
+            if (body_itr == bodies.end() || coll.apply_changes)
             {
                 auto scale = global::GetScale(entity);
 
-                auto* body = SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second;
+                if (body_itr == bodies.end())
+                {
+                    body_itr = SaveBody(entity, rgbd, CreateBody(entity, rgbd));
+                    compound_fixtures.emplace(entity, std::array<std::vector<b2Fixture*>, 3>
+                    { 
+                        std::vector<b2Fixture*>(coll.convex_colliders.size()), 
+                        std::vector<b2Fixture*>(coll.circle_colliders.size()), 
+                        std::vector<b2Fixture*>(coll.rectangle_colliders.size()) 
+                    });
+                }
+
+                auto& fixtures = compound_fixtures.at(entity);
+                auto* body = body_itr->second;
+
+                // clear fixture
+                if (coll.apply_changes)
+                {
+                    auto* fixture = body->GetFixtureList();
+                    b2Fixture* next = nullptr;
+                    while (fixture != nullptr)
+                    {
+                        next = fixture->GetNext();
+                        body->DestroyFixture(fixture);
+                        fixture = next;
+                    }
+
+                    fixtures = std::array<std::vector<b2Fixture*>, 3>
+                    { 
+                        std::vector<b2Fixture*>(coll.convex_colliders.size()), 
+                        std::vector<b2Fixture*>(coll.circle_colliders.size()), 
+                        std::vector<b2Fixture*>(coll.rectangle_colliders.size()) 
+                    };
+
+                    coll.apply_changes = false;
+                }
 
                 // convex sub collider
-                for (auto& convex_collider : coll.convex_colliders)
+                for (auto i = 0; i < coll.convex_colliders.size(); ++i)
                 {
-                    b2PolygonShape convex;
-                    std::vector<b2Vec2> vertices;
-                    std::transform(convex_collider.points.begin(), convex_collider.points.end(), std::back_inserter(vertices), 
-                    [&](const Vec2f& v) { return cast::ToB2Vec2((v - convex_collider.origin) * scale); });
-                    convex.Set(vertices.data(), vertices.size());
+                    auto& convex_coll = coll.convex_colliders.at(i);
 
-                    AddFixture(body, convex_collider, &convex);
+                    b2PolygonShape convex;
+                    SyncConvex(convex, entity, convex_coll);
+
+                    fixtures.at(0).at(i) = AddFixture(body, convex_coll, &convex).second;
+
+                    convex_coll.apply_changes = false;
                 }
 
                 // circle sub collider
-                for (auto& circle_collider : coll.circle_colliders)
+                for (auto i = 0; i < coll.circle_colliders.size(); ++i)
                 {
-                    b2CircleShape circle;
-                    circle.m_radius = cast::ToB2Length(circle_collider.radius);
-                    circle.m_p = cast::ToB2Vec2(-circle_collider.origin);
+                    auto& circle_coll = coll.circle_colliders.at(i);
 
-                    AddFixture(body, circle_collider, &circle);
+                    b2CircleShape circle;
+                    SyncCircle(circle, entity, circle_coll);
+
+                    fixtures.at(1).at(i) = AddFixture(body, circle_coll, &circle).second;
+
+                    circle_coll.apply_changes = false;
                 }
 
                 // rectangle sub collider
-                for (auto& rectangle_collider : coll.rectangle_colliders)
+                for (auto i = 0; i < coll.rectangle_colliders.size(); ++i)
                 {
+                    auto& rectangle_coll = coll.rectangle_colliders.at(i);
+
                     b2PolygonShape rect;
                     rect.SetAsBox(
-                        cast::ToB2Length(rectangle_collider.size.x * scale.x) / 2.f, cast::ToB2Length(rectangle_collider.size.y * scale.y) / 2.f, 
-                        cast::ToB2Vec2(rectangle_collider.origin), 
+                        cast::ToB2Length(rectangle_coll.size.x * scale.x) / 2.f, cast::ToB2Length(rectangle_coll.size.y * scale.y) / 2.f, 
+                        cast::ToB2Vec2(rectangle_coll.origin), 
                         0
                     );
 
-                    AddFixture(body, rectangle_collider, &rect);
+                    fixtures.at(2).at(i) = AddFixture(body, rectangle_coll, &rect).second;
+
+                    rectangle_coll.apply_changes = false;
+                }
+            }
+            else
+            {
+                auto* body = body_itr->second;
+                
+                // convex sub collider
+                for (auto i = 0; i < coll.convex_colliders.size(); ++i)
+                {
+                    auto& convex_coll = coll.convex_colliders.at(i);
+
+                    if (!convex_coll.apply_changes)
+                        continue;
+
+                    auto* body = body_itr->second;
+                    auto*& fixture = compound_fixtures.at(entity).at(0).at(i);
+                    auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
+
+                    if (shape->m_count != convex_coll.points.size())
+                    {
+                        body->DestroyFixture(fixture);
+                        b2PolygonShape convex;
+                        SyncConvex(convex, entity, convex_coll);
+                        fixture = AddFixture(body, convex_coll, &convex).second;
+                    }
+                    else
+                    {
+                        SyncFixture(fixture, convex_coll);
+                        SyncConvex(*shape, entity, convex_coll);
+                    }
+
+                    coll.apply_changes = false;
+                }
+
+                // circle sub collider
+                for (auto i = 0; i < coll.circle_colliders.size(); ++i)
+                {
+                    auto& circle_coll = coll.circle_colliders.at(i);
+
+                    if (!circle_coll.apply_changes)
+                        continue;
+
+                    auto* body = body_itr->second;
+                    auto*& fixture = compound_fixtures.at(entity).at(1).at(i);
+                    auto* shape = static_cast<b2CircleShape*>(fixture->GetShape());
+
+                    SyncFixture(fixture, circle_coll);
+                    SyncCircle(*shape, entity, circle_coll);
+
+                    circle_coll.apply_changes = false;
+                }
+
+                // rectangle sub collider
+                for (auto i = 0; i < coll.rectangle_colliders.size(); ++i)
+                {
+                    auto& rectangle_coll = coll.rectangle_colliders.at(i);
+
+                    if (!rectangle_coll.apply_changes)
+                        continue;
                 }
             }
         }

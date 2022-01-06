@@ -5,6 +5,8 @@
 #include <doge/components/RigidBody.hpp>
 #include <memory>
 #include <unordered_map>
+#include <array>
+#include <vector>
 
 namespace doge
 {
@@ -20,6 +22,7 @@ namespace doge
 
         static std::unique_ptr<b2World> world;
         static std::unordered_map<EntityID, b2Body*> bodies;
+        static std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, 3>> compound_fixtures;
         static Vec2f gravity;
 
         static void Start(Engine& engine);
