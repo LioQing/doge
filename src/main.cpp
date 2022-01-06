@@ -27,18 +27,21 @@ namespace TestScene
                 .type = doge::RigidBody::Type::Dynamic, 
             });
 
-            my_shape.AddComponent(doge::ConvexCollider
+            // my_shape.AddComponent(doge::ConvexCollider
+            // {
+            //     .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+            //     .density = 1.f,
+            //     .restitution = .5f,
+            //     .friction = .3f,
+            // });
+
+            my_shape.AddComponent(doge::RectangleCollider
             {
-                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+                .size = { 20, 40 },
                 .density = 1.f,
                 .restitution = .5f,
                 .friction = .3f,
             });
-
-            // my_shape.AddComponent(doge::RectangleCollider
-            // {
-            //     .size = { 5, 10 },
-            // });
 
             my_shape.AddComponent<doge::Position>(i * 30, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
@@ -46,9 +49,16 @@ namespace TestScene
             my_shape.AddComponent<doge::AngularVelocity>(20);
             my_shape.AddComponent<doge::Scale>(2, 2);
 
-            auto& rect = my_shape.AddComponent(doge::ConvexShape
+            // auto& rect = my_shape.AddComponent(doge::ConvexShape
+            // {
+            //     .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+            //     .color = doge::Color(0x00FF0088),
+            // });
+
+            my_shape.AddComponent(doge::RectangleShape
             {
-                .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
+                .size = { 20, 40 },
+                .origin = { 10, 20 },
                 .color = doge::Color(0x00FF0088),
             });
         }
@@ -171,7 +181,7 @@ namespace TestScene
             count = 0;
         }
 
-        for (auto [entity, rgbd, scale, velocity, position, convex, coll] : e.Select<doge::RigidBody, doge::Scale, doge::Velocity, doge::Position, doge::ConvexShape, doge::ConvexCollider>().EntitiesAndComponents())
+        for (auto [entity, rgbd, scale, velocity, position, convex, coll] : e.Select<doge::RigidBody, doge::Scale, doge::Velocity, doge::Position, doge::RectangleShape, doge::RectangleCollider>().EntitiesAndComponents())
         {
             if (doge::global::GetAABB(convex).top > e.window_settings.resolution.y / 2.f)
                 e.DestroyEntity(entity);

@@ -162,40 +162,82 @@ namespace doge
         }
 
         // rectangle collider
+        auto SyncRectangle = [](b2PolygonShape& rect, const Entity& entity, const RectangleCollider& coll)
+        {
+            auto scale = global::GetScale(entity);
+            rect.SetAsBox(
+                cast::ToB2Length(coll.size.x * scale.x) / 2.f, cast::ToB2Length(coll.size.y * scale.y) / 2.f, 
+                cast::ToB2Vec2(coll.origin), 
+                0
+            );
+        };
+
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, RectangleCollider>().EntitiesAndComponents())
         {
             auto body_itr = bodies.find(entity.id);
             if (body_itr == bodies.end())
             {
-                auto scale = global::GetScale(entity);
                 b2PolygonShape rect;
-                rect.SetAsBox(
-                    cast::ToB2Length(coll.size.x * scale.x) / 2.f, cast::ToB2Length(coll.size.y * scale.y) / 2.f, 
-                    cast::ToB2Vec2(coll.origin), 
-                    0
-                );
+                SyncRectangle(rect, entity, coll);
 
                 AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &rect);
+            }
+            else if (coll.apply_changes)
+            {
+                auto* body = body_itr->second;
+                auto* fixture = body->GetFixtureList();
+                auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
+
+                SyncFixture(fixture, coll);
+                SyncRectangle(*shape, entity, coll);
+
+                coll.apply_changes = false;
             }
         }
 
         // edge collider
+        auto SyncEdge = [](b2ChainShape& chain, const Entity& entity, const EdgeCollider& coll)
+        {
+            auto scale = global::GetScale(entity);
+            std::vector<b2Vec2> vertices;
+            std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+            [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
+            if (coll.is_loop)
+                chain.CreateLoop(vertices.data(), vertices.size());
+            else
+                chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+        };
+
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, EdgeCollider>().EntitiesAndComponents())
         {
             auto body_itr = bodies.find(entity.id);
             if (body_itr == bodies.end())
             {
-                auto scale = global::GetScale(entity);
                 b2ChainShape chain;
-                std::vector<b2Vec2> vertices;
-                std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-                [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
-                if (coll.is_loop)
-                    chain.CreateLoop(vertices.data(), vertices.size());
-                else
-                    chain.CreateChain(vertices.data(), vertices.size(), vertices.front(), vertices.back());
+                SyncEdge(chain, entity, coll);
 
                 AddFixture(SaveBody(entity, rgbd, CreateBody(entity, rgbd))->second, coll, &chain);
+            }
+            else if (coll.apply_changes)
+            {
+                auto* body = body_itr->second;
+                auto* fixture = body->GetFixtureList();
+                auto* shape = static_cast<b2ChainShape*>(fixture->GetShape());
+
+                if (shape->m_count != coll.points.size())
+                {
+                    body->DestroyFixture(fixture);
+                    b2ChainShape chain;
+                    SyncEdge(chain, entity, coll);
+                    AddFixture(body, coll, &chain);
+                }
+                else
+                {
+                    SyncFixture(fixture, coll);
+                    SyncEdge(*shape, entity, coll);
+                }
+
+                coll.apply_changes = false;
             }
         }
 
@@ -343,6 +385,15 @@ namespace doge
 
                     if (!rectangle_coll.apply_changes)
                         continue;
+
+                    auto* body = body_itr->second;
+                    auto*& fixture = compound_fixtures.at(entity).at(2).at(i);
+                    auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
+
+                    SyncFixture(fixture, rectangle_coll);
+                    SyncRectangle(*shape, entity, rectangle_coll);
+
+                    rectangle_coll.apply_changes = false;
                 }
             }
         }
