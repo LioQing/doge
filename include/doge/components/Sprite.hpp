@@ -9,8 +9,8 @@ namespace doge
 {
     struct Sprite
     {
-        Texture texture;
-        Recti texture_rectangle;
+        std::string texture_id = "";
+        Recti texture_rectangle = Recti();
         Vec2f origin = Vec2f::Zero();
         Color color = Color::White();
     };

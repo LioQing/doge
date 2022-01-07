@@ -66,5 +66,7 @@ namespace doge
         Texture(const std::string& filename, const Recti& area = Recti());
         Texture(void* data, std::size_t size, const Recti& area = Recti());
         Texture(const Image& image, const Recti& area = Recti());
+
+        Vec2u GetSize() const;
     };
 }

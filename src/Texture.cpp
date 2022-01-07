@@ -90,4 +90,9 @@ namespace doge
     {
         texture_data.FromImage(image.image_data, area);
     }
+
+    Vec2u Texture::GetSize() const
+    {
+        return texture_data.GetSize();
+    }
 }
