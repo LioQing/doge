@@ -2,11 +2,121 @@
 
 #include <memory>
 #include <doge/core/Engine.hpp>
+#include <doge/core/Texture.hpp>
 #include <doge/components.hpp>
 #include <doge/utils.hpp>
 
 namespace doge
 {
+    // textures and images
+
+    Vec2u IOBus::TextureData::GetSize() const
+    {
+        return cast::FromSfVec2(texture.getSize());
+    }
+
+    bool IOBus::TextureData::Create(const Vec2u& size)
+    {
+        return texture.create(size.x, size.y);
+    }
+
+    bool IOBus::TextureData::FromFile(const std::string& filename, const Recti& area)
+    {
+        return texture.loadFromFile(filename, cast::ToSfRect(area));
+    }
+
+    bool IOBus::TextureData::FromMemory(void* data, std::size_t size, const Recti& area)
+    {
+        return texture.loadFromMemory(data, size, cast::ToSfRect(area));
+    }
+
+    bool IOBus::TextureData::FromImage(const ImageData& image, const Recti& area)
+    {
+        return texture.loadFromImage(image.image, cast::ToSfRect(area));
+    }
+
+    void IOBus::TextureData::SetSmooth(bool smooth)
+    {
+        texture.setSmooth(smooth);
+    }
+
+    bool IOBus::TextureData::IsSmooth() const
+    {
+        return texture.isSmooth();
+    }
+
+    void IOBus::TextureData::SetSRGB(bool srgb)
+    {
+        texture.setSrgb(srgb);
+    }
+
+    bool IOBus::TextureData::IsSRGB() const
+    {
+        return texture.isSrgb();
+    }
+
+    void IOBus::TextureData::SetRepeated(bool repeated)
+    {
+        texture.setRepeated(repeated);
+    }
+
+    bool IOBus::TextureData::IsRepeated() const
+    {
+        return texture.isRepeated();
+    }
+
+    Vec2u IOBus::ImageData::GetSize() const
+    {
+        return cast::FromSfVec2(image.getSize());
+    }
+
+    void IOBus::ImageData::Create(const Vec2u& size, const Color& color)
+    {
+        image.create(size.x, size.y, cast::ToSfColor(color));
+    }
+
+    bool IOBus::ImageData::FromFile(const std::string& filename)
+    {
+        return image.loadFromFile(filename);
+    }
+
+    bool IOBus::ImageData::FromMemory(void* data, std::size_t size)
+    {
+        return image.loadFromMemory(data, size);
+    }
+
+    void IOBus::ImageData::FromTexture(const TextureData& texture)
+    {
+        image = texture.texture.copyToImage();
+    }
+
+    bool IOBus::ImageData::ToFile(const std::string& filename) const 
+    {
+        return image.saveToFile(filename);
+    }
+
+    void IOBus::ImageData::MaskColor(const Color& color, std::uint8_t alpha)
+    {
+        image.createMaskFromColor(cast::ToSfColor(color), alpha);
+    }
+
+    void IOBus::ImageData::SetPixel(std::uint32_t x, std::uint32_t y, const Color& color)
+    {
+        image.setPixel(x, y, cast::ToSfColor(color));
+    }
+
+    Color IOBus::ImageData::GetPixel(std::uint32_t x, std::uint32_t y) const
+    {
+        return cast::FromSfColor(image.getPixel(x, y));
+    }
+
+    const std::uint8_t* IOBus::ImageData::GetPixelPtr() const
+    {
+        return image.getPixelsPtr();
+    }
+
+    // window
+
     void IOBus::CreateWindow(const WindowSettings& window_settings)
     {
         if (window_settings.mode == WindowSettings::Mode::FullScreen)
@@ -31,6 +141,8 @@ namespace doge
     {
         window.close();
     }
+
+    // game loops
 
     void IOBus::Render(const Engine& engine)
     {

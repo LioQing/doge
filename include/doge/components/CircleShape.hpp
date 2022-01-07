@@ -10,6 +10,6 @@ namespace doge
         float radius = 1.f;
         Vec2f origin = Vec2f::Zero();
         Color color = Color::White();
-        size_t point_count = 32;
+        std::size_t point_count = 32;
     };
 }

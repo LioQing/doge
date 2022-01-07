@@ -17,6 +17,7 @@
 #include <doge/core/Entity.hpp>
 #include <doge/core/PCNode.hpp>
 #include <doge/core/Range.hpp>
+#include <doge/core/Assets.hpp>
 
 namespace doge
 {
@@ -121,5 +122,9 @@ namespace doge
         {
             return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), active_scene_id);
         }
+
+        // assets
+
+        Assets assets;
     };
 }

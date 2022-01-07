@@ -197,7 +197,7 @@ namespace TestScene
                 e.DestroyEntity(entity);
             }
             
-            shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 100.f);
+            shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 50.f);
             shape.circle_shapes.at(0).origin = { shape.circle_shapes.at(0).radius + 15, shape.circle_shapes.at(0).radius };
 
             coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;

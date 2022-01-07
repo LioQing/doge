@@ -8,5 +8,6 @@
 #include "core/PCNode.hpp"
 #include "core/Range.hpp"
 #include "core/Component.hpp"
-#include "core/AssetManager.hpp"
+#include "core/Assets.hpp"
 #include "core/Texture.hpp"
+#include "core/Image.hpp"

@@ -18,3 +18,4 @@
 #include "components/Tag.hpp"
 #include "components/CompoundShape.hpp"
 #include "components/CompoundCollider.hpp"
+#include "components/Sprite.hpp"
