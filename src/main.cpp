@@ -59,11 +59,9 @@ namespace TestScene
             {
                 .size = { 20, 40 },
                 .origin = { 10, 20 },
-                //.color = doge::Color(0x00FF0088),
+                .color = doge::Color(0x00FF0088),
                 .outline_color = doge::Color::Green(),
                 .outline_thickness = 2.f,
-                .texture_id = "missing_texture",
-                .texture_rectangle = { 0, 0, 30, 30 },
             });
         }
 
@@ -115,11 +113,9 @@ namespace TestScene
                     {
                         .radius = 10.f,
                         .origin = doge::Vec2f(25.f, 10.f),
-                        //.color = doge::Color(0x0000FF88),
+                        .color = doge::Color(0x0000FF88),
                         .outline_color = doge::Color::Blue(),
                         .outline_thickness = 2.f,
-                        .texture_id = "missing_texture",
-                        .texture_rectangle = { 0, 0, 30, 30 },
                     },
                 },
                 .rectangle_shapes =
@@ -128,11 +124,9 @@ namespace TestScene
                     {
                         .size = { 30, 8 },
                         .origin = { 15, 4 },
-                        //.color = doge::Color(0x0000FF88),
+                        .color = doge::Color(0x0000FF88),
                         .outline_color = doge::Color::Blue(),
                         .outline_thickness = 2.f,
-                        .texture_id = "missing_texture",
-                        .texture_rectangle = { 0, 0, 30, 30 },
                     },
                 },
             });
@@ -196,6 +190,32 @@ namespace TestScene
             .color = doge::Color::Red(),
         });
 
+        auto my_custom_shape = e.AddEntity();
+        my_custom_shape.AddComponent(doge::CustomShape
+        {
+            .type = doge::CustomShape::Type::Triangles,
+            .vertices = 
+            {
+                doge::CustomShape::Vertex({ 0, 0 }, doge::Color::Red()),
+                doge::CustomShape::Vertex({ 100, 100 }, doge::Color::Green()),
+                doge::CustomShape::Vertex({ 100, 0 }, doge::Color::Blue()),
+            },
+            .origin = { 50, 50 },
+            .texture_id = "missing_texture",
+        });
+        my_custom_shape.AddComponent(doge::RigidBody(doge::RigidBody::Kinematic));
+        my_custom_shape.AddComponent(doge::ConvexCollider
+        {
+            .points = 
+            {
+                doge::Vec2f(0, 0),
+                doge::Vec2f(100, 100),
+                doge::Vec2f(100, 0),
+            },
+            .origin = { 50, 50 },
+        });
+        my_custom_shape.AddComponent<doge::Rotation>();
+
         AddBlocks(e);
     }
 
@@ -228,6 +248,11 @@ namespace TestScene
 
             //coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;
             //coll.circle_colliders.at(0).apply_changes = true;
+        }
+
+        for (auto [rotation, custom_shape] : e.Select<doge::Rotation, doge::CustomShape>().Components())
+        {
+            rotation.rotation += 0.005 * dt;
         }
 
         for (auto [sprite] : e.Select<doge::Sprite>().Components())

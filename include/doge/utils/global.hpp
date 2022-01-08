@@ -40,5 +40,13 @@ namespace doge
 
         static Rectf GetAABB(const Sprite& sprite, const Entity& entity);
         static Rectf GetAABB(const Component<Sprite>& sprite);
+
+        static Rectf GetAABB(const CustomShape& custom, const Entity& entity);
+        static Rectf GetAABB(const Component<CustomShape>& custom);
+
+    private:
+
+        static Rectf GetAABB(const Vec2f& tl, const Vec2f& br, const Vec2f& bl, const Vec2f& tr, const Vec2f& position);
+        static Rectf GetAABB(const std::vector<Vec2f>& points, const Vec2f& position);
     };
 }

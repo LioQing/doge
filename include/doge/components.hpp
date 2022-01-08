@@ -19,3 +19,4 @@
 #include "components/CompoundSprite.hpp"
 #include "components/CompoundCollider.hpp"
 #include "components/Sprite.hpp"
+#include "components/CustomShape.hpp"

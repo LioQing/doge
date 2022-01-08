@@ -23,7 +23,7 @@ namespace doge
             return Vec2<U>(x, y);
         }
 
-        Vec2& Set(T x, T y)
+        Vec2& Set(T x, T y) &
         {
             this->x = x;
             this->y = y;
@@ -46,7 +46,7 @@ namespace doge
             return Vec2<T>(tx, ty);
         }
         template <typename U>
-        Vec2& Rotate(U theta)
+        Vec2& Rotate(U theta) &
         {
             *this = Rotated(theta);
 
@@ -62,7 +62,7 @@ namespace doge
             if (Magnitude() == 0) return *this;
             return Vec2(*this / Magnitude());
         }
-        Vec2& Normalize()
+        Vec2& Normalize() &
         {
             if (Magnitude() == 0) return *this;
             *this *= (1.0 / Magnitude());

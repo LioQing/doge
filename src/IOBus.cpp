@@ -349,6 +349,57 @@ namespace doge
             UpdateSprite(sprite_comp, sprite_comp, entity, 0);
         }
 
+        // custom shape
+        auto SyncCustom = [&](DrawableVertices& vertices, const CustomShape& custom_comp, const Entity& entity)
+        {
+            auto size = custom_comp.vertices.size();
+
+            if      (custom_comp.type == CustomShape::Type::Points)         vertices.type = sf::PrimitiveType::Points;
+            else if (custom_comp.type == CustomShape::Type::Lines)          vertices.type = sf::PrimitiveType::Lines;
+            else if (custom_comp.type == CustomShape::Type::LineStrip)      vertices.type = sf::PrimitiveType::LineStrip;
+            else if (custom_comp.type == CustomShape::Type::Triangles)      vertices.type = sf::PrimitiveType::Triangles;
+            else if (custom_comp.type == CustomShape::Type::TriangleStrip)  vertices.type = sf::PrimitiveType::TriangleStrip;
+            else if (custom_comp.type == CustomShape::Type::TriangleFan)    vertices.type = sf::PrimitiveType::TriangleFan;
+            else if (custom_comp.type == CustomShape::Type::Quads)          vertices.type = sf::PrimitiveType::Quads;
+            else throw std::invalid_argument("Invalid CustomShape::Type");
+
+            if (vertices.vertices.size() < custom_comp.vertices.size())
+            {
+                vertices.vertices.resize(size);
+            }
+
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                auto& vertex = custom_comp.vertices.at(i);
+                vertices.vertices.at(i).position = 
+                    cast::ToSfVec2((vertex.position - custom_comp.origin).Rotated(global::GetRotation(entity)) * global::GetScale(entity) 
+                    + global::GetPosition(entity));
+                vertices.vertices.at(i).color = cast::ToSfColor(vertex.color);
+                vertices.vertices.at(i).texCoords = cast::ToSfVec2(vertex.texture_coordinates);
+            }
+
+            if (custom_comp.texture_id != "")
+            {
+                vertices.texture = &engine.assets.textures.at(custom_comp.texture_id).texture_data.texture;
+            }
+        };
+
+        auto UpdateCustom = [&]<typename TComp>(Component<TComp>& comp, const CustomShape& custom_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Custom, index);
+            auto draw_itr = EmplaceDrawables.template operator()<DrawableVertices>(key, comp);
+
+            if (InAnyViewHelper(custom_comp, entity, key))
+            {
+                SyncCustom(static_cast<DrawableVertices&>(*draw_itr->second), custom_comp, entity);
+            }
+        };
+
+        for (auto [entity, custom_comp] : engine.Select<CustomShape>().EntitiesAndComponents())
+        {
+            UpdateCustom(custom_comp, custom_comp, entity, 0);
+        }
+
         // compound shape
         for (auto [entity, compound_comp] : engine.Select<CompoundSprite>().EntitiesAndComponents())
         {
