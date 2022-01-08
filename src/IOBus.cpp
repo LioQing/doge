@@ -156,36 +156,35 @@ namespace doge
             shape.setFillColor(cast::ToSfColor(comp.color));
         };
 
-        auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(EntityID eid, Component<TComp>& comp)
+        auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(const DrawableKey& key, Component<TComp>& comp)
         {
-            auto draw_itr = drawables.find(eid);
+            auto draw_itr = drawables.find(key);
             if (draw_itr != drawables.end())
                 return draw_itr;
             
-            auto [draw_itr_, success] = drawables.emplace(eid, static_cast<std::unique_ptr<sf::Drawable>>(std::make_unique<TSfShape>()));
+            auto [draw_itr_, success] = drawables.emplace(key, static_cast<std::unique_ptr<sf::Drawable>>(std::make_unique<TSfShape>()));
             if (!success)
             {
-                throw std::invalid_argument(std::string("More than one shape is found in Entity ") + std::to_string(eid));
+                throw std::invalid_argument(std::string("More than one shape is found in Entity ") + std::to_string(std::get<0>(key)));
             }
             draw_itr = std::move(draw_itr_);
-            comp.OnRemoval([&, eid](){ drawables.erase(eid); });
+            comp.OnRemoval([&, val_key = key](){ drawables.erase(val_key); });
             return draw_itr;
         };
 
         auto InAnyViewHelper = [&]<typename TComp>(
             const TComp& comp, 
             const Entity& entity, 
-            std::uint8_t compound_arr_index = 0,
-            std::size_t compound_vec_index = 0
+            const DrawableKey& key
             )
         {
             auto is_in_any_view = false;
+            Rectf aabb = global::GetAABB(comp, entity);
 
             for (auto cam_entity : engine.Select<Camera>().Entities())
             {
-                auto& [view_ptr, draw_ids] = views_draws.at(cam_entity.id);
-
-                Rectf aabb = global::GetAABB(comp, entity);
+                auto& [view_ptr, draw_keys] = views_draws.at(cam_entity.id);
+                
                 bool is_in_view = 
                     aabb.left + aabb.width > view_ptr->getCenter().x - view_ptr->getSize().x / 2.f &&
                     aabb.top + aabb.height > view_ptr->getCenter().y - view_ptr->getSize().y / 2.f &&
@@ -194,14 +193,14 @@ namespace doge
 
                 is_in_any_view = is_in_any_view || is_in_view;
 
-                auto draw_id_itr = draw_ids.find(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
-                if (draw_id_itr != draw_ids.end() && !is_in_view)
+                auto draw_key_itr = draw_keys.find(key);
+                if (draw_key_itr != draw_keys.end() && !is_in_view)
                 {
-                    draw_ids.erase(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
+                    draw_keys.erase(key);
                 }
-                else if (draw_id_itr == draw_ids.end() && is_in_view)
+                else if (draw_key_itr == draw_keys.end() && is_in_view)
                 {
-                    draw_ids.emplace(std::make_tuple(entity.id, compound_arr_index, compound_vec_index));
+                    draw_keys.emplace(key);
                 }
             }
 
@@ -214,7 +213,7 @@ namespace doge
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::set<std::tuple<EntityID, std::uint8_t, std::size_t>>())).first;
+                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::set<DrawableKey>())).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
@@ -250,14 +249,20 @@ namespace doge
             }
         };
 
+        auto UpdateConvex = [&]<typename TComp>(Component<TComp>& comp, const ConvexShape& convex_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Convex, index);
+            auto draw_itr = EmplaceDrawables.template operator()<sf::ConvexShape>(key, comp);
+
+            if (InAnyViewHelper(convex_comp, entity, key))
+            {
+                SyncConvex(static_cast<sf::ConvexShape&>(*draw_itr->second), convex_comp, entity);
+            }
+        };
+
         for (auto [entity, convex_comp] : engine.Select<ConvexShape>().EntitiesAndComponents())
         {
-            auto draw_itr = EmplaceDrawables.template operator()<sf::ConvexShape>(entity, convex_comp);
-
-            if (InAnyViewHelper(convex_comp, entity))
-            {
-                SyncConvex(static_cast<sf::ConvexShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), convex_comp, entity);
-            }
+            UpdateConvex(convex_comp, convex_comp, entity, 0);
         }
 
         // circle shape
@@ -268,14 +273,20 @@ namespace doge
             circle_shape.setPointCount(circle_comp.point_count);
         };
 
+        auto UpdateCircle = [&]<typename TComp>(Component<TComp>& comp, const CircleShape& circle_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Circle, index);
+            auto draw_itr = EmplaceDrawables.template operator()<sf::CircleShape>(key, comp);
+            
+            if (InAnyViewHelper(circle_comp, entity, key))
+            {
+                SyncCircle(static_cast<sf::CircleShape&>(*draw_itr->second), circle_comp, entity);
+            }
+        };
+
         for (auto [entity, circle_comp] : engine.Select<CircleShape>().EntitiesAndComponents())
         {
-            auto draw_itr = EmplaceDrawables.template operator()<sf::CircleShape>(entity, circle_comp);
-            
-            if (InAnyViewHelper(circle_comp, entity))
-            {
-                SyncCircle(static_cast<sf::CircleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), circle_comp, entity);
-            }
+            UpdateCircle(circle_comp, circle_comp, entity, 0);
         }
 
         // rectangle shape
@@ -285,76 +296,41 @@ namespace doge
             rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
         };
 
+        auto UpdateRectangle = [&]<typename TComp>(Component<TComp>& comp, const RectangleShape& rectangle_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Rectangle, index);
+            auto draw_itr = EmplaceDrawables.template operator()<sf::RectangleShape>(key, comp);
+
+            if (InAnyViewHelper(rectangle_comp, entity, key))
+            {
+                SyncRectangle(static_cast<sf::RectangleShape&>(*draw_itr->second), rectangle_comp, entity);
+            }
+        };
+
         for (auto [entity, rectangle_comp] : engine.Select<RectangleShape>().EntitiesAndComponents())
         {
-            auto draw_itr = EmplaceDrawables.template operator()<sf::RectangleShape>(entity, rectangle_comp);
-
-            if (InAnyViewHelper(rectangle_comp, entity))
-            {
-                SyncRectangle(static_cast<sf::RectangleShape&>(*std::get<std::unique_ptr<sf::Drawable>>(draw_itr->second)), rectangle_comp, entity);
-            }
+            UpdateRectangle(rectangle_comp, rectangle_comp, entity, 0);
         }
 
         // compound shape
         for (auto [entity, compound_comp] : engine.Select<CompoundShape>().EntitiesAndComponents())
         {
-            auto draw_itr = drawables.find(entity.id);
-            if (draw_itr == drawables.end())
-            {
-                auto [draw_itr_, success] = drawables.emplace(entity.id, std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>());
-                if (!success)
-                {
-                    throw std::invalid_argument(std::string("More than one shape is found in Entity ") + std::to_string(entity.id));
-                }
-                draw_itr = std::move(draw_itr_);
-                compound_comp.OnRemoval([&, eid = entity.id](){ drawables.erase(eid); });
-            }
-
-            auto& draw_arr = std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(draw_itr->second);
-
             // convex sub shape
-            draw_arr.at(0).resize(compound_comp.convex_shapes.size());
             for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)
             {
-                if (!draw_arr.at(0).at(i))
-                {
-                    draw_arr.at(0).at(i) = std::make_unique<sf::ConvexShape>();
-                }
-
-                if (InAnyViewHelper(compound_comp.convex_shapes.at(i), entity, 0, i))
-                {
-                    SyncConvex(static_cast<sf::ConvexShape&>(*draw_arr.at(0).at(i)), compound_comp.convex_shapes.at(i), entity);
-                }
+                UpdateConvex(compound_comp, compound_comp.convex_shapes.at(i), entity, i);
             }
 
             // circle sub shape
-            draw_arr.at(1).resize(compound_comp.circle_shapes.size());
             for (std::size_t i = 0; i < compound_comp.circle_shapes.size(); ++i)
             {
-                if (!draw_arr.at(1).at(i))
-                {
-                    draw_arr.at(1).at(i) = std::make_unique<sf::CircleShape>();
-                }
-                
-                if (InAnyViewHelper(compound_comp.circle_shapes.at(i), entity, 1, i))
-                {
-                    SyncCircle(static_cast<sf::CircleShape&>(*draw_arr.at(1).at(i)), compound_comp.circle_shapes.at(i), entity);
-                }
+                UpdateCircle(compound_comp, compound_comp.circle_shapes.at(i), entity, i);
             }
 
             // rectangle sub shape
-            draw_arr.at(2).resize(compound_comp.rectangle_shapes.size());
             for (std::size_t i = 0; i < compound_comp.rectangle_shapes.size(); ++i)
             {
-                if (!draw_arr.at(2).at(i))
-                {
-                    draw_arr.at(2).at(i) = std::make_unique<sf::RectangleShape>();
-                }
-
-                if (InAnyViewHelper(compound_comp.rectangle_shapes.at(i), entity, 2, i))
-                {
-                    SyncRectangle(static_cast<sf::RectangleShape&>(*draw_arr.at(2).at(i)), compound_comp.rectangle_shapes.at(i), entity);
-                }
+                UpdateRectangle(compound_comp, compound_comp.rectangle_shapes.at(i), entity, i);
             }
         }
 
@@ -362,25 +338,14 @@ namespace doge
         window.clear();
         for (auto& [eid, view_draw] : views_draws)
         {
-            auto& [view, draw_ids] = view_draw;
+            auto& [view, draw_keys] = view_draw;
 
             window.setView(*view);
 
             // draw
-            for (auto draw_id : draw_ids)
+            for (auto draw_key : draw_keys)
             {
-                auto eid = std::get<0>(draw_id);
-                if (drawables.at(eid).index() == 0)
-                {
-                    window.draw(*std::get<std::unique_ptr<sf::Drawable>>(drawables.at(eid)));
-                }
-                else
-                {
-                    window.draw(*std::get<std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>(drawables.at(eid))
-                        .at(std::get<1>(draw_id))
-                        .at(std::get<2>(draw_id))
-                    );
-                }
+                window.draw(*drawables.at(draw_key));
             }
         }
     }

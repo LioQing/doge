@@ -2,10 +2,11 @@
 
 #include <concepts>
 #include <unordered_map>
+#include <map>
 #include <memory>
+#include <set>
 #include <variant>
 #include <array>
-#include <set>
 #include <SFML/Graphics.hpp>
 #include <doge/core/WindowSettings.hpp>
 #include <doge/utils/Rect.hpp>
@@ -18,16 +19,6 @@ namespace doge
 
     struct IOBus
     {
-        // window
-
-        sf::RenderWindow window;
-        sf::Clock clock;
-
-        // game loops
-
-        std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<std::tuple<EntityID, std::uint8_t, std::size_t>>>> views_draws;
-        std::unordered_map<EntityID, std::variant<std::unique_ptr<sf::Drawable>, std::array<std::vector<std::unique_ptr<sf::Drawable>>, 3>>> drawables;
-
         // textures and images
 
         struct TextureData;
@@ -78,11 +69,24 @@ namespace doge
 
         // window
 
+        sf::RenderWindow window;
+        sf::Clock clock;
+
         void CreateWindow(const WindowSettings& window_settings);
 
         void CloseWindow();
 
         // game loops
+
+        enum DrawableType : uint8_t
+        {
+            Convex = 0, Circle, Rectangle,
+        };
+
+        using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;
+        
+        std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>> views_draws;
+        std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 
         template <typename Functor>
         requires std::invocable<Functor, sf::Event>
@@ -109,8 +113,5 @@ namespace doge
         void StartDeltaClock();
 
         float GetDeltaTime();
-
-        // textures and images
-
     };
 }
