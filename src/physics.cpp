@@ -167,7 +167,7 @@ namespace doge
             auto scale = global::GetScale(entity);
             rect.SetAsBox(
                 cast::ToB2Length(coll.size.x * scale.x) / 2.f, cast::ToB2Length(coll.size.y * scale.y) / 2.f, 
-                cast::ToB2Vec2(coll.origin), 
+                cast::ToB2Vec2(-coll.origin), 
                 0
             );
         };

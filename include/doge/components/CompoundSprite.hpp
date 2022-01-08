@@ -7,7 +7,7 @@
 
 namespace doge
 {
-    struct CompoundShape
+    struct CompoundSprite
     {
         std::vector<ConvexShape> convex_shapes;
         std::vector<CircleShape> circle_shapes;

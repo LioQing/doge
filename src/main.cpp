@@ -11,7 +11,7 @@ namespace TestScene
     void AddBlocks(doge::Engine& e)
     {
         int last = -1;
-        for (auto i = 0; i < 20; ++i)
+        for (auto i = 0; i < 10; ++i)
         {
             auto my_shape = e.AddEntity("Test", "test");
 
@@ -43,7 +43,7 @@ namespace TestScene
                 .friction = .3f,
             });
 
-            my_shape.AddComponent<doge::Position>(i * 30, 0);
+            my_shape.AddComponent<doge::Position>(i * 50, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
             my_shape.AddComponent<doge::AngularVelocity>(20);
@@ -63,7 +63,7 @@ namespace TestScene
             });
         }
 
-        for (auto i = 1; i < 21; ++i)
+        for (auto i = 1; i < 11; ++i)
         {
             auto my_shape = e.AddEntity();
 
@@ -98,12 +98,12 @@ namespace TestScene
                 },
             });
 
-            my_shape.AddComponent<doge::Position>(-i * 30, 0);
+            my_shape.AddComponent<doge::Position>(-i * 50, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
             my_shape.AddComponent<doge::AngularVelocity>(20);
 
-            my_shape.AddComponent(doge::CompoundShape
+            my_shape.AddComponent(doge::CompoundSprite
             {
                 .circle_shapes = 
                 {
@@ -125,6 +125,20 @@ namespace TestScene
                 },
             });
         }
+
+        auto my_sprite = e.AddEntity();
+        my_sprite.AddComponent(doge::Sprite
+        {
+            .texture_rectangle = { 0, 0, 100, 100 },
+            .origin = { 50, 50 },
+        });
+        my_sprite.AddComponent(doge::RigidBody{ .type = doge::RigidBody::Type::Dynamic });
+        my_sprite.AddComponent<doge::Position>(0, -200);
+        my_sprite.AddComponent<doge::Rotation>();
+        my_sprite.AddComponent(doge::RectangleCollider
+        {
+            .size = { 100, 100 },
+        });
     }
 
     int count = 0;
@@ -186,22 +200,28 @@ namespace TestScene
             if (doge::global::GetAABB(convex).top > e.window_settings.resolution.y / 2.f)
                 e.DestroyEntity(entity);
             
-            scale.scale = doge::Vec2f::One() * std::clamp(100.f / velocity.velocity.Magnitude(), 0.1f, 2.f);
-            coll.apply_changes = true;
+            //scale.scale = doge::Vec2f::One() * std::clamp(100.f / velocity.velocity.Magnitude(), 0.1f, 2.f);
+            //coll.apply_changes = true;
         }
 
-        for (auto [entity, rgbd, position, shape, coll, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundShape, doge::CompoundCollider, doge::Velocity>().EntitiesAndComponents())
+        for (auto [entity, rgbd, position, shape, coll, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider, doge::Velocity>().EntitiesAndComponents())
         {
             if (position.position.y - shape.circle_shapes.at(0).radius > e.window_settings.resolution.y / 2.f)
             {
                 e.DestroyEntity(entity);
             }
             
-            shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 50.f);
-            shape.circle_shapes.at(0).origin = { shape.circle_shapes.at(0).radius + 15, shape.circle_shapes.at(0).radius };
+            //shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 50.f);
+            //shape.circle_shapes.at(0).origin = { shape.circle_shapes.at(0).radius + 15, shape.circle_shapes.at(0).radius };
 
-            coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;
-            coll.circle_colliders.at(0).apply_changes = true;
+            //coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;
+            //coll.circle_colliders.at(0).apply_changes = true;
+        }
+
+        for (auto [sprite] : e.Select<doge::Sprite>().Components())
+        {
+            if (doge::global::GetAABB(sprite).top > e.window_settings.resolution.y / 2.f)
+                e.DestroyEntity(sprite.GetEntity());
         }
 
         std::cout << 1000/dt << std::endl;

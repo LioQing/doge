@@ -147,12 +147,17 @@ namespace doge
     void IOBus::Render(const Engine& engine)
     {
         // helper functions
-        auto SyncShape = []<typename TComp>(sf::Shape& shape, const TComp& comp, const Entity& entity)
+        auto SyncTransformable = []<typename TComp>(sf::Transformable& transform, const TComp& comp, const Entity& entity)
         {
-            shape.setOrigin(cast::ToSfVec2(comp.origin));
-            shape.setScale(cast::ToSfVec2(global::GetScale(entity)));
-            shape.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
-            shape.setRotation(cast::ToDegree(global::GetRotation(entity)));
+            transform.setOrigin(cast::ToSfVec2(comp.origin));
+            transform.setScale(cast::ToSfVec2(global::GetScale(entity)));
+            transform.setPosition(cast::ToSfVec2(global::GetPosition(entity)));
+            transform.setRotation(cast::ToDegree(global::GetRotation(entity)));
+        };
+
+        auto SyncShape = [&]<typename TComp>(sf::Shape& shape, const TComp& comp, const Entity& entity)
+        {
+            SyncTransformable(shape, comp, entity);
             shape.setFillColor(cast::ToSfColor(comp.color));
         };
 
@@ -312,8 +317,33 @@ namespace doge
             UpdateRectangle(rectangle_comp, rectangle_comp, entity, 0);
         }
 
+        // sprite
+        auto SyncSprite = [&](sf::Sprite& sprite, const Sprite& sprite_comp, const Entity& entity)
+        {
+            SyncTransformable(sprite, sprite_comp, entity);
+            sprite.setTexture(engine.assets.textures.at(sprite_comp.texture_id).texture_data.texture);
+            sprite.setTextureRect(cast::ToSfRect(sprite_comp.texture_rectangle));
+            sprite.setColor(cast::ToSfColor(sprite_comp.color));
+        };
+
+        auto UpdateSprite = [&]<typename TComp>(Component<TComp>& comp, const Sprite& sprite_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Sprite, index);
+            auto draw_itr = EmplaceDrawables.template operator()<sf::Sprite>(key, comp);
+
+            if (InAnyViewHelper(sprite_comp, entity, key))
+            {
+                SyncSprite(static_cast<sf::Sprite&>(*draw_itr->second), sprite_comp, entity);
+            }
+        };
+
+        for (auto [entity, sprite_comp] : engine.Select<Sprite>().EntitiesAndComponents())
+        {
+            UpdateSprite(sprite_comp, sprite_comp, entity, 0);
+        }
+
         // compound shape
-        for (auto [entity, compound_comp] : engine.Select<CompoundShape>().EntitiesAndComponents())
+        for (auto [entity, compound_comp] : engine.Select<CompoundSprite>().EntitiesAndComponents())
         {
             // convex sub shape
             for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)

@@ -34,6 +34,7 @@ set(SRC_FILES
     physics.cpp
     math.cpp
     Texture.cpp
+    Assets.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
@@ -55,3 +56,7 @@ add_executable(test
 )
 
 target_link_libraries(test ${PROJECT_NAME}-static ${SFML_LIBS})
+
+add_custom_command(TARGET test PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:test>/assets)

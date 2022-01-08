@@ -51,7 +51,8 @@ namespace doge
 
         WindowSettings window_settings;
 
-        void ApplyWindowSetting();
+        void CreateWindow();
+        void CloseWindow();
 
         void SetFrameRate(uint32_t fps);
 

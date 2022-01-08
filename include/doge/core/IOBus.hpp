@@ -78,9 +78,9 @@ namespace doge
 
         // game loops
 
-        enum DrawableType : uint8_t
+        enum class DrawableType : uint8_t
         {
-            Convex = 0, Circle, Rectangle,
+            Convex = 0, Circle, Rectangle, Sprite
         };
 
         using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;

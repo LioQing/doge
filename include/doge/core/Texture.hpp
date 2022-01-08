@@ -33,39 +33,30 @@ namespace doge
             std::variant<std::nullptr_t, std::vector<Recti>, Vec2u> frame = nullptr;
         };
 
-        struct RenderOptions
+        enum RenderOptions
         {
-            enum Options
-            {
-                None = 0,
-                Smooth = 1 << 0,
-                sRGB = 1 << 1,
-                Repeated = 1 << 2,
-            };
-
-            RenderOptions(IOBus::TextureData& texture_data);
-
-            void Set(Options options);
-            bool IsSmooth() const;
-            bool IsSRGB() const;
-            bool IsRepeated() const;
-
-        private:
-
-            IOBus::TextureData& texture_data;
+            None = 0,
+            Smooth = 1 << 0,
+            sRGB = 1 << 1,
+            Repeated = 1 << 2,
         };
-
+        
         IOBus::TextureData texture_data = IOBus::TextureData();
         SpriteSheet sprite_sheet = SpriteSheet();
-        RenderOptions render_options = RenderOptions(texture_data);
 
         Texture() = default;
         Texture(const Texture&) = default;
         Texture(const IOBus::TextureData& texture_data);
-        Texture(const Vec2u& size);
-        Texture(const std::string& filename, const Recti& area = Recti());
-        Texture(void* data, std::size_t size, const Recti& area = Recti());
-        Texture(const Image& image, const Recti& area = Recti());
+
+        bool Create(const Vec2u& size);
+        bool FromFile(const std::string& filename, const Recti& area = Recti());
+        bool FromMemory(void* data, std::size_t size, const Recti& area = Recti());
+        bool FromImage(const Image& image, const Recti& area = Recti());
+
+        void SetRenderOptions(RenderOptions options);
+        bool IsSmooth() const;
+        bool IsSRGB() const;
+        bool IsRepeated() const;
 
         Vec2u GetSize() const;
     };

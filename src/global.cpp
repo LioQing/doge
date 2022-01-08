@@ -136,4 +136,31 @@ namespace doge
     {
         return GetAABB(rectangle, rectangle.GetEntity());
     }
+
+    Rectf global::GetAABB(const Sprite& sprite, const Entity& entity)
+    {
+        auto tl = ((Vec2f::Zero() - sprite.origin) * GetScale(entity)).Rotate(GetRotation(entity));
+        auto br = ((Vec2f(sprite.texture_rectangle.width, sprite.texture_rectangle.height) - sprite.origin) * GetScale(entity)).Rotate(GetRotation(entity));
+        auto bl = Vec2f(tl.x, br.y).Rotate(GetRotation(entity));
+        auto tr = Vec2f(br.x, tl.y).Rotate(GetRotation(entity));
+
+        Rectf aabb(
+            std::min({ tl.x, br.x, bl.x, tr.x }), 
+            std::min({ tl.y, br.y, bl.y, tr.y }), 
+            std::max({ tl.x, br.x, bl.x, tr.x }), 
+            std::max({ tl.y, br.y, bl.y, tr.y })
+        );
+
+        aabb.width -= aabb.left;
+        aabb.height -= aabb.top;
+        aabb.left += GetPosition(entity).x;
+        aabb.top += GetPosition(entity).y;
+
+        return aabb;
+    }
+    
+    Rectf global::GetAABB(const Component<Sprite>& sprite)
+    {
+        return GetAABB(sprite, sprite.GetEntity());
+    }
 }

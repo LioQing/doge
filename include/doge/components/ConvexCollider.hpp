@@ -12,7 +12,7 @@ namespace doge
 
         Vec2f origin = Vec2f::Zero();
         
-        float density = 0.f;
+        float density = 1.f;
         float restitution = 0.f;
         float friction = 0.2f;
         

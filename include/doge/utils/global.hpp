@@ -37,5 +37,8 @@ namespace doge
 
         static Rectf GetAABB(const RectangleShape& rectangle, const Entity& entity);
         static Rectf GetAABB(const Component<RectangleShape>& rectangle);
+
+        static Rectf GetAABB(const Sprite& sprite, const Entity& entity);
+        static Rectf GetAABB(const Component<Sprite>& sprite);
     };
 }

@@ -41,54 +41,50 @@ namespace doge
         return Recti(size.x * indices.x, size.y * indices.y, size.x, size.y);
     }
 
-    Texture::RenderOptions::RenderOptions(IOBus::TextureData& texture_data) : texture_data(texture_data)
-    {
-    }
-
-    void Texture::RenderOptions::Set(Options options)
-    {
-        texture_data.SetSmooth(options & Options::Smooth);
-        texture_data.SetSRGB(options & Options::sRGB);
-        texture_data.SetRepeated(options & Options::Repeated);
-    }
-
-    bool Texture::RenderOptions::IsSmooth() const
-    {
-        return texture_data.IsSmooth();
-    }
-
-    bool Texture::RenderOptions::IsSRGB() const
-    {
-        return texture_data.IsSRGB();
-    }
-
-    bool Texture::RenderOptions::IsRepeated() const
-    {
-        return texture_data.IsRepeated();
-    }
-
     Texture::Texture(const IOBus::TextureData& texture_data) : texture_data(texture_data)
     {
     }
 
-    Texture::Texture(const Vec2u& size)
+    bool Texture::Create(const Vec2u& size)
     {
-        texture_data.Create(size);
+        return texture_data.Create(size);
     }
     
-    Texture::Texture(const std::string& filename, const Recti& area)
+    bool Texture::FromFile(const std::string& filename, const Recti& area)
     {
-        texture_data.FromFile(filename, area);
+        return texture_data.FromFile(filename, area);
     }
 
-    Texture::Texture(void* data, std::size_t size, const Recti& area)
+    bool Texture::FromMemory(void* data, std::size_t size, const Recti& area)
     {
-        texture_data.FromMemory(data, size, area);
+        return texture_data.FromMemory(data, size, area);
     }
 
-    Texture::Texture(const Image& image, const Recti& area)
+    bool Texture::FromImage(const Image& image, const Recti& area)
     {
-        texture_data.FromImage(image.image_data, area);
+        return texture_data.FromImage(image.image_data, area);
+    }
+    
+    void Texture::SetRenderOptions(RenderOptions options)
+    {
+        texture_data.SetSmooth(options & RenderOptions::Smooth);
+        texture_data.SetSRGB(options & RenderOptions::sRGB);
+        texture_data.SetRepeated(options & RenderOptions::Repeated);
+    }
+
+    bool Texture::IsSmooth() const
+    {
+        return texture_data.IsSmooth();
+    }
+
+    bool Texture::IsSRGB() const
+    {
+        return texture_data.IsSRGB();
+    }
+
+    bool Texture::IsRepeated() const
+    {
+        return texture_data.IsRepeated();
     }
 
     Vec2u Texture::GetSize() const

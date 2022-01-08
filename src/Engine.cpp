@@ -10,9 +10,18 @@ namespace doge
 {
     // IO
 
-    void Engine::ApplyWindowSetting()
+    void Engine::CreateWindow()
     {
         io_bus.CreateWindow(window_settings);
+
+        assets.LoadTexture("missing_texture", "missing_texture.png");
+        assets.textures.at("missing_texture").SetRenderOptions(Texture::RenderOptions::Repeated);
+    }
+
+    void Engine::CloseWindow()
+    {
+        assets.Clear();
+        io_bus.CloseWindow();
     }
 
     void Engine::SetFrameRate(uint32_t fps)
@@ -99,7 +108,7 @@ namespace doge
     void Engine::StartScene(const std::string& id)
     {
         SetCurrentScene(id);
-        ApplyWindowSetting();
+        CreateWindow();
 
         is_open = true;
         while (is_open)
