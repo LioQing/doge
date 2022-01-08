@@ -293,7 +293,7 @@ namespace doge
                     b2PolygonShape convex;
                     SyncConvex(convex, entity, convex_coll);
 
-                    fixtures.at(0).at(i) = AddFixture(body, convex_coll, &convex).second;
+                    fixtures.at(static_cast<uint8_t>(FixtureType::Convex)).at(i) = AddFixture(body, convex_coll, &convex).second;
 
                     convex_coll.apply_changes = false;
                 }
@@ -306,7 +306,7 @@ namespace doge
                     b2CircleShape circle;
                     SyncCircle(circle, entity, circle_coll);
 
-                    fixtures.at(1).at(i) = AddFixture(body, circle_coll, &circle).second;
+                    fixtures.at(static_cast<uint8_t>(FixtureType::Circle)).at(i) = AddFixture(body, circle_coll, &circle).second;
 
                     circle_coll.apply_changes = false;
                 }
@@ -323,7 +323,7 @@ namespace doge
                         0
                     );
 
-                    fixtures.at(2).at(i) = AddFixture(body, rectangle_coll, &rect).second;
+                    fixtures.at(static_cast<uint8_t>(FixtureType::Rectangle)).at(i) = AddFixture(body, rectangle_coll, &rect).second;
 
                     rectangle_coll.apply_changes = false;
                 }
@@ -341,7 +341,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(0).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Convex)).at(i);
                     auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
 
                     if (shape->m_count != convex_coll.points.size())
@@ -369,7 +369,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(1).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Circle)).at(i);
                     auto* shape = static_cast<b2CircleShape*>(fixture->GetShape());
 
                     SyncFixture(fixture, circle_coll);
@@ -387,7 +387,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(2).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Rectangle)).at(i);
                     auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
 
                     SyncFixture(fixture, rectangle_coll);

@@ -4,9 +4,10 @@
 #include <doge/core/Entity.hpp>
 #include <doge/components/RigidBody.hpp>
 #include <memory>
-#include <unordered_map>
+#include <map>
 #include <array>
 #include <vector>
+#include <tuple>
 
 namespace doge
 {
@@ -19,6 +20,11 @@ namespace doge
         static void Disable(Engine& engine);
 
     private:
+
+        enum class FixtureType : std::uint8_t
+        {
+            Convex, Circle, Rectangle
+        };
 
         static std::unique_ptr<b2World> world;
         static std::unordered_map<EntityID, b2Body*> bodies;

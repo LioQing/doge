@@ -159,6 +159,13 @@ namespace doge
         {
             SyncTransformable(shape, comp, entity);
             shape.setFillColor(cast::ToSfColor(comp.color));
+            shape.setOutlineColor(cast::ToSfColor(comp.outline_color));
+            shape.setOutlineThickness(comp.outline_thickness);
+            if (comp.texture_id != "")
+            {
+                shape.setTexture(&engine.assets.textures.at(comp.texture_id).texture_data.texture);
+                shape.setTextureRect(cast::ToSfRect(comp.texture_rectangle));
+            }
         };
 
         auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(const DrawableKey& key, Component<TComp>& comp)
@@ -361,6 +368,12 @@ namespace doge
             for (std::size_t i = 0; i < compound_comp.rectangle_shapes.size(); ++i)
             {
                 UpdateRectangle(compound_comp, compound_comp.rectangle_shapes.at(i), entity, i);
+            }
+
+            // sub sprites
+            for (std::size_t i = 0; i < compound_comp.sprites.size(); ++i)
+            {
+                UpdateSprite(compound_comp, compound_comp.sprites.at(i), entity, i);
             }
         }
 

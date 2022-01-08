@@ -59,7 +59,11 @@ namespace TestScene
             {
                 .size = { 20, 40 },
                 .origin = { 10, 20 },
-                .color = doge::Color(0x00FF0088),
+                //.color = doge::Color(0x00FF0088),
+                .outline_color = doge::Color::Green(),
+                .outline_thickness = 2.f,
+                .texture_id = "missing_texture",
+                .texture_rectangle = { 0, 0, 30, 30 },
             });
         }
 
@@ -111,7 +115,11 @@ namespace TestScene
                     {
                         .radius = 10.f,
                         .origin = doge::Vec2f(25.f, 10.f),
-                        .color = doge::Color(0x0000FF88),
+                        //.color = doge::Color(0x0000FF88),
+                        .outline_color = doge::Color::Blue(),
+                        .outline_thickness = 2.f,
+                        .texture_id = "missing_texture",
+                        .texture_rectangle = { 0, 0, 30, 30 },
                     },
                 },
                 .rectangle_shapes =
@@ -120,7 +128,11 @@ namespace TestScene
                     {
                         .size = { 30, 8 },
                         .origin = { 15, 4 },
-                        .color = doge::Color(0x0000FF88),
+                        //.color = doge::Color(0x0000FF88),
+                        .outline_color = doge::Color::Blue(),
+                        .outline_thickness = 2.f,
+                        .texture_id = "missing_texture",
+                        .texture_rectangle = { 0, 0, 30, 30 },
                     },
                 },
             });

@@ -80,7 +80,7 @@ namespace doge
 
         enum class DrawableType : uint8_t
         {
-            Convex = 0, Circle, Rectangle, Sprite
+            Convex, Circle, Rectangle, Sprite
         };
 
         using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;
