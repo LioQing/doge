@@ -30,13 +30,15 @@ namespace doge
 
     Recti Texture::SpriteSheet::GetFrame(std::size_t index) const
     {
-        assert(type == SpriteSheet::Type::VariedSize && "Texture has the wrong SpriteSheet::Type when calling SpriteSheet::GetFrame(std::size_t index)");
+        if (type == SpriteSheet::Type::VariedSize)
+            throw std::invalid_argument("Texture has the wrong SpriteSheet::Type when calling SpriteSheet::GetFrame(std::size_t index)");
         return std::get<std::vector<Recti>>(frame).at(index);
     }
 
     Recti Texture::SpriteSheet::GetFrame(const Vec2i& indices) const
     {
-        assert(type == SpriteSheet::Type::FixedSize && "Texture has the wrong SpriteSheet::Type when calling SpriteSheet::GetFrame(const Vec2i& indices)");
+        if (type == SpriteSheet::Type::FixedSize)
+            throw std::invalid_argument("Texture has the wrong SpriteSheet::Type when calling SpriteSheet::GetFrame(const Vec2i& indices)");
         auto& size = std::get<Vec2u>(frame);
         return Recti(size.x * indices.x, size.y * indices.y, size.x, size.y);
     }

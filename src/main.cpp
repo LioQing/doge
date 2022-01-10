@@ -151,21 +151,21 @@ namespace TestScene
             // },
             .points = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.window.settings.resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
-                doge::Vec2f(e.window.settings.resolution.x / 2.f - 100, 0), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
             },
             //.size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
         });
-        ground.AddComponent<doge::Position>(0.f, e.window.settings.resolution.y / 2.f - 50.f);
+        ground.AddComponent<doge::Position>(0.f, e.window.settings.size.y / 2.f - 50.f);
 
         ground.AddComponent(doge::ConvexShape
         {
             .points = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.window.settings.resolution.x) / 2.f + 100, 0),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
-                doge::Vec2f(e.window.settings.resolution.x / 2.f - 100, 0), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
             },
             .color = doge::Color::Red(),
         });
@@ -201,6 +201,10 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
+        std::cout << doge::io::InputDevice::Mouse::GetPosition() << " " 
+        << e.input_device.GetRelativeMousePosition() << " "
+        << doge::io::InputDevice::Mouse::GetPosition() - e.window.window_io.GetPosition() << " " << std::endl;
+
         if (++count > 100)
         {
             AddBlocks(e);
@@ -209,7 +213,7 @@ namespace TestScene
 
         for (auto [entity, rgbd, scale, velocity, position, convex, coll] : e.Select<doge::RigidBody, doge::Scale, doge::Velocity, doge::Position, doge::RectangleShape, doge::RectangleCollider>().EntitiesAndComponents())
         {
-            if (doge::global::GetAABB(convex).top > e.window.settings.resolution.y / 2.f)
+            if (doge::global::GetAABB(convex).top > e.window.settings.size.y / 2.f)
                 e.DestroyEntity(entity);
             
             //scale.scale = doge::Vec2f::One() * std::clamp(100.f / velocity.velocity.Magnitude(), 0.1f, 2.f);
@@ -218,7 +222,7 @@ namespace TestScene
 
         for (auto [entity, rgbd, position, shape, coll, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider, doge::Velocity>().EntitiesAndComponents())
         {
-            if (position.position.y - shape.circle_shapes.at(0).radius > e.window.settings.resolution.y / 2.f)
+            if (position.position.y - shape.circle_shapes.at(0).radius > e.window.settings.size.y / 2.f)
             {
                 e.DestroyEntity(entity);
             }
@@ -237,11 +241,9 @@ namespace TestScene
 
         for (auto [sprite] : e.Select<doge::Sprite>().Components())
         {
-            if (doge::global::GetAABB(sprite).top > e.window.settings.resolution.y / 2.f)
+            if (doge::global::GetAABB(sprite).top > e.window.settings.size.y / 2.f)
                 e.DestroyEntity(sprite.GetEntity());
         }
-
-        std::cout << 1000/dt << std::endl;
     }
 
     void FixedUpdate(doge::Engine& e, doge::DeltaTime dt)
@@ -272,7 +274,7 @@ int main()
 
     doge::physics::Enable(e);
 
-    e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Mode::Windowed));
+    e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Style::Default));
 
     doge::physics::Disable(e);
 

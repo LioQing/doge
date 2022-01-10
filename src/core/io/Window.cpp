@@ -10,7 +10,7 @@ namespace doge::io
     void Window::CreateWindow(const WindowSettings& settings)
     {
         style = cast::ToSfStyle(settings.style);
-        window.create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style);
+        window_sptr->create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style);
         
         if (settings.style == WindowSettings::Style::None)
         {
@@ -23,7 +23,7 @@ namespace doge::io
 
     void Window::CloseWindow()
     {
-        window.close();
+        window_sptr->close();
     }
 
     void Window::Render(const Engine& engine)
@@ -311,24 +311,24 @@ namespace doge::io
         }
 
         // draw
-        window.clear();
+        window_sptr->clear();
         for (auto& [eid, view_draw] : views_draws)
         {
             auto& [view, draw_keys] = view_draw;
 
-            window.setView(*view);
+            window_sptr->setView(*view);
 
             // draw
             for (auto draw_key : draw_keys)
             {
-                window.draw(*drawables.at(draw_key));
+                window_sptr->draw(*drawables.at(draw_key));
             }
         }
     }
 
     void Window::Display()
     {
-        window.display();
+        window_sptr->display();
     }
 
     void Window::ApplySettings(const WindowSettings& settings)
@@ -349,17 +349,17 @@ namespace doge::io
 
     void Window::SetFrameRate(std::uint32_t frame_rate)
     {
-        window.setFramerateLimit(frame_rate);
+        window_sptr->setFramerateLimit(frame_rate);
     }
 
     void Window::SetTitle(const std::string& title)
     {
-        window.setTitle(title);
+        window_sptr->setTitle(title);
     }
 
     void Window::SetIcon(const File::Image& icon)
     {
-        window.setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
+        window_sptr->setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
     }
 
     void Window::StartDeltaClock()
@@ -374,26 +374,26 @@ namespace doge::io
 
     bool Window::IsOpen() const
     {
-        return window.isOpen();
+        return window_sptr->isOpen();
     }
 
     Vec2i Window::GetPosition() const
     {
-        return cast::FromSfVec2(window.getPosition());
+        return cast::FromSfVec2(window_sptr->getPosition());
     }
 
     void Window::SetPosition(const Vec2i& pos)
     {
-        window.setPosition(cast::ToSfVec2(pos));
+        window_sptr->setPosition(cast::ToSfVec2(pos));
     }
 
     Vec2u Window::GetSize() const
     {
-        return cast::FromSfVec2(window.getSize());
+        return cast::FromSfVec2(window_sptr->getSize());
     }
 
     void Window::SetSize(const Vec2u& size)
     {
-        window.setSize(cast::ToSfVec2(size));
+        window_sptr->setSize(cast::ToSfVec2(size));
     }
 }

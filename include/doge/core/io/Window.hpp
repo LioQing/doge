@@ -24,7 +24,7 @@ namespace doge
     {
         struct Window
         {
-            sf::RenderWindow window;
+            std::shared_ptr<sf::RenderWindow> window_sptr = std::make_shared<sf::RenderWindow>();
             sf::Clock clock;
             int style = sf::Style::Default;
 
@@ -47,7 +47,7 @@ namespace doge
             void PollEvent(Functor functor)
             {
                 sf::Event event;
-                while (window.pollEvent(event))
+                while (window_sptr->pollEvent(event))
                 {
                     if (event.type == sf::Event::Closed)
                     {
@@ -66,7 +66,7 @@ namespace doge
 
             void ApplySettings(const WindowSettings& settings);
 
-            void SetFrameRate(uint32_t frame_rate);
+            void SetFrameRate(std::uint32_t frame_rate);
 
             void SetTitle(const std::string& title);
 

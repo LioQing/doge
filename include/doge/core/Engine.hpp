@@ -12,6 +12,7 @@
 #include <doge/utils.hpp>
 #include <doge/components/SceneInfo.hpp>
 #include <doge/core/io/Window.hpp>
+#include <doge/core/io/InputDevice.hpp>
 #include <doge/core/GameLoopFunctions.hpp>
 #include <doge/core/Window.hpp>
 #include <doge/core/Entity.hpp>
@@ -98,5 +99,9 @@ namespace doge
         // assets
 
         Assets assets;
+
+        // input device
+
+        io::InputDevice input_device = io::InputDevice(window.window_io.window_sptr);
     };
 }
