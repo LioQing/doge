@@ -18,13 +18,13 @@ namespace doge
         glf.fixed_update = FixedUpdate;
         glf.finish = Finish;
         
-        engine.AddExtension("doge_box2d", glf);
+        engine.scenes.extensions.emplace("doge_box2d", glf);
         world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
     }
 
     void physics::Disable(Engine& engine)
     {
-        engine.EraseExtension("doge_box2d");
+        engine.scenes.extensions.erase("doge_box2d");
     }
 
     void physics::Start(Engine& engine)

@@ -13,76 +13,47 @@
 #include <doge/components/SceneInfo.hpp>
 #include <doge/core/IOBus.hpp>
 #include <doge/core/GameLoopFunctions.hpp>
-#include <doge/core/WindowSettings.hpp>
+#include <doge/core/Window.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/core/PCNode.hpp>
 #include <doge/core/Range.hpp>
 #include <doge/core/Assets.hpp>
+#include <doge/core/Scenes.hpp>
 
 namespace doge
 {
     struct Engine
     {
-    private:
-    
-        // IO
-        IOBus io_bus;
-
-        // Game Loop
-        DeltaTime fixed_time_step = 10.f;
-        std::unordered_map<std::string, GameLoopFunctions> extensions;
-        std::unordered_map<std::string, GameLoopFunctions> scenes;
-        std::string current_scene_id;
-        std::string active_scene_id;
-        bool is_open = false;
-        bool is_running = false;
-
-        // Entities
-        std::deque<EntityID> to_be_destroyed;
-
         // Helper functions
         void Main();
         void DestroyEntities();
-        const std::shared_ptr<PCNode> GetPCNode(EntityID eid) const; 
+        const std::shared_ptr<PCNode> GetPCNode(EntityID eid) const;
 
     public:
 
         // IO
 
-        WindowSettings window_settings;
+        Window window;
 
         void CreateWindow();
         void CloseWindow();
 
-        void SetFrameRate(uint32_t fps);
-
         // Game loop
 
+        Scenes scenes;
+
         void StartScene(const std::string& id);
-        void StartScene(const std::string& id, const WindowSettings& window_settings);
+        void StartScene(const std::string& id, const Window::Settings& window_settings);
 
         void StopScene();
 
-        void RestartScene();
+        void RestartScene(const std::string& new_id);
 
         void AddScene(const std::string& id, const GameLoopFunctions& glf);
 
-        void SetCurrentScene(const std::string& id);
-
-        bool HasScene(const std::string& id) const;
-
-        const std::string& GetCurrentScene() const;
-        const std::string& GetActiveScene() const;
-
-        void SetFixedTimeStep(float millisec);
-
-        void AddExtension(const std::string& id, const GameLoopFunctions& glf);
-
-        void EraseExtension(const std::string& id);
-
-        bool HasExtension(const std::string& id) const;
-
         // Entities
+
+        std::deque<EntityID> to_be_destroyed;
 
         Entity AddEntity(bool all_scenes = false);
 
@@ -121,7 +92,7 @@ namespace doge
         template <typename... TComps>
         Range<TComps...> Select() const
         {
-            return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), active_scene_id);
+            return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), scenes.active_scene_id);
         }
 
         // assets

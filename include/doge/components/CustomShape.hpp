@@ -14,7 +14,7 @@ namespace doge
             Vec2f texture_coordinates = Vec2f::Zero();
         };
 
-        enum class Type
+        enum Type
         {
             Points,
             Lines,

@@ -8,14 +8,16 @@
 #include <variant>
 #include <array>
 #include <SFML/Graphics.hpp>
-#include <doge/core/WindowSettings.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Color.hpp>
+#include <doge/utils/Vec2.hpp>
 
 namespace doge
 {
     struct Engine;
+    struct Window;
+    struct WindowSettings;
 
     struct IOBus
     {
@@ -78,9 +80,9 @@ namespace doge
 
         // game loops
 
-        enum class DrawableType : uint8_t
+        enum DrawableType
         {
-            Convex, Circle, Rectangle, Sprite, Custom
+            Convex, Circle, Rectangle, SpriteType, Custom
         };
 
         using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;
@@ -113,5 +115,15 @@ namespace doge
         void StartDeltaClock();
 
         float GetDeltaTime();
+
+        // user control
+
+        struct Keyboard
+        {
+            using Key = sf::Keyboard::Key;
+
+            static bool IsKeyDown(Key key);
+            static void SetVirtualKeyboardVisible(bool visible);
+        };
     };
 }

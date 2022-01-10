@@ -13,7 +13,7 @@ namespace doge
 
     void Engine::CreateWindow()
     {
-        io_bus.CreateWindow(window_settings);
+        window.CreateWindow();
 
         if (assets.LoadTexture("missing_texture", "missing_texture.png"))
             assets.textures.at("missing_texture").SetRenderOptions(Texture::RenderOptions::Repeated);
@@ -22,26 +22,18 @@ namespace doge
     void Engine::CloseWindow()
     {
         assets.Clear();
-        io_bus.CloseWindow();
+        window.CloseWindow();
     }
-
-    void Engine::SetFrameRate(uint32_t fps)
-    {
-        window_settings.fps = fps;
-        io_bus.SetFrameRate(fps);
-    }
-
-    // Game Loop
 
     void Engine::Main()
     {
-        active_scene_id = current_scene_id;
-        auto active_scene = scenes.at(current_scene_id);
+        scenes.active_scene_id = scenes.current_scene_id;
+        auto& active_scene = scenes.scenes.at(scenes.current_scene_id);
 
-        is_running = true;
+        scenes.is_running = true;
         if (active_scene.start)
             active_scene.start(*this);
-        for (auto [id, extension] : extensions)
+        for (auto [id, extension] : scenes.extensions)
         {
             if (extension.start)
                 extension.start(*this);
@@ -49,40 +41,40 @@ namespace doge
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
-        io_bus.SetFrameRate(window_settings.fps);
-        io_bus.StartDeltaClock();
-        while (active_scene_id == current_scene_id && is_running && is_open)
+        window.SetFrameRate(window.settings.fps);
+        window.io_bus.StartDeltaClock();
+        while (scenes.active_scene_id == scenes.current_scene_id && scenes.is_running && scenes.is_open)
         {
-            dt = io_bus.GetDeltaTime();
+            dt = window.io_bus.GetDeltaTime();
             acc_fixed_dt += dt;
 
-            io_bus.PollEvent([&](const sf::Event& event)
+            window.io_bus.PollEvent([&](const sf::Event& event)
             {
                 if (event.type == sf::Event::Closed)
                 {
-                    is_running = false;
-                    is_open = false;
+                    scenes.is_running = false;
+                    scenes.is_open = false;
                 }
                 else if (event.type == sf::Event::Resized)
                 {
-                    window_settings.resolution = Vec2u(event.size.width, event.size.height);
+                    window.settings.resolution = Vec2u(event.size.width, event.size.height);
                 }
             });
             
-            for (; acc_fixed_dt > fixed_time_step; acc_fixed_dt -= fixed_time_step)
+            for (; acc_fixed_dt > scenes.fixed_time_step; acc_fixed_dt -= scenes.fixed_time_step)
             {
                 if (active_scene.fixed_update)
-                    active_scene.fixed_update(*this, fixed_time_step);
-                for (auto [id, extension] : extensions)
+                    active_scene.fixed_update(*this, scenes.fixed_time_step);
+                for (auto [id, extension] : scenes.extensions)
                 {
                     if (extension.fixed_update)
-                        extension.fixed_update(*this, fixed_time_step);
+                        extension.fixed_update(*this, scenes.fixed_time_step);
                 }
             }
 
             if (active_scene.update)
                 active_scene.update(*this, dt);
-            for (auto [id, extension] : extensions)
+            for (auto [id, extension] : scenes.extensions)
             {
                 if(extension.update)
                     extension.update(*this, dt);
@@ -90,98 +82,53 @@ namespace doge
 
             DestroyEntities();
 
-            io_bus.Render(*this);
-            io_bus.Display();
+            window.io_bus.Render(*this);
+            window.io_bus.Display();
         }
-
         
-        for (auto [id, extension] : extensions)
+        for (auto [id, extension] : scenes.extensions)
         {
             if (extension.finish)
                 extension.finish(*this);
         }
         if (active_scene.finish)
             active_scene.finish(*this);
-        is_running = false;
+        scenes.is_running = false;
         DestroyEntities();
     }
 
     void Engine::StartScene(const std::string& id)
     {
-        SetCurrentScene(id);
+        scenes.current_scene_id = id;
         CreateWindow();
 
-        is_open = true;
-        while (is_open)
+        scenes.is_open = true;
+        while (scenes.is_open)
             Main();
     }
 
-    void Engine::StartScene(const std::string& id, const WindowSettings& window_settings)
+    void Engine::StartScene(const std::string& id, const Window::Settings& window_settings)
     {
-        this->window_settings = window_settings;
+        window.settings = window_settings;
         StartScene(id);
     }
 
     void Engine::StopScene()
     {
-        io_bus.CloseWindow();
-        is_open = false;
-        is_running = false;
+        window.CloseWindow();
+        scenes.is_open = false;
+        scenes.is_running = false;
     }
 
-    void Engine::RestartScene()
+    void Engine::RestartScene(const std::string& new_id)
     {
-        is_running = false;
+        scenes.current_scene_id = new_id;
+        scenes.is_running = false;
     }
 
     void Engine::AddScene(const std::string& id, const GameLoopFunctions& glf)
     {
-        scenes.emplace(id, glf);
-    }
-
-    void Engine::SetCurrentScene(const std::string& id)
-    {
-        if (scenes.find(id) == scenes.end())
-        {
-            throw std::out_of_range("Scene ID \"" + id + "\" not found");
-        }
-
-        current_scene_id = id;
-    }
-
-    bool Engine::HasScene(const std::string& id) const
-    {
-        return scenes.find(id) != scenes.end();
-    }
-
-    const std::string& Engine::GetCurrentScene() const 
-    {
-        return current_scene_id;
-    }
-
-    const std::string& Engine::GetActiveScene() const 
-    {
-        return active_scene_id;
-    }
-
-    void Engine::SetFixedTimeStep(float millisec)
-    {
-        fixed_time_step = millisec;
-    }
-
-    void Engine::AddExtension(const std::string& id, const GameLoopFunctions& glf)
-    {
-        extensions.emplace(id, glf);
-    }
-
-    void Engine::EraseExtension(const std::string& id)
-    {
-        extensions.erase(id);
-    }
-
-    bool Engine::HasExtension(const std::string& id) const
-    {
-        return extensions.find(id) != extensions.end();
+        scenes.scenes.emplace(id, glf);
     }
 
     // Entities
@@ -217,7 +164,7 @@ namespace doge
         if (all_scenes)
             e.AddComponent<SceneInfo>();
         else
-            e.AddComponent<SceneInfo>(std::vector<std::string>({ active_scene_id }));
+            e.AddComponent<SceneInfo>(std::vector<std::string>({ scenes.active_scene_id }));
         
         auto node = PCNode::AddNode(e);
 

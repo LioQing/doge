@@ -1,8 +1,7 @@
 #include <doge/core/IOBus.hpp>
 
 #include <memory>
-#include <doge/core/Engine.hpp>
-#include <doge/core/Texture.hpp>
+#include <doge/core.hpp>
 #include <doge/components.hpp>
 #include <doge/utils.hpp>
 
@@ -117,13 +116,13 @@ namespace doge
 
     // window
 
-    void IOBus::CreateWindow(const WindowSettings& window_settings)
+    void IOBus::CreateWindow(const Window::Settings& window_settings)
     {
-        if (window_settings.mode == WindowSettings::Mode::FullScreen)
+        if (window_settings.mode == Window::Settings::Mode::FullScreen)
         {
             window.create(sf::VideoMode(window_settings.resolution.x, window_settings.resolution.y), window_settings.title, sf::Style::Fullscreen);
         }
-        else if (window_settings.mode == WindowSettings::Mode::Borderless)
+        else if (window_settings.mode == Window::Settings::Mode::Borderless)
         {
             window.create(sf::VideoMode(window_settings.resolution.x, window_settings.resolution.y), window_settings.title, sf::Style::None);
             window.setPosition(sf::Vector2i(0, 0));
@@ -234,7 +233,7 @@ namespace doge
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
             {
-                view->setSize(cast::ToSfVec2(engine.window_settings.resolution * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(engine.window.settings.resolution * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
             }
             else
             {
@@ -335,7 +334,7 @@ namespace doge
 
         auto UpdateSprite = [&]<typename TComp>(Component<TComp>& comp, const Sprite& sprite_comp, const Entity& entity, std::size_t index)
         {
-            auto key = DrawableKey(entity, DrawableType::Sprite, index);
+            auto key = DrawableKey(entity, DrawableType::SpriteType, index);
             auto draw_itr = EmplaceDrawables.template operator()<sf::Sprite>(key, comp);
 
             if (InAnyViewHelper(sprite_comp, entity, key))
@@ -462,5 +461,17 @@ namespace doge
     float IOBus::GetDeltaTime()
     {
         return clock.restart().asMicroseconds() / 1000.f;
+    }
+
+    // user controls
+
+    bool IOBus::Keyboard::IsKeyDown(Key key)
+    {
+        return sf::Keyboard::isKeyPressed(key);
+    }
+
+    void IOBus::Keyboard::SetVirtualKeyboardVisible(bool visible)
+    {
+        sf::Keyboard::setVirtualKeyboardVisible(visible);
     }
 }

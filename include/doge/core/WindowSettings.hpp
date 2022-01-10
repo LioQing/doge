@@ -1,6 +1,8 @@
 #pragma once
 
+#include <string>
 #include <doge/utils/Vec2.hpp>
+#include <doge/core/IOBus.hpp>
 
 namespace doge
 {
@@ -13,7 +15,7 @@ namespace doge
             Borderless,
         };
 
-        enum WindowStyle
+        enum Style
         {
             None = 0,
             Titlebar = 1 << 0,
@@ -22,14 +24,10 @@ namespace doge
             All = Titlebar | Resizable | Close,
         };
 
-        WindowSettings() = default;
-        WindowSettings(uint32_t width, uint32_t height, const std::string& title = "", uint32_t fps = 60, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
-        WindowSettings(Vec2u size, const std::string& title = "", uint32_t fps = 60, Mode mode = Mode::Windowed, WindowStyle window_style = WindowStyle::All);
-
         Vec2u resolution = Vec2u(800, 600);
-        WindowStyle window_style = WindowStyle::All;
-        Mode mode = Mode::Windowed;
-        uint32_t fps = 60;
         std::string title = "";
+        std::uint32_t fps = 60;
+        Mode mode = Mode::Windowed;
+        Style window_style = Style::All;
     };
 }

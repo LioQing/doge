@@ -22,7 +22,7 @@ set(SRC_FILES
     IOBus.cpp
     cast.cpp
     Color.cpp
-    WindowSettings.cpp
+    Window.cpp
     global.cpp
     Velocity.cpp
     Scale.cpp

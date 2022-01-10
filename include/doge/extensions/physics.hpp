@@ -21,7 +21,7 @@ namespace doge
 
     private:
 
-        enum class FixtureType : std::uint8_t
+        enum FixtureType
         {
             Convex, Circle, Rectangle
         };

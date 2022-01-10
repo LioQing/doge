@@ -9,7 +9,7 @@ namespace doge
     {
         void Finish(Engine& e)
         {
-            for (auto entity : e.Select<>().InAllOf(e.GetActiveScene()).Entities())
+            for (auto entity : e.Select<>().InAllOf(e.scenes.active_scene_id).Entities())
             {
                 e.DestroyEntity(entity);
             }
