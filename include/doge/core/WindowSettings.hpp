@@ -2,7 +2,7 @@
 
 #include <string>
 #include <doge/utils/Vec2.hpp>
-#include <doge/core/IOBus.hpp>
+#include <doge/core/io/Window.hpp>
 
 namespace doge
 {

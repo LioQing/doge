@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/Engine.hpp"
-#include "core/IOBus.hpp"
+#include "core/io/Window.hpp"
 #include "core/Window.hpp"
 #include "core/GameLoopFunctions.hpp"
 #include "core/Entity.hpp"

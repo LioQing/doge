@@ -3,7 +3,7 @@
 #include <string>
 #include <doge/core/WindowSettings.hpp>
 #include <doge/utils/Vec2.hpp>
-#include <doge/core/IOBus.hpp>
+#include <doge/core/io/Window.hpp>
 
 namespace doge
 {
@@ -12,7 +12,7 @@ namespace doge
         using Settings = WindowSettings;
 
         Settings settings;
-        IOBus io_bus;
+        io::Window window_io;
 
         void CreateWindow();
         void CloseWindow();

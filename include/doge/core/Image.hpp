@@ -1,6 +1,6 @@
 #pragma once
 
-#include <doge/core/IOBus.hpp>
+#include <doge/core/io/Window.hpp>
 
 namespace doge
 {
@@ -8,10 +8,10 @@ namespace doge
 
     struct Image
     {
-        IOBus::ImageData image_data;
+        io::Window::ImageData image_data;
 
         Image(const Image&) = default;
-        Image(const IOBus::ImageData& texture_data);
+        Image(const io::Window::ImageData& texture_data);
 
         void Create(const Vec2u& size, const Color& color = Color::Black());
         bool FromFile(const std::string& filename);

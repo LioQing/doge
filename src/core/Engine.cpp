@@ -5,7 +5,7 @@
 #include <vector>
 #include <doge/utils.hpp>
 #include <doge/components.hpp>
-#include <doge/core/IOBus.hpp>
+#include <doge/core/io/Window.hpp>
 
 namespace doge
 {
@@ -42,13 +42,13 @@ namespace doge
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
         window.SetFrameRate(window.settings.fps);
-        window.io_bus.StartDeltaClock();
+        window.window_io.StartDeltaClock();
         while (scenes.active_scene_id == scenes.current_scene_id && scenes.is_running && scenes.is_open)
         {
-            dt = window.io_bus.GetDeltaTime();
+            dt = window.window_io.GetDeltaTime();
             acc_fixed_dt += dt;
 
-            window.io_bus.PollEvent([&](const sf::Event& event)
+            window.window_io.PollEvent([&](const sf::Event& event)
             {
                 if (event.type == sf::Event::Closed)
                 {
@@ -82,8 +82,8 @@ namespace doge
 
             DestroyEntities();
 
-            window.io_bus.Render(*this);
-            window.io_bus.Display();
+            window.window_io.Render(*this);
+            window.window_io.Display();
         }
         
         for (auto [id, extension] : scenes.extensions)

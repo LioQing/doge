@@ -4,12 +4,12 @@ namespace doge
 {
     void Window::CreateWindow()
     {
-        io_bus.CreateWindow(settings);
+        window_io.CreateWindow(settings);
     }
 
     void Window::CloseWindow()
     {
-        io_bus.CloseWindow();
+        window_io.CloseWindow();
     }
 
     void Window::SetFrameRate(std::uint32_t fps)

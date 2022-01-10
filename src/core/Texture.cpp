@@ -41,7 +41,7 @@ namespace doge
         return Recti(size.x * indices.x, size.y * indices.y, size.x, size.y);
     }
 
-    Texture::Texture(const IOBus::TextureData& texture_data) : texture_data(texture_data)
+    Texture::Texture(const io::Window::TextureData& texture_data) : texture_data(texture_data)
     {
     }
 

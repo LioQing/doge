@@ -17,24 +17,24 @@ find_package(SFML 2.5 COMPONENTS system graphics window REQUIRED)
 set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Debug)
 
 set(SRC_FILES
-    lic.cpp
-    Engine.cpp
-    IOBus.cpp
-    cast.cpp
-    Color.cpp
-    Window.cpp
-    global.cpp
-    Velocity.cpp
-    Scale.cpp
-    Position.cpp
-    Entity.cpp
-    default_functions.cpp
-    PCNode.cpp
-    Range.cpp
-    physics.cpp
-    math.cpp
-    Texture.cpp
-    Assets.cpp
+    utils/lic.cpp
+    core/Engine.cpp
+    core/io/Window.cpp
+    utils/cast.cpp
+    utils/Color.cpp
+    core/Window.cpp
+    utils/global.cpp
+    components/Velocity.cpp
+    components/Scale.cpp
+    components/Position.cpp
+    core/Entity.cpp
+    utils/default_functions.cpp
+    core/PCNode.cpp
+    core/Range.cpp
+    extensions/physics.cpp
+    utils/math.cpp
+    core/Texture.cpp
+    core/Assets.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

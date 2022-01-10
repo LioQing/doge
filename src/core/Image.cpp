@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    Image::Image(const IOBus::ImageData& image_data) : image_data(image_data)
+    Image::Image(const io::Window::ImageData& image_data) : image_data(image_data)
     {
     }
 
