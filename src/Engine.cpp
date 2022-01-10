@@ -5,6 +5,7 @@
 #include <vector>
 #include <doge/utils.hpp>
 #include <doge/components.hpp>
+#include <doge/core/IOBus.hpp>
 
 namespace doge
 {
@@ -14,8 +15,8 @@ namespace doge
     {
         io_bus.CreateWindow(window_settings);
 
-        assets.LoadTexture("missing_texture", "missing_texture.png");
-        assets.textures.at("missing_texture").SetRenderOptions(Texture::RenderOptions::Repeated);
+        if (assets.LoadTexture("missing_texture", "missing_texture.png"))
+            assets.textures.at("missing_texture").SetRenderOptions(Texture::RenderOptions::Repeated);
     }
 
     void Engine::CloseWindow()

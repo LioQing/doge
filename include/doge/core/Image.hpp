@@ -12,12 +12,11 @@ namespace doge
 
         Image(const Image&) = default;
         Image(const IOBus::ImageData& texture_data);
-        Image(const Vec2u& size, const Color& color = Color::Black());
-        Image(const std::string& filename);
-        Image(void* data, std::size_t size);
-        Image(const Texture& texture);
 
-        Vec2u GetSize() const;
+        void Create(const Vec2u& size, const Color& color = Color::Black());
+        bool FromFile(const std::string& filename);
+        bool FromMemory(void* data, std::size_t size);
+        void FromTexture(const Texture& texture);
 
         void ToFile(const std::string& filename) const;
 
@@ -28,5 +27,7 @@ namespace doge
 
         void FlipHorizontally();
         void FlipVertically();
+
+        Vec2u GetSize() const;
     };
 }

@@ -43,7 +43,7 @@ namespace doge
         // Helper functions
         void Main();
         void DestroyEntities();
-        const std::shared_ptr<PCNode> GetPCNode(lic::EntityID eid) const;
+        const std::shared_ptr<PCNode> GetPCNode(EntityID eid) const; 
 
     public:
 

@@ -9,22 +9,22 @@ namespace doge
     {
     }
 
-    Image::Image(const Vec2u& size, const Color& color)
+    void Image::Create(const Vec2u& size, const Color& color)
     {
         image_data.Create(size, color);
     }
     
-    Image::Image(const std::string& filename)
+    bool Image::FromFile(const std::string& filename)
     {
-        image_data.FromFile(filename);
+        return image_data.FromFile(filename);
     }
 
-    Image::Image(void* data, std::size_t size)
+    bool Image::FromMemory(void* data, std::size_t size)
     {
-        image_data.FromMemory(data, size);
+        return image_data.FromMemory(data, size);
     }
 
-    Image::Image(const Texture& texture)
+    void Image::FromTexture(const Texture& texture)
     {
         image_data.FromTexture(texture.texture_data);
     }

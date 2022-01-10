@@ -8,61 +8,45 @@
 
 namespace TestScene
 {
+    doge::Entity AddGreenRect(doge::Engine& e)
+    {
+        auto my_shape = e.AddEntity("Test", "test");
+
+        my_shape.AddComponent(doge::RigidBody
+        {
+            .type = doge::RigidBody::Type::Dynamic, 
+        });
+
+        my_shape.AddComponent(doge::RectangleCollider
+        {
+            .size = { 20, 40 },
+            .density = 1.f,
+            .restitution = .5f,
+            .friction = .3f,
+        });
+
+        my_shape.AddComponent<doge::Position>();
+        my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
+        my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
+        my_shape.AddComponent<doge::AngularVelocity>(20);
+        my_shape.AddComponent<doge::Scale>(2, 2);
+
+        my_shape.AddComponent(doge::RectangleShape
+        {
+            .size = { 20, 40 },
+            .origin = { 10, 20 },
+            .color = doge::Color(0x00FF0088),
+        });
+
+        return my_shape;
+    }
+
     void AddBlocks(doge::Engine& e)
     {
-        int last = -1;
         for (auto i = 0; i < 10; ++i)
         {
-            auto my_shape = e.AddEntity("Test", "test");
-
-            if (last != -1)
-            {
-                my_shape.SetParent(last);
-                my_shape.RemoveParent();
-            }
-            last = my_shape.id;
-
-            my_shape.AddComponent(doge::RigidBody
-            {
-                .type = doge::RigidBody::Type::Dynamic, 
-            });
-
-            // my_shape.AddComponent(doge::ConvexCollider
-            // {
-            //     .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
-            //     .density = 1.f,
-            //     .restitution = .5f,
-            //     .friction = .3f,
-            // });
-
-            my_shape.AddComponent(doge::RectangleCollider
-            {
-                .size = { 20, 40 },
-                .density = 1.f,
-                .restitution = .5f,
-                .friction = .3f,
-            });
-
-            my_shape.AddComponent<doge::Position>(i * 50, 0);
-            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
-            my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
-            my_shape.AddComponent<doge::AngularVelocity>(20);
-            my_shape.AddComponent<doge::Scale>(2, 2);
-
-            // auto& rect = my_shape.AddComponent(doge::ConvexShape
-            // {
-            //     .points = { { -7, -10 }, { 7, -10 }, { 12, 10 }, { -12, 10 } },
-            //     .color = doge::Color(0x00FF0088),
-            // });
-
-            my_shape.AddComponent(doge::RectangleShape
-            {
-                .size = { 20, 40 },
-                .origin = { 10, 20 },
-                .color = doge::Color(0x00FF0088),
-                .outline_color = doge::Color::Green(),
-                .outline_thickness = 2.f,
-            });
+            auto entity = AddGreenRect(e);
+            entity.GetComponent<doge::Position>().position = { 50.f * i, 0.f };
         }
 
         for (auto i = 1; i < 11; ++i)
@@ -114,8 +98,6 @@ namespace TestScene
                         .radius = 10.f,
                         .origin = doge::Vec2f(25.f, 10.f),
                         .color = doge::Color(0x0000FF88),
-                        .outline_color = doge::Color::Blue(),
-                        .outline_thickness = 2.f,
                     },
                 },
                 .rectangle_shapes =
@@ -125,8 +107,6 @@ namespace TestScene
                         .size = { 30, 8 },
                         .origin = { 15, 4 },
                         .color = doge::Color(0x0000FF88),
-                        .outline_color = doge::Color::Blue(),
-                        .outline_thickness = 2.f,
                     },
                 },
             });

@@ -103,7 +103,7 @@ namespace doge
             bool HasComponent() const;
 
             /**
-             * @brief Add a component to this entity
+             * @brief Add a component to this entity, re-construct the old component if the entity already has the component type
              * 
              * @tparam TComp type of the component to be added
              * @param args arguments to be passed to the component for initialization
@@ -399,7 +399,7 @@ namespace doge
         template <typename TComp>
         static Component<TComp>& AddComponent(EntityID eid, const TComp& c)
         {
-            return AddComponent<TComp>(eid, std::move(c));
+            return AddComponent<TComp, decltype(c)>(eid, c);
         }
 
         /**
@@ -703,7 +703,7 @@ namespace doge
     template <typename TComp>
     lic::Component<TComp>& lic::Entity::AddComponent(const TComp& c) const
     {
-        return lic::AddComponent<TComp>(this->id, std::move(c));
+        return lic::AddComponent<TComp>(this->id, c);
     }
 
     template <typename TComp>
