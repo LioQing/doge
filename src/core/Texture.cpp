@@ -41,54 +41,54 @@ namespace doge
         return Recti(size.x * indices.x, size.y * indices.y, size.x, size.y);
     }
 
-    Texture::Texture(const io::Window::TextureData& texture_data) : texture_data(texture_data)
+    Texture::Texture(const io::File::Texture& texture_io) : texture_io(texture_io)
     {
     }
 
     bool Texture::Create(const Vec2u& size)
     {
-        return texture_data.Create(size);
+        return texture_io.Create(size);
     }
     
     bool Texture::FromFile(const std::string& filename, const Recti& area)
     {
-        return texture_data.FromFile(filename, area);
+        return texture_io.FromFile(filename, area);
     }
 
     bool Texture::FromMemory(void* data, std::size_t size, const Recti& area)
     {
-        return texture_data.FromMemory(data, size, area);
+        return texture_io.FromMemory(data, size, area);
     }
 
     bool Texture::FromImage(const Image& image, const Recti& area)
     {
-        return texture_data.FromImage(image.image_data, area);
+        return texture_io.FromImage(image.image_io, area);
     }
     
     void Texture::SetRenderOptions(RenderOptions options)
     {
-        texture_data.SetSmooth(options & RenderOptions::Smooth);
-        texture_data.SetSRGB(options & RenderOptions::sRGB);
-        texture_data.SetRepeated(options & RenderOptions::Repeated);
+        texture_io.SetSmooth(options & RenderOptions::Smooth);
+        texture_io.SetSRGB(options & RenderOptions::sRGB);
+        texture_io.SetRepeated(options & RenderOptions::Repeated);
     }
 
     bool Texture::IsSmooth() const
     {
-        return texture_data.IsSmooth();
+        return texture_io.IsSmooth();
     }
 
     bool Texture::IsSRGB() const
     {
-        return texture_data.IsSRGB();
+        return texture_io.IsSRGB();
     }
 
     bool Texture::IsRepeated() const
     {
-        return texture_data.IsRepeated();
+        return texture_io.IsRepeated();
     }
 
     Vec2u Texture::GetSize() const
     {
-        return texture_data.GetSize();
+        return texture_io.GetSize();
     }
 }

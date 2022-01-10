@@ -1,6 +1,6 @@
 #pragma once
 
-#include <doge/core/io/Window.hpp>
+#include <doge/core/io/File.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <vector>
@@ -41,12 +41,12 @@ namespace doge
             Repeated = 1 << 2,
         };
         
-        io::Window::TextureData texture_data = io::Window::TextureData();
+        io::File::Texture texture_io = io::File::Texture();
         SpriteSheet sprite_sheet = SpriteSheet();
 
         Texture() = default;
         Texture(const Texture&) = default;
-        Texture(const io::Window::TextureData& texture_data);
+        Texture(const io::File::Texture& texture);
 
         bool Create(const Vec2u& size);
         bool FromFile(const std::string& filename, const Recti& area = Recti());

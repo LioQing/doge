@@ -12,6 +12,7 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
+#include <doge/core/io/File.hpp>
 
 namespace doge
 {
@@ -23,64 +24,9 @@ namespace doge
     {
         struct Window
         {
-            // textures and images
-
-            struct TextureData;
-            struct ImageData;
-
-            struct TextureData
-            {
-                sf::Texture texture;
-
-                Vec2u GetSize() const;
-
-                bool Create(const Vec2u& size);
-                bool FromFile(const std::string& filename, const Recti& area = Recti());
-                bool FromMemory(void* data, std::size_t size, const Recti& area = Recti());
-                bool FromImage(const ImageData& image, const Recti& area = Recti());
-
-                void SetSmooth(bool smooth);
-                bool IsSmooth() const;
-
-                void SetSRGB(bool srgb);
-                bool IsSRGB() const;
-
-                void SetRepeated(bool repeated);
-                bool IsRepeated() const;
-            };
-
-            struct ImageData
-            {
-                sf::Image image;
-
-                Vec2u GetSize() const;
-
-                void Create(const Vec2u& size, const Color& color = Color::Black());
-                bool FromFile(const std::string& filename);
-                bool FromMemory(void* data, std::size_t size);
-                void FromTexture(const TextureData& texture);
-
-                bool ToFile(const std::string& filename) const;
-
-                void MaskColor(const Color& color, std::uint8_t alpha = 0);
-                void SetPixel(std::uint32_t x, std::uint32_t y, const Color& color);
-                Color GetPixel(std::uint32_t x, std::uint32_t y) const;
-                const std::uint8_t* GetPixelPtr() const;
-
-                void FlipHorizontally();
-                void FlipVertically();
-            };
-
-            // window
-
             sf::RenderWindow window;
             sf::Clock clock;
-
-            void CreateWindow(const WindowSettings& window_settings);
-
-            void CloseWindow();
-
-            // game loops
+            int style = sf::Style::Default;
 
             enum DrawableType
             {
@@ -91,6 +37,10 @@ namespace doge
             
             std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>> views_draws;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
+
+            void CreateWindow(const WindowSettings& settings);
+
+            void CloseWindow();
 
             template <typename Functor>
             requires std::invocable<Functor, sf::Event>
@@ -112,21 +62,27 @@ namespace doge
 
             void Display();
 
+            // properties
+
+            void ApplySettings(const WindowSettings& settings);
+
             void SetFrameRate(uint32_t frame_rate);
+
+            void SetTitle(const std::string& title);
+
+            void SetIcon(const File::Image& icon);
 
             void StartDeltaClock();
 
-            float GetDeltaTime();
+            float GetDeltaTimeRestart();
 
-            // user control
+            bool IsOpen() const;
 
-            struct Keyboard
-            {
-                using Key = sf::Keyboard::Key;
+            Vec2i GetPosition() const;
+            void SetPosition(const Vec2i& pos);
 
-                static bool IsKeyDown(Key key);
-                static void SetVirtualKeyboardVisible(bool visible);
-            };
+            Vec2u GetSize() const;
+            void SetSize(const Vec2u& size);
         };
     }
 }

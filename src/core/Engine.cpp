@@ -45,7 +45,7 @@ namespace doge
         window.window_io.StartDeltaClock();
         while (scenes.active_scene_id == scenes.current_scene_id && scenes.is_running && scenes.is_open)
         {
-            dt = window.window_io.GetDeltaTime();
+            dt = window.window_io.GetDeltaTimeRestart();
             acc_fixed_dt += dt;
 
             window.window_io.PollEvent([&](const sf::Event& event)
@@ -57,7 +57,7 @@ namespace doge
                 }
                 else if (event.type == sf::Event::Resized)
                 {
-                    window.settings.resolution = Vec2u(event.size.width, event.size.height);
+                    window.settings.size = Vec2u(event.size.width, event.size.height);
                 }
             });
             

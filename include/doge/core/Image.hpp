@@ -8,10 +8,10 @@ namespace doge
 
     struct Image
     {
-        io::Window::ImageData image_data;
+        io::File::Image image_io;
 
         Image(const Image&) = default;
-        Image(const io::Window::ImageData& texture_data);
+        Image(const io::File::Image& texture);
 
         void Create(const Vec2u& size, const Color& color = Color::Black());
         bool FromFile(const std::string& filename);

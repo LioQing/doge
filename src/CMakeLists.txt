@@ -35,6 +35,7 @@ set(SRC_FILES
     utils/math.cpp
     core/Texture.cpp
     core/Assets.cpp
+    core/io/File.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

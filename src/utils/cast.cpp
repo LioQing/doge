@@ -1,6 +1,10 @@
 #include <doge/utils/cast.hpp>
 
+#include <SFML/Graphics.hpp>
+#include <box2d/box2d.h>
 #include <doge/components.hpp>
+#include <doge/utils.hpp>
+#include <doge/core.hpp>
 
 namespace doge
 {
@@ -53,5 +57,31 @@ namespace doge
     float cast::ToRadian(float degree)
     {
         return degree * 3.1415926535f / 180.f;
+    }
+
+    WindowSettings::Style cast::FromSfStyle(int style)
+    {
+        switch (style)
+        {
+            case sf::Style::None:           return WindowSettings::Style::None;
+            case sf::Style::Titlebar:       return WindowSettings::Style::Titlebar;
+            case sf::Style::Resize:         return WindowSettings::Style::Resizable;
+            case sf::Style::Close:          return WindowSettings::Style::Close;
+            case sf::Style::Fullscreen:     return WindowSettings::Style::Fullscreen;
+            default: return WindowSettings::Style::Default;
+        }
+    }
+
+    int cast::ToSfStyle(WindowSettings::Style style)
+    {
+        switch (style)
+        {
+            case WindowSettings::Style::None:       return sf::Style::None;
+            case WindowSettings::Style::Titlebar:   return sf::Style::Titlebar;
+            case WindowSettings::Style::Resizable:  return sf::Style::Resize;
+            case WindowSettings::Style::Close:      return sf::Style::Close;
+            case WindowSettings::Style::Fullscreen: return sf::Style::Fullscreen;
+            default: return sf::Style::Default;
+        }
     }
 }

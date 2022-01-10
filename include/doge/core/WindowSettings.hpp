@@ -8,26 +8,20 @@ namespace doge
 {
     struct WindowSettings
     {
-        enum Mode
-        {
-            Windowed,
-            FullScreen,
-            Borderless,
-        };
-
         enum Style
         {
             None = 0,
             Titlebar = 1 << 0,
             Resizable = 1 << 1,
             Close = 1 << 2,
-            All = Titlebar | Resizable | Close,
+            Fullscreen = 1 << 3,
+
+            Default = Titlebar | Resizable | Close,
         };
 
-        Vec2u resolution = Vec2u(800, 600);
+        Vec2u size = Vec2u(800, 600);
         std::string title = "";
         std::uint32_t fps = 60;
-        Mode mode = Mode::Windowed;
-        Style window_style = Style::All;
+        Style style = Style::Default;
     };
 }

@@ -17,6 +17,8 @@ namespace doge
         void CreateWindow();
         void CloseWindow();
 
-        void SetFrameRate(uint32_t fps);
+        void SetFrameRate(std::uint32_t fps);
+
+        void SetTitle(const std::string& title);
     };
 }

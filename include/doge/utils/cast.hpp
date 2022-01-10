@@ -2,10 +2,11 @@
 
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
-#include "../components/RigidBody.hpp"
-#include "Vec2.hpp"
-#include "Rect.hpp"
-#include "Color.hpp"
+#include <doge/components/RigidBody.hpp>
+#include <doge/utils/Color.hpp>
+#include <doge/utils/Vec2.hpp>
+#include <doge/utils/Rect.hpp>
+#include <doge/core/WindowSettings.hpp>
 
 namespace doge
 {
@@ -52,5 +53,9 @@ namespace doge
 
         static float ToDegree(float radian);
         static float ToRadian(float degree);
+
+        
+        static WindowSettings::Style FromSfStyle(int style);
+        static int ToSfStyle(WindowSettings::Style style);
     };
 }
