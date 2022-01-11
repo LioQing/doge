@@ -203,7 +203,7 @@ namespace TestScene
     {
         std::cout << doge::io::InputDevice::Mouse::GetPosition() << " " 
         << e.input_device.GetRelativeMousePosition() << " "
-        << doge::io::InputDevice::Mouse::GetPosition() - e.window.window_io.GetPosition() << " " << std::endl;
+        << 1000 / dt << " " << std::endl;
 
         if (++count > 100)
         {

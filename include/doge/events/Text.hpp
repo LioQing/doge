@@ -4,8 +4,8 @@
 
 namespace doge::event
 {
-    struct Text : lev::Event<Text>
+    struct Text
     {
-
+        std::uint32_t unicode;
     };
 };

@@ -26,6 +26,15 @@ namespace doge::io
         window_sptr->close();
     }
 
+    void Window::PollEvent()
+    {
+        sf::Event event;
+        while (window_sptr->pollEvent(event))
+        {
+            sf_event(event);
+        }
+    }
+
     void Window::Render(const Engine& engine)
     {
         // helper functions

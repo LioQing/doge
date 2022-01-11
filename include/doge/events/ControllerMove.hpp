@@ -4,8 +4,10 @@
 
 namespace doge::event
 {
-    struct ControllerMove : lev::Event<ControllerMove>
+    struct ControllerMove
     {
-
+        std::uint8_t id;
+        std::uint8_t axis;
+        float position;
     };
 };

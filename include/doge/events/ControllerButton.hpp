@@ -4,8 +4,9 @@
 
 namespace doge::event
 {
-    struct ControllerButton : lev::Event<ControllerButton>
+    struct ControllerButton
     {
-
+        std::uint8_t id;
+        std::uint8_t button;
     };
 };

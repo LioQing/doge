@@ -84,4 +84,147 @@ namespace doge
             default: return sf::Style::Default;
         }
     }
+
+    io::InputDevice::Keyboard::Key cast::FromSfKeyboardKey(sf::Keyboard::Key key)
+    {
+        return key;
+    }
+
+    sf::Keyboard::Key cast::ToSfKeyboardKey(io::InputDevice::Keyboard::Key key)
+    {
+        return key;        
+    }
+
+    io::InputDevice::Mouse::Wheel cast::FromSfMouseWheel(sf::Mouse::Wheel wheel)
+    {
+        using dwheel = io::InputDevice::Mouse::Wheel;
+        using sfwheel = sf::Mouse::Wheel;
+
+        return wheel == sfwheel::HorizontalWheel ? dwheel::Horizontal : dwheel::Vertical;
+    }
+
+    sf::Mouse::Wheel cast::ToSfMouseWheel(io::InputDevice::Mouse::Wheel wheel)
+    {
+        using dwheel = io::InputDevice::Mouse::Wheel;
+        using sfwheel = sf::Mouse::Wheel;
+
+        return wheel == dwheel::Horizontal ? sfwheel::HorizontalWheel : sfwheel::VerticalWheel;
+    }
+
+    io::InputDevice::Mouse::Button cast::FromSfMouseButton(sf::Mouse::Button button)
+    {
+        using dbutton = io::InputDevice::Mouse::Button;
+        using sfbutton = sf::Mouse::Button;
+
+        switch (button)
+        {
+            case sfbutton::Left:        return dbutton::Left;
+            case sfbutton::Right:       return dbutton::Right;
+            case sfbutton::Middle:      return dbutton::Middle;
+            case sfbutton::XButton1:    return dbutton::Mouse4;
+            case sfbutton::XButton2:    return dbutton::Mouse5;
+            default: return dbutton::Count;
+        }
+    }
+
+    sf::Mouse::Button cast::ToSfMouseButton(io::InputDevice::Mouse::Button button)
+    {
+        using dbutton = io::InputDevice::Mouse::Button;
+        using sfbutton = sf::Mouse::Button;
+
+        switch (button)
+        {
+            case dbutton::Left:     return sfbutton::Left;
+            case dbutton::Right:    return sfbutton::Right;
+            case dbutton::Middle:   return sfbutton::Middle;
+            case dbutton::Mouse4:   return sfbutton::XButton1;
+            case dbutton::Mouse5:   return sfbutton::XButton2;
+            default: return sfbutton::ButtonCount;
+        }
+    }
+
+    io::InputDevice::Sensor::Type cast::FromSfSensorType(sf::Sensor::Type type)
+    {
+        using dtype = io::InputDevice::Sensor::Type;
+        using sftype = sf::Sensor::Type;
+
+        switch (type)
+        {
+            case sftype::Accelerometer:         return dtype::Accelerometer;
+            case sftype::Gyroscope:             return dtype::Gyroscope;
+            case sftype::Magnetometer:          return dtype::Magnetometer;
+            case sftype::Gravity:               return dtype::Gravity;
+            case sftype::UserAcceleration:      return dtype::UserAcceleration;
+            case sftype::Orientation:           return dtype::Orientation;
+            default: return dtype::Count;
+        }
+    }
+
+    sf::Sensor::Type cast::ToSfSensorType(io::InputDevice::Sensor::Type type)
+    {
+        using dtype = io::InputDevice::Sensor::Type;
+        using sftype = sf::Sensor::Type;
+
+        switch (type)
+        {
+            case dtype::Accelerometer:         return sftype::Accelerometer;
+            case dtype::Gyroscope:             return sftype::Gyroscope;
+            case dtype::Magnetometer:          return sftype::Magnetometer;
+            case dtype::Gravity:               return sftype::Gravity;
+            case dtype::UserAcceleration:      return sftype::UserAcceleration;
+            case dtype::Orientation:           return sftype::Orientation;
+            default: return sftype::Count;
+        }
+    }
+
+    io::Event::Content cast::FromSfEvent(const sf::Event& event)
+    {
+        using io::Event;
+
+        if (event.type == sf::Event::EventType::Closed)
+            return Event::Content(Event::Type::Closed);
+        if (event.type == sf::Event::EventType::Resized)
+            return Event::Content(Event::Type::Resized, event::Size(Vec2u(event.size.width, event.size.height)));
+        if (event.type == sf::Event::EventType::LostFocus)
+            return Event::Content(Event::Type::LostFocus);
+        if (event.type == sf::Event::EventType::GainedFocus)
+            return Event::Content(Event::Type::GainedFocus);
+        if (event.type == sf::Event::EventType::TextEntered)
+            return Event::Content(Event::Type::TextEntered, event::Text(event.text.unicode));
+        if (event.type == sf::Event::EventType::KeyPressed)
+            return Event::Content(Event::Type::KeyPressed, event::Key(cast::FromSfKeyboardKey(event.key.code), event.key.alt, event.key.control, event.key.shift, event.key.system));
+        if (event.type == sf::Event::EventType::KeyReleased)
+            return Event::Content(Event::Type::KeyReleased, event::Key(cast::FromSfKeyboardKey(event.key.code), event.key.alt, event.key.control, event.key.shift, event.key.system));
+        if (event.type == sf::Event::EventType::MouseWheelScrolled)
+            return Event::Content(Event::Type::MouseWheelScrolled, event::MouseWheel(cast::FromSfMouseWheel(event.mouseWheelScroll.wheel), event.mouseWheelScroll.delta, Vec2i(event.mouseWheelScroll.x, event.mouseWheelScroll.y)));
+        if (event.type == sf::Event::EventType::MouseButtonPressed)
+            return Event::Content(Event::Type::MouseButtonPressed, event::MouseButton(cast::FromSfMouseButton(event.mouseButton.button), Vec2i(event.mouseButton.x, event.mouseButton.y)));
+        if (event.type == sf::Event::EventType::MouseButtonReleased)
+            return Event::Content(Event::Type::MouseButtonReleased, event::MouseButton(cast::FromSfMouseButton(event.mouseButton.button), Vec2i(event.mouseButton.x, event.mouseButton.y)));
+        if (event.type == sf::Event::EventType::MouseMoved)
+            return Event::Content(Event::Type::MouseMoved, event::MouseMove(Vec2i(event.mouseMove.x, event.mouseMove.y)));
+        if (event.type == sf::Event::EventType::MouseEntered)
+            return Event::Content(Event::Type::MouseEntered);
+        if (event.type == sf::Event::EventType::MouseLeft)
+            return Event::Content(Event::Type::MouseLeft);
+        if (event.type == sf::Event::EventType::JoystickButtonPressed)
+            return Event::Content(Event::Type::ControllerButtonPressed, event::ControllerButton(event.joystickButton.joystickId, event.joystickButton.button));
+        if (event.type == sf::Event::EventType::JoystickButtonReleased)
+            return Event::Content(Event::Type::ControllerButtonReleased, event::ControllerButton(event.joystickButton.joystickId, event.joystickButton.button));
+        if (event.type == sf::Event::EventType::JoystickMoved)
+            return Event::Content(Event::Type::ControllerMoved, event::ControllerMove(event.joystickMove.joystickId, event.joystickMove.axis, event.joystickMove.position));
+        if (event.type == sf::Event::EventType::JoystickConnected)
+            return Event::Content(Event::Type::ControllerConnected, event::ControllerConnect(event.joystickConnect.joystickId));
+        if (event.type == sf::Event::EventType::JoystickDisconnected)
+            return Event::Content(Event::Type::ControllerDisconnected, event::ControllerConnect(event.joystickConnect.joystickId));
+        if (event.type == sf::Event::EventType::TouchBegan)
+            return Event::Content(Event::Type::TouchBegan, event::Touch(event.touch.finger, Vec2i(event.touch.x, event.touch.y)));
+        if (event.type == sf::Event::EventType::TouchMoved)
+            return Event::Content(Event::Type::TouchMoved, event::Touch(event.touch.finger, Vec2i(event.touch.x, event.touch.y)));
+        if (event.type == sf::Event::EventType::TouchEnded)
+            return Event::Content(Event::Type::TouchEnded, event::Touch(event.touch.finger, Vec2i(event.touch.x, event.touch.y)));
+        if (event.type == sf::Event::EventType::SensorChanged)
+            return Event::Content(Event::Type::SensorChanged, event::Sensor(cast::FromSfSensorType(event.sensor.type), Vec3f(event.sensor.x, event.sensor.y, event.sensor.z)));
+        return Event::Content(Event::Type::Count);
+    }
 }

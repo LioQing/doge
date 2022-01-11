@@ -4,8 +4,8 @@
 
 namespace doge::event
 {
-    struct ControllerConnect : lev::Event<ControllerConnect>
+    struct ControllerConnect
     {
-
+        std::uint8_t id;
     };
 };

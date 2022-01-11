@@ -77,16 +77,32 @@ namespace doge::lev
 
         void Raise() const&
         {
-            static_assert(std::is_base_of<Event, std::tuple_element_t<0, std::tuple<TArgs...>>>::value && "Cannot call raise event when lev::Event<TArg> is not base of TArg");
-
-            for (auto& [id, function] : listeners)
+            if constexpr (sizeof...(TArgs) == 0)
             {
-                function(*static_cast<const std::tuple_element_t<0, std::tuple<TArgs...>>*>(this));
+                for (auto& [id, function] : listeners)
+                {
+                    function();
+                }
+
+                for (auto& function : idless_listeners)
+                {
+                    function();
+                }
             }
-
-            for (auto& function : idless_listeners)
+            else
             {
-                function(*static_cast<const std::tuple_element_t<0, std::tuple<TArgs...>>*>(this));
+                static_assert(std::is_base_of<Event, std::tuple_element_t<0, std::tuple<TArgs...>>>::value && 
+                    "Cannot call raise event when lev::Event<TArg> is not base of TArg");
+
+                for (auto& [id, function] : listeners)
+                {
+                    function(*static_cast<const std::tuple_element_t<0, std::tuple<TArgs...>>*>(this));
+                }
+
+                for (auto& function : idless_listeners)
+                {
+                    function(*static_cast<const std::tuple_element_t<0, std::tuple<TArgs...>>*>(this));
+                }
             }
         }
 

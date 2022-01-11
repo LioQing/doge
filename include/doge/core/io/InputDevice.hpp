@@ -46,7 +46,9 @@ namespace doge::io
 
         struct Controller
         {
-            
+            static constexpr std::uint8_t COUNT = 8;
+            static constexpr std::uint8_t AXIS_COUNT = 8;
+            static constexpr std::uint8_t BUTTON_COUNT = 32;
         };
 
         struct Touch
@@ -56,7 +58,16 @@ namespace doge::io
 
         struct Sensor
         {
-
+            enum Type
+            {
+                Accelerometer,
+                Gyroscope,
+                Magnetometer,
+                Gravity,
+                UserAcceleration,
+                Orientation,
+                Count
+            };
         };
 
         std::weak_ptr<sf::RenderWindow> window_wptr;

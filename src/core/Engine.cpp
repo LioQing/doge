@@ -30,6 +30,21 @@ namespace doge
         scenes.active_scene_id = scenes.current_scene_id;
         auto& active_scene = scenes.scenes.at(scenes.current_scene_id);
 
+        events.on_window_closed.AddListener("Engine_OnWindowClosed", 
+        [&]()
+        {
+            scenes.is_open = false;
+            scenes.is_running = false;
+        });
+
+        events.on_window_resized.AddListener("Engine_OnWindowResized", 
+        [&](const event::Size& size)
+        {
+            window.settings.size = size.size;
+        });
+
+        window.window_io.sf_event.AddListener("events_event_io_OnPollEvent", std::bind(&io::Event::OnPollEvent, events.event_io, std::placeholders::_1));
+
         scenes.is_running = true;
         if (active_scene.start)
             active_scene.start(*this);
@@ -48,18 +63,7 @@ namespace doge
             dt = window.window_io.GetDeltaTimeRestart();
             acc_fixed_dt += dt;
 
-            window.window_io.PollEvent([&](const sf::Event& event)
-            {
-                if (event.type == sf::Event::Closed)
-                {
-                    scenes.is_running = false;
-                    scenes.is_open = false;
-                }
-                else if (event.type == sf::Event::Resized)
-                {
-                    window.settings.size = Vec2u(event.size.width, event.size.height);
-                }
-            });
+            window.window_io.PollEvent();
             
             for (; acc_fixed_dt > scenes.fixed_time_step; acc_fixed_dt -= scenes.fixed_time_step)
             {
@@ -95,6 +99,10 @@ namespace doge
             active_scene.finish(*this);
         scenes.is_running = false;
         DestroyEntities();
+
+        window.window_io.sf_event.RemoveListener("events_event_io_OnPollEvent");
+
+        events.on_window_closed.RemoveListener("Engine_OnWindowClosed");
     }
 
     void Engine::StartScene(const std::string& id)

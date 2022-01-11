@@ -20,6 +20,7 @@
 #include <doge/core/Range.hpp>
 #include <doge/core/Assets.hpp>
 #include <doge/core/Scenes.hpp>
+#include <doge/core/Events.hpp>
 
 namespace doge
 {
@@ -97,11 +98,12 @@ namespace doge
         }
 
         // assets
-
         Assets assets;
 
         // input device
-
         io::InputDevice input_device = io::InputDevice(window.window_io.window_sptr);
+
+        // events
+        Events events;
     };
 }

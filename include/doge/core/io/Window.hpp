@@ -12,6 +12,7 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
+#include <doge/utils/lev.hpp>
 #include <doge/core/io/File.hpp>
 
 namespace doge
@@ -24,9 +25,8 @@ namespace doge
     {
         struct Window
         {
-            std::shared_ptr<sf::RenderWindow> window_sptr = std::make_shared<sf::RenderWindow>();
+            const std::shared_ptr<sf::RenderWindow> window_sptr = std::make_shared<sf::RenderWindow>();
             sf::Clock clock;
-            int style = sf::Style::Default;
 
             enum DrawableType
             {
@@ -38,25 +38,13 @@ namespace doge
             std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>> views_draws;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 
+            doge::Event<sf::Event> sf_event;
+
             void CreateWindow(const WindowSettings& settings);
 
             void CloseWindow();
 
-            template <typename Functor>
-            requires std::invocable<Functor, sf::Event>
-            void PollEvent(Functor functor)
-            {
-                sf::Event event;
-                while (window_sptr->pollEvent(event))
-                {
-                    if (event.type == sf::Event::Closed)
-                    {
-                        CloseWindow();
-                    }
-
-                    functor(event);
-                }
-            }
+            void PollEvent();
 
             void Render(const Engine& engine);
 
@@ -83,6 +71,10 @@ namespace doge
 
             Vec2u GetSize() const;
             void SetSize(const Vec2u& size);
+
+        private:
+            
+            int style = sf::Style::Default;
         };
     }
 }

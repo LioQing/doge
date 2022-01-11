@@ -37,6 +37,8 @@ set(SRC_FILES
     core/Assets.cpp
     core/io/File.cpp
     core/io/InputDevice.cpp
+    core/io/Event.cpp
+    core/Events.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
