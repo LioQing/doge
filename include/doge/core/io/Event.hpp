@@ -6,7 +6,7 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/lev.hpp>
 #include <doge/utils/aliases.hpp>
-#include <doge/core/io/InputDevice.hpp>
+#include <doge/core/io/Input.hpp>
 
 namespace doge::io
 {

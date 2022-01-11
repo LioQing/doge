@@ -3,12 +3,13 @@
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 #include <doge/components/RigidBody.hpp>
+#include <doge/components/PolygonShape.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Vec3.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/core/WindowSettings.hpp>
-#include <doge/core/io/InputDevice.hpp>
+#include <doge/core/io/Input.hpp>
 #include <doge/core/io/Event.hpp>
 #include <doge/events.hpp>
 
@@ -73,18 +74,24 @@ namespace doge
         static WindowSettings::Style FromSfStyle(int style);
         static int ToSfStyle(WindowSettings::Style style);
 
-        static io::InputDevice::Keyboard::Key FromSfKeyboardKey(sf::Keyboard::Key key);
-        static sf::Keyboard::Key ToSfKeyboardKey(io::InputDevice::Keyboard::Key key);
+        static io::Input::Keyboard::Key FromSfKeyboardKey(sf::Keyboard::Key key);
+        static sf::Keyboard::Key ToSfKeyboardKey(io::Input::Keyboard::Key key);
 
-        static io::InputDevice::Mouse::Wheel FromSfMouseWheel(sf::Mouse::Wheel wheel);
-        static sf::Mouse::Wheel ToSfMouseWheel(io::InputDevice::Mouse::Wheel wheel);
+        static io::Input::Mouse::Wheel FromSfMouseWheel(sf::Mouse::Wheel wheel);
+        static sf::Mouse::Wheel ToSfMouseWheel(io::Input::Mouse::Wheel wheel);
 
-        static io::InputDevice::Mouse::Button FromSfMouseButton(sf::Mouse::Button button);
-        static sf::Mouse::Button ToSfMouseButton(io::InputDevice::Mouse::Button button);
+        static io::Input::Mouse::Button FromSfMouseButton(sf::Mouse::Button button);
+        static sf::Mouse::Button ToSfMouseButton(io::Input::Mouse::Button button);
 
-        static io::InputDevice::Sensor::Type FromSfSensorType(sf::Sensor::Type type);
-        static sf::Sensor::Type ToSfSensorType(io::InputDevice::Sensor::Type type);
+        static io::Input::Sensor::Type FromSfSensorType(sf::Sensor::Type type);
+        static sf::Sensor::Type ToSfSensorType(io::Input::Sensor::Type type);
 
         static io::Event::Content FromSfEvent(const sf::Event& event);
+
+        static PolygonShape::Type FromSfPolygonType(sf::PrimitiveType type);
+        static sf::PrimitiveType ToSfPolygonType(PolygonShape::Type type);
+
+        static std::uint8_t FromSfControllerAxis(sf::Joystick::Axis axis);
+        static sf::Joystick::Axis ToSfControllerAxis(std::uint8_t axis);
     };
 }

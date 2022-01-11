@@ -25,12 +25,12 @@ namespace doge
     {
         struct Window
         {
-            const std::shared_ptr<sf::RenderWindow> window_sptr = std::make_shared<sf::RenderWindow>();
+            sf::RenderWindow window;
             sf::Clock clock;
 
             enum DrawableType
             {
-                Convex, Circle, Rectangle, SpriteType, Custom
+                Convex, Circle, Rectangle, SpriteType, Polygon
             };
 
             using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;

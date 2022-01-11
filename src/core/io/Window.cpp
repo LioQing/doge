@@ -10,7 +10,7 @@ namespace doge::io
     void Window::CreateWindow(const WindowSettings& settings)
     {
         style = cast::ToSfStyle(settings.style);
-        window_sptr->create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style);
+        window.create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style);
         
         if (settings.style == WindowSettings::Style::None)
         {
@@ -23,13 +23,13 @@ namespace doge::io
 
     void Window::CloseWindow()
     {
-        window_sptr->close();
+        window.close();
     }
 
     void Window::PollEvent()
     {
         sf::Event event;
-        while (window_sptr->pollEvent(event))
+        while (window.pollEvent(event))
         {
             sf_event(event);
         }
@@ -240,55 +240,48 @@ namespace doge::io
             UpdateSprite(sprite_comp, sprite_comp, entity, 0);
         }
 
-        // custom shape
-        auto SyncCustom = [&](DrawableVertices& vertices, const CustomShape& custom_comp, const Entity& entity)
+        // polygon shape
+        auto SyncPolygon = [&](DrawableVertices& vertices, const PolygonShape& polygon_comp, const Entity& entity)
         {
-            auto size = custom_comp.vertices.size();
+            auto size = polygon_comp.vertices.size();
 
-            if      (custom_comp.type == CustomShape::Type::Points)         vertices.type = sf::PrimitiveType::Points;
-            else if (custom_comp.type == CustomShape::Type::Lines)          vertices.type = sf::PrimitiveType::Lines;
-            else if (custom_comp.type == CustomShape::Type::LineStrip)      vertices.type = sf::PrimitiveType::LineStrip;
-            else if (custom_comp.type == CustomShape::Type::Triangles)      vertices.type = sf::PrimitiveType::Triangles;
-            else if (custom_comp.type == CustomShape::Type::TriangleStrip)  vertices.type = sf::PrimitiveType::TriangleStrip;
-            else if (custom_comp.type == CustomShape::Type::TriangleFan)    vertices.type = sf::PrimitiveType::TriangleFan;
-            else if (custom_comp.type == CustomShape::Type::Quads)          vertices.type = sf::PrimitiveType::Quads;
-            else throw std::invalid_argument("Invalid CustomShape::Type");
+            vertices.type = cast::ToSfPolygonType(polygon_comp.type);
 
-            if (vertices.vertices.size() < custom_comp.vertices.size())
+            if (vertices.vertices.size() < polygon_comp.vertices.size())
             {
                 vertices.vertices.resize(size);
             }
 
             for (std::size_t i = 0; i < size; ++i)
             {
-                auto& vertex = custom_comp.vertices.at(i);
+                auto& vertex = polygon_comp.vertices.at(i);
                 vertices.vertices.at(i).position = 
-                    cast::ToSfVec2((vertex.position - custom_comp.origin).Rotated(global::GetRotation(entity)) * global::GetScale(entity) 
+                    cast::ToSfVec2((vertex.position - polygon_comp.origin).Rotated(global::GetRotation(entity)) * global::GetScale(entity) 
                     + global::GetPosition(entity));
                 vertices.vertices.at(i).color = cast::ToSfColor(vertex.color);
                 vertices.vertices.at(i).texCoords = cast::ToSfVec2(vertex.texture_coordinates);
             }
 
-            if (custom_comp.texture_id != "")
+            if (polygon_comp.texture_id != "")
             {
-                vertices.texture = &engine.assets.textures.at(custom_comp.texture_id).texture_io.texture;
+                vertices.texture = &engine.assets.textures.at(polygon_comp.texture_id).texture_io.texture;
             }
         };
 
-        auto UpdateCustom = [&]<typename TComp>(Component<TComp>& comp, const CustomShape& custom_comp, const Entity& entity, std::size_t index)
+        auto UpdatePolygon = [&]<typename TComp>(Component<TComp>& comp, const PolygonShape& polygon_comp, const Entity& entity, std::size_t index)
         {
-            auto key = DrawableKey(entity, DrawableType::Custom, index);
+            auto key = DrawableKey(entity, DrawableType::Polygon, index);
             auto draw_itr = EmplaceDrawables.template operator()<DrawableVertices>(key, comp);
 
-            if (InAnyViewHelper(custom_comp, entity, key))
+            if (InAnyViewHelper(polygon_comp, entity, key))
             {
-                SyncCustom(static_cast<DrawableVertices&>(*draw_itr->second), custom_comp, entity);
+                SyncPolygon(static_cast<DrawableVertices&>(*draw_itr->second), polygon_comp, entity);
             }
         };
 
-        for (auto [entity, custom_comp] : engine.Select<CustomShape>().EntitiesAndComponents())
+        for (auto [entity, polygon_comp] : engine.Select<PolygonShape>().EntitiesAndComponents())
         {
-            UpdateCustom(custom_comp, custom_comp, entity, 0);
+            UpdatePolygon(polygon_comp, polygon_comp, entity, 0);
         }
 
         // compound shape
@@ -320,24 +313,24 @@ namespace doge::io
         }
 
         // draw
-        window_sptr->clear();
+        window.clear();
         for (auto& [eid, view_draw] : views_draws)
         {
             auto& [view, draw_keys] = view_draw;
 
-            window_sptr->setView(*view);
+            window.setView(*view);
 
             // draw
             for (auto draw_key : draw_keys)
             {
-                window_sptr->draw(*drawables.at(draw_key));
+                window.draw(*drawables.at(draw_key));
             }
         }
     }
 
     void Window::Display()
     {
-        window_sptr->display();
+        window.display();
     }
 
     void Window::ApplySettings(const WindowSettings& settings)
@@ -358,17 +351,17 @@ namespace doge::io
 
     void Window::SetFrameRate(std::uint32_t frame_rate)
     {
-        window_sptr->setFramerateLimit(frame_rate);
+        window.setFramerateLimit(frame_rate);
     }
 
     void Window::SetTitle(const std::string& title)
     {
-        window_sptr->setTitle(title);
+        window.setTitle(title);
     }
 
     void Window::SetIcon(const File::Image& icon)
     {
-        window_sptr->setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
+        window.setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
     }
 
     void Window::StartDeltaClock()
@@ -383,26 +376,26 @@ namespace doge::io
 
     bool Window::IsOpen() const
     {
-        return window_sptr->isOpen();
+        return window.isOpen();
     }
 
     Vec2i Window::GetPosition() const
     {
-        return cast::FromSfVec2(window_sptr->getPosition());
+        return cast::FromSfVec2(window.getPosition());
     }
 
     void Window::SetPosition(const Vec2i& pos)
     {
-        window_sptr->setPosition(cast::ToSfVec2(pos));
+        window.setPosition(cast::ToSfVec2(pos));
     }
 
     Vec2u Window::GetSize() const
     {
-        return cast::FromSfVec2(window_sptr->getSize());
+        return cast::FromSfVec2(window.getSize());
     }
 
     void Window::SetSize(const Vec2u& size)
     {
-        window_sptr->setSize(cast::ToSfVec2(size));
+        window.setSize(cast::ToSfVec2(size));
     }
 }

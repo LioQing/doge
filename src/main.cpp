@@ -137,25 +137,17 @@ namespace TestScene
         cam = e.AddCamera();
         cam.AddComponent<doge::Position>();
         cam.AddComponent<doge::Rotation>();
-        // cam.AddComponent<doge::Scale>(2, 2);
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
         ground.AddComponent(doge::EdgeCollider
         {
-            // .points = // shape: \/
-            // { 
-            //     doge::Vec2f(-static_cast<float>(e.GetVideoSettings().resolution.x) / 2.f + 100, -100), 
-            //     doge::Vec2f(0, 0), 
-            //     doge::Vec2f(e.GetVideoSettings().resolution.x / 2.f - 100, -100),
-            // },
             .points = // shape: /\.
             { 
                 doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
                 doge::Vec2f(0, -100), 
                 doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
             },
-            //.size = doge::Vec2f(e.GetVideoSettings().resolution.x, 10.0f),
         });
         ground.AddComponent<doge::Position>(0.f, e.window.settings.size.y / 2.f - 50.f);
 
@@ -171,14 +163,14 @@ namespace TestScene
         });
 
         auto my_custom_shape = e.AddEntity();
-        my_custom_shape.AddComponent(doge::CustomShape
+        my_custom_shape.AddComponent(doge::PolygonShape
         {
-            .type = doge::CustomShape::Type::Triangles,
+            .type = doge::PolygonShape::Type::Triangles,
             .vertices = 
             {
-                doge::CustomShape::Vertex({ 0, 0 }, doge::Color::Red()),
-                doge::CustomShape::Vertex({ 100, 100 }, doge::Color::Green()),
-                doge::CustomShape::Vertex({ 100, 0 }, doge::Color::Blue()),
+                doge::PolygonShape::Vertex({ 0, 0 }, doge::Color::Red()),
+                doge::PolygonShape::Vertex({ 100, 100 }, doge::Color::Green()),
+                doge::PolygonShape::Vertex({ 100, 0 }, doge::Color::Blue()),
             },
             .origin = { 50, 50 },
             .texture_id = "missing_texture",
@@ -201,8 +193,8 @@ namespace TestScene
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        std::cout << doge::io::InputDevice::Mouse::GetPosition() << " " 
-        << e.input_device.GetRelativeMousePosition() << " "
+        std::cout << doge::io::Input::Mouse::GetPosition() << " " 
+        << doge::io::Input::Mouse::GetPosition(e.window.window_io) << " "
         << 1000 / dt << " " << std::endl;
 
         if (++count > 100)
@@ -215,26 +207,15 @@ namespace TestScene
         {
             if (doge::global::GetAABB(convex).top > e.window.settings.size.y / 2.f)
                 e.DestroyEntity(entity);
-            
-            //scale.scale = doge::Vec2f::One() * std::clamp(100.f / velocity.velocity.Magnitude(), 0.1f, 2.f);
-            //coll.apply_changes = true;
         }
 
         for (auto [entity, rgbd, position, shape, coll, velocity] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider, doge::Velocity>().EntitiesAndComponents())
         {
             if (position.position.y - shape.circle_shapes.at(0).radius > e.window.settings.size.y / 2.f)
-            {
                 e.DestroyEntity(entity);
-            }
-            
-            //shape.circle_shapes.at(0).radius = std::clamp(500.f / velocity.velocity.Magnitude(), 0.f, 50.f);
-            //shape.circle_shapes.at(0).origin = { shape.circle_shapes.at(0).radius + 15, shape.circle_shapes.at(0).radius };
-
-            //coll.circle_colliders.at(0).radius = shape.circle_shapes.at(0).radius;
-            //coll.circle_colliders.at(0).apply_changes = true;
         }
 
-        for (auto [rotation, custom_shape] : e.Select<doge::Rotation, doge::CustomShape>().Components())
+        for (auto [rotation, custom_shape] : e.Select<doge::Rotation, doge::PolygonShape>().Components())
         {
             rotation.rotation += 0.005 * dt;
         }

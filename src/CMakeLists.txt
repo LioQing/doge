@@ -36,7 +36,7 @@ set(SRC_FILES
     core/Texture.cpp
     core/Assets.cpp
     core/io/File.cpp
-    core/io/InputDevice.cpp
+    core/io/Input.cpp
     core/io/Event.cpp
     core/Events.cpp
 )

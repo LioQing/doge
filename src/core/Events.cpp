@@ -6,7 +6,7 @@ namespace doge
 {
     Events::Events()
     {
-        event_io->event += std::bind(&Events::OnIOEvent, this, std::placeholders::_1);
+        event_io.event += std::bind(&Events::OnIOEvent, this, std::placeholders::_1);
     }
 
     void Events::OnIOEvent(const io::Event::Content& event)

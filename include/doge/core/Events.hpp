@@ -31,7 +31,7 @@ namespace doge
         Event<event::Touch              > on_touch_ended;
         Event<event::Sensor             > on_sensor_changed;
 
-        const std::shared_ptr<io::Event> event_io = std::make_shared<io::Event>();
+        io::Event event_io;
 
         Events();
 

@@ -85,35 +85,35 @@ namespace doge
         }
     }
 
-    io::InputDevice::Keyboard::Key cast::FromSfKeyboardKey(sf::Keyboard::Key key)
+    io::Input::Keyboard::Key cast::FromSfKeyboardKey(sf::Keyboard::Key key)
     {
         return key;
     }
 
-    sf::Keyboard::Key cast::ToSfKeyboardKey(io::InputDevice::Keyboard::Key key)
+    sf::Keyboard::Key cast::ToSfKeyboardKey(io::Input::Keyboard::Key key)
     {
         return key;        
     }
 
-    io::InputDevice::Mouse::Wheel cast::FromSfMouseWheel(sf::Mouse::Wheel wheel)
+    io::Input::Mouse::Wheel cast::FromSfMouseWheel(sf::Mouse::Wheel wheel)
     {
-        using dwheel = io::InputDevice::Mouse::Wheel;
+        using dwheel = io::Input::Mouse::Wheel;
         using sfwheel = sf::Mouse::Wheel;
 
         return wheel == sfwheel::HorizontalWheel ? dwheel::Horizontal : dwheel::Vertical;
     }
 
-    sf::Mouse::Wheel cast::ToSfMouseWheel(io::InputDevice::Mouse::Wheel wheel)
+    sf::Mouse::Wheel cast::ToSfMouseWheel(io::Input::Mouse::Wheel wheel)
     {
-        using dwheel = io::InputDevice::Mouse::Wheel;
+        using dwheel = io::Input::Mouse::Wheel;
         using sfwheel = sf::Mouse::Wheel;
 
         return wheel == dwheel::Horizontal ? sfwheel::HorizontalWheel : sfwheel::VerticalWheel;
     }
 
-    io::InputDevice::Mouse::Button cast::FromSfMouseButton(sf::Mouse::Button button)
+    io::Input::Mouse::Button cast::FromSfMouseButton(sf::Mouse::Button button)
     {
-        using dbutton = io::InputDevice::Mouse::Button;
+        using dbutton = io::Input::Mouse::Button;
         using sfbutton = sf::Mouse::Button;
 
         switch (button)
@@ -127,9 +127,9 @@ namespace doge
         }
     }
 
-    sf::Mouse::Button cast::ToSfMouseButton(io::InputDevice::Mouse::Button button)
+    sf::Mouse::Button cast::ToSfMouseButton(io::Input::Mouse::Button button)
     {
-        using dbutton = io::InputDevice::Mouse::Button;
+        using dbutton = io::Input::Mouse::Button;
         using sfbutton = sf::Mouse::Button;
 
         switch (button)
@@ -143,9 +143,9 @@ namespace doge
         }
     }
 
-    io::InputDevice::Sensor::Type cast::FromSfSensorType(sf::Sensor::Type type)
+    io::Input::Sensor::Type cast::FromSfSensorType(sf::Sensor::Type type)
     {
-        using dtype = io::InputDevice::Sensor::Type;
+        using dtype = io::Input::Sensor::Type;
         using sftype = sf::Sensor::Type;
 
         switch (type)
@@ -160,9 +160,9 @@ namespace doge
         }
     }
 
-    sf::Sensor::Type cast::ToSfSensorType(io::InputDevice::Sensor::Type type)
+    sf::Sensor::Type cast::ToSfSensorType(io::Input::Sensor::Type type)
     {
-        using dtype = io::InputDevice::Sensor::Type;
+        using dtype = io::Input::Sensor::Type;
         using sftype = sf::Sensor::Type;
 
         switch (type)
@@ -226,5 +226,71 @@ namespace doge
         if (event.type == sf::Event::EventType::SensorChanged)
             return Event::Content(Event::Type::SensorChanged, event::Sensor(cast::FromSfSensorType(event.sensor.type), Vec3f(event.sensor.x, event.sensor.y, event.sensor.z)));
         return Event::Content(Event::Type::Count);
+    }
+
+    PolygonShape::Type cast::FromSfPolygonType(sf::PrimitiveType type)
+    {
+        switch (type)
+        {
+            case sf::PrimitiveType::Points:             return PolygonShape::Type::Points;
+            case sf::PrimitiveType::Lines:              return PolygonShape::Type::Lines;
+            case sf::PrimitiveType::LineStrip:          return PolygonShape::Type::LineStrip;
+            case sf::PrimitiveType::Triangles:          return PolygonShape::Type::Triangles;
+            case sf::PrimitiveType::TriangleStrip:      return PolygonShape::Type::TriangleStrip;
+            case sf::PrimitiveType::TriangleFan:        return PolygonShape::Type::TriangleFan;
+            case sf::PrimitiveType::Quads:              return PolygonShape::Type::Quads;
+            default: throw std::invalid_argument("Invalid PolygonShape::Type");
+        }
+    }
+
+    sf::PrimitiveType cast::ToSfPolygonType(PolygonShape::Type type)
+    {
+        switch (type)
+        {
+            case PolygonShape::Type::Points:            return sf::PrimitiveType::Points;
+            case PolygonShape::Type::Lines:             return sf::PrimitiveType::Lines;
+            case PolygonShape::Type::LineStrip:         return sf::PrimitiveType::LineStrip;
+            case PolygonShape::Type::Triangles:         return sf::PrimitiveType::Triangles;
+            case PolygonShape::Type::TriangleStrip:     return sf::PrimitiveType::TriangleStrip;
+            case PolygonShape::Type::TriangleFan:       return sf::PrimitiveType::TriangleFan;
+            case PolygonShape::Type::Quads:             return sf::PrimitiveType::Quads;
+            default: throw std::invalid_argument("Invalid PolygonShape::Type");
+        }
+    }
+
+    std::uint8_t cast::FromSfControllerAxis(sf::Joystick::Axis axis)
+    {
+        using a = sf::Joystick::Axis;
+
+        switch (axis)
+        {
+            case a::X:      return 0;
+            case a::Y:      return 1;
+            case a::Z:      return 2;
+            case a::R:      return 3;
+            case a::U:      return 4;
+            case a::V:      return 5;
+            case a::PovX:   return 6;
+            case a::PovY:   return 7;
+            default:        return -1;
+        }
+    }
+
+    sf::Joystick::Axis cast::ToSfControllerAxis(std::uint8_t axis)
+    {
+        using a = sf::Joystick::Axis;
+
+        switch (axis)
+        {
+            case 0: return a::X;
+            case 1: return a::Y;
+            case 2: return a::Z;
+            case 3: return a::R;
+            case 4: return a::U;
+            case 5: return a::V;
+            case 6: return a::PovX;
+            case 7: return a::PovY;
+            default: throw std::invalid_argument("Invalid controller axis");
+        }
     }
 }

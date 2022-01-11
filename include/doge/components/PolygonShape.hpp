@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    struct CustomShape
+    struct PolygonShape
     {
         struct Vertex
         {

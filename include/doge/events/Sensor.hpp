@@ -2,13 +2,13 @@
 
 #include <doge/utils/lev.hpp>
 #include <doge/utils/Vec3.hpp>
-#include <doge/core/io/InputDevice.hpp>
+#include <doge/core/io/Input.hpp>
 
 namespace doge::event
 {
     struct Sensor
     {
-        io::InputDevice::Sensor::Type type;
+        io::Input::Sensor::Type type;
         Vec3f value;
     };
 };
