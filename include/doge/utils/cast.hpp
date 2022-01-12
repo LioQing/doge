@@ -57,6 +57,24 @@ namespace doge
             return sf::Rect<T>(r.left, r.top, r.width, r.height);
         }
 
+        template <typename T>
+        static Rect<T> RectFromVec2(const Vec2<T>& pos, const Vec2<T>& size)
+        {
+            return Rect<T>(pos.x, pos.y, size.x, size.y);
+        }
+
+        template <typename T>
+        static Vec2<T> PosFromRect(const Rect<T>& r)
+        {
+            return Vec2<T>(r.left, r.top);
+        }
+
+        template <typename T>
+        static Vec2<T> SizeFromRect(const Rect<T>& r)
+        {
+            return Vec2<T>(r.width, r.height);
+        }
+
         static Color FromSfColor(const sf::Color& color);
         static sf::Color ToSfColor(const Color& color);
 

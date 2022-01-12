@@ -8,7 +8,9 @@ namespace doge::event
 {
     struct Sensor
     {
-        io::Input::Sensor::Type type;
+        using Type = io::Input::Sensor::Type;
+
+        Type type;
         Vec3f value;
     };
 };

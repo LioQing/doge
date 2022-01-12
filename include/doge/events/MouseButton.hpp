@@ -8,7 +8,9 @@ namespace doge::event
 {
     struct MouseButton
     {
-        io::Input::Mouse::Button button;
+        using Button = io::Input::Mouse::Button;
+
+        Button button;
         Vec2i position;
     };
 };

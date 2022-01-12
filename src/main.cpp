@@ -17,9 +17,12 @@ namespace TestScene
             .type = doge::RigidBody::Type::Dynamic, 
         });
 
-        my_shape.AddComponent(doge::RectangleCollider
+        my_shape.AddComponent(doge::ConvexCollider
         {
-            .size = { 20, 40 },
+            .points =
+            {
+                { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
+            },
             .density = 1.f,
             .restitution = .5f,
             .friction = .3f,
@@ -31,12 +34,16 @@ namespace TestScene
         my_shape.AddComponent<doge::AngularVelocity>(20);
         my_shape.AddComponent<doge::Scale>(2, 2);
 
-        my_shape.AddComponent(doge::RectangleShape
+        my_shape.AddComponent(doge::ConvexShape
         {
-            .size = { 20, 40 },
-            .origin = { 10, 20 },
+            .points =
+            {
+                { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
+            },
             .color = doge::Color(0x00FF0088),
         });
+
+        my_shape.AddComponent<doge::Scale>(1, 1);
 
         return my_shape;
     }
@@ -88,6 +95,7 @@ namespace TestScene
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), doge::math::pi * 2));
             my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
             my_shape.AddComponent<doge::AngularVelocity>(20);
+            my_shape.AddComponent<doge::Scale>(1, 1);
 
             my_shape.AddComponent(doge::CompoundSprite
             {
@@ -134,9 +142,9 @@ namespace TestScene
     {
         count = 0;
 
-        cam = e.AddCamera();
-        cam.AddComponent<doge::Position>();
-        cam.AddComponent<doge::Rotation>();
+        cam = e.AddCamera(doge::Vec2f(3000, e.window.settings.size.y), doge::Rectf(0, 0, 0.5, 0.5));
+        cam.AddComponent<doge::Position>(0, 50);
+        cam.AddComponent<doge::Rotation>(doge::math::pi / 6);
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
@@ -189,13 +197,22 @@ namespace TestScene
         my_custom_shape.AddComponent<doge::Rotation>();
 
         AddBlocks(e);
+
+        e.events.on_key_pressed += [&e](const doge::event::Key& key)
+        {
+            if (key.key == doge::event::Key::Code::Space)
+            {
+                auto scrnshot = e.window.TakeScreenshot();
+
+                scrnshot.ToFile("screenshot.png");
+            }
+        };
     }
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        std::cout << doge::io::Input::Mouse::GetPosition() << " " 
-        << doge::io::Input::Mouse::GetPosition(e.window.window_io) << " "
-        << 1000 / dt << " " << std::endl;
+        std::cout << e.window.MapPixelToCoords(doge::io::Input::Mouse::GetPosition(e.window.window_io), cam.GetComponent<doge::Camera>())
+            << doge::io::Input::Mouse::GetPosition(e.window.window_io) - e.window.settings.size / 2.f << std::endl;
 
         if (++count > 100)
         {
@@ -242,8 +259,11 @@ int main()
     srand(time(0));
     doge::Engine e;
     e.window.settings.title = "doge test";
-    e.window.settings.fps = 60;
+    e.window.settings.fps = 120;
+    e.window.settings.v_sync = true;
     e.scenes.fixed_time_step = 20;
+
+    e.window.SetIcon("assets/textures/missing_texture.png");
 
     doge::GameLoopFunctions test;
     test.start = TestScene::Start;

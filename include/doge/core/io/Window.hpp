@@ -27,6 +27,8 @@ namespace doge
         {
             sf::RenderWindow window;
             sf::Clock clock;
+            doge::Color background_color = doge::Color::Black();
+            File::Image icon;
 
             enum DrawableType
             {
@@ -50,6 +52,14 @@ namespace doge
 
             void Display();
 
+            File::Image TakeScreenshot() const;
+
+            // delta time
+
+            void StartDeltaClock();
+
+            float GetDeltaTimeRestart();
+
             // properties
 
             void ApplySettings(const WindowSettings& settings);
@@ -60,9 +70,9 @@ namespace doge
 
             void SetIcon(const File::Image& icon);
 
-            void StartDeltaClock();
+            void SetVisible(bool visible);
 
-            float GetDeltaTimeRestart();
+            void SetVSyncEnabled(bool enabled);
 
             bool IsOpen() const;
 
@@ -71,6 +81,14 @@ namespace doge
 
             Vec2u GetSize() const;
             void SetSize(const Vec2u& size);
+
+            void RequestFocus();
+            bool HasFocus() const;
+
+            Vec2i GetClientAreaPosition() const;
+
+            Vec2i GetMousePosition() const;
+            void SetMousePosition(const Vec2i& position) const;
 
         private:
             

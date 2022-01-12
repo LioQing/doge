@@ -7,7 +7,9 @@ namespace doge::event
 {
     struct Key
     {
-        io::Input::Keyboard::Key key;
+        using Code = io::Input::Keyboard::Key;
+
+        Code key;
         bool alt;
         bool control;
         bool shift;

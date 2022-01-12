@@ -8,7 +8,9 @@ namespace doge::event
 {
     struct MouseWheel
     {
-        io::Input::Mouse::Wheel wheel;
+        using Wheel = io::Input::Mouse::Wheel;
+
+        Wheel wheel;
         float delta;
         Vec2i position;
     };

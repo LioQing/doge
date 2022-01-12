@@ -19,6 +19,12 @@ namespace doge::io
         }
 
         SetFrameRate(settings.fps);
+        SetVSyncEnabled(settings.v_sync);
+
+        if (icon.GetSize() != Vec2u::Zero())
+        {
+            SetIcon(icon);
+        }
     }
 
     void Window::CloseWindow()
@@ -125,7 +131,7 @@ namespace doge::io
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
             {
-                view->setSize(cast::ToSfVec2(engine.window.settings.size * Vec2f(cam.port.width, cam.port.height) * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(engine.window.settings.size * cast::SizeFromRect(cam.port) * global::GetScale(entity)));
             }
             else
             {
@@ -256,7 +262,7 @@ namespace doge::io
             {
                 auto& vertex = polygon_comp.vertices.at(i);
                 vertices.vertices.at(i).position = 
-                    cast::ToSfVec2((vertex.position - polygon_comp.origin).Rotated(global::GetRotation(entity)) * global::GetScale(entity) 
+                    cast::ToSfVec2(((vertex.position - polygon_comp.origin) * global::GetScale(entity)).Rotated(global::GetRotation(entity))
                     + global::GetPosition(entity));
                 vertices.vertices.at(i).color = cast::ToSfColor(vertex.color);
                 vertices.vertices.at(i).texCoords = cast::ToSfVec2(vertex.texture_coordinates);
@@ -313,7 +319,7 @@ namespace doge::io
         }
 
         // draw
-        window.clear();
+        window.clear(cast::ToSfColor(background_color));
         for (auto& [eid, view_draw] : views_draws)
         {
             auto& [view, draw_keys] = view_draw;
@@ -333,6 +339,31 @@ namespace doge::io
         window.display();
     }
 
+    File::Image Window::TakeScreenshot() const
+    {
+        sf::Vector2u size = window.getSize();
+        sf::Texture texture;
+        texture.create(size.x, size.y);
+        texture.update(window);
+        sf::Image screenshot = texture.copyToImage();
+
+        return File::Image(screenshot);
+    }
+
+    // delta time
+
+    void Window::StartDeltaClock()
+    {
+        clock.restart();
+    }
+
+    float Window::GetDeltaTimeRestart()
+    {
+        return clock.restart().asMicroseconds() / 1000.f;
+    }
+
+    // properties
+
     void Window::ApplySettings(const WindowSettings& settings)
     {
         if (!IsOpen())
@@ -347,6 +378,7 @@ namespace doge::io
         SetSize(settings.size);
         SetTitle(settings.title);
         SetFrameRate(settings.fps);
+        SetVSyncEnabled(settings.v_sync);
     }
 
     void Window::SetFrameRate(std::uint32_t frame_rate)
@@ -364,14 +396,14 @@ namespace doge::io
         window.setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
     }
 
-    void Window::StartDeltaClock()
+    void Window::SetVisible(bool visible)
     {
-        clock.restart();
+        window.setVisible(visible);
     }
 
-    float Window::GetDeltaTimeRestart()
+    void Window::SetVSyncEnabled(bool enabled)
     {
-        return clock.restart().asMicroseconds() / 1000.f;
+        window.setVerticalSyncEnabled(enabled);
     }
 
     bool Window::IsOpen() const
@@ -397,5 +429,32 @@ namespace doge::io
     void Window::SetSize(const Vec2u& size)
     {
         window.setSize(cast::ToSfVec2(size));
+    }
+
+    void Window::RequestFocus()
+    {
+        window.requestFocus();
+    }
+
+    bool Window::HasFocus() const
+    {
+        return window.hasFocus();
+    }
+
+    Vec2i Window::GetClientAreaPosition() const
+    {
+        using m = io::Input::Mouse;
+
+        return m::GetPosition(*this) - m::GetPosition();
+    }
+
+    Vec2i Window::GetMousePosition() const
+    {
+        return cast::FromSfVec2(sf::Mouse::getPosition(window));
+    }
+
+    void Window::SetMousePosition(const Vec2i& position) const
+    {
+        sf::Mouse::setPosition(cast::ToSfVec2(position), window);
     }
 }

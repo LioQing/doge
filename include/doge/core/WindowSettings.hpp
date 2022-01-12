@@ -23,5 +23,6 @@ namespace doge
         std::string title = "";
         std::uint32_t fps = 60;
         Style style = Style::Default;
+        bool v_sync = false;
     };
 }
