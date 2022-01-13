@@ -65,6 +65,8 @@ namespace doge
 
         Entity GetEntity(EntityID eid) const;
 
+        bool HasEntity(EntityID eid) const;
+
         void DestroyEntity(EntityID eid);
 
         template <typename... TArgs>

@@ -15,6 +15,7 @@ namespace TestScene
         my_shape.AddComponent(doge::RigidBody
         {
             .type = doge::RigidBody::Type::Dynamic, 
+            //.continuous = true,
         });
 
         my_shape.AddComponent(doge::ConvexCollider
@@ -160,6 +161,11 @@ namespace TestScene
 
     int count = 0;
     doge::Entity cam;
+    doge::Vec2f mouse_down;
+    doge::Vec2f mouse_down_entity_pos;
+    float mouse_down_entity_rot;
+    int mouse_down_id = -1;
+    doge::Entity line;
 
     void Start(doge::Engine& e)
     {
@@ -236,6 +242,57 @@ namespace TestScene
                 scrnshot.ToFile("screenshot.png");
             }
         };
+
+        e.events.on_mouse_button_pressed += [&](const doge::event::MouseButton& button)
+        {
+            if (button.button == doge::event::MouseButton::Button::Left)
+            {
+                for (auto entity : e.Select<doge::ConvexCollider>().Entities())
+                {
+                    mouse_down = e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>());
+                    if (!doge::physics::GetCollider(entity).TestPoint(mouse_down))
+                        continue;
+
+                    line.GetComponent<doge::Position>().position = mouse_down;
+                    mouse_down_entity_pos = entity.GetIfHasComponentElseDefault<doge::Position>().position;
+                    mouse_down_entity_rot = entity.GetIfHasComponentElseDefault<doge::Rotation>().rotation;
+                    mouse_down_id = entity.id;
+
+                    std::cout << mouse_down_id << mouse_down_entity_pos << std::endl;
+
+                    return;
+                }
+            }
+        };
+
+        e.events.on_mouse_button_released += [&](const doge::event::MouseButton& button)
+        {
+            if (button.button == doge::event::MouseButton::Button::Left)
+            {
+                if (mouse_down_id == -1) return;
+
+                std::cout << line << " " << mouse_down_id << std::endl;
+
+                if (!e.HasEntity(mouse_down_id) || !doge::physics::HasBody(mouse_down_id))
+                    return;
+                
+                doge::physics::GetBody(mouse_down_id).ApplyImpulse((mouse_down - e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>())), mouse_down);
+                mouse_down_id = -1;
+            }
+        };
+
+        line = e.AddEntity();
+        line.AddComponent<doge::Tag>(std::set{ std::string("line") });
+        line.AddComponent<doge::Position>();
+        line.AddComponent(doge::PolygonShape
+        { 
+            .type = doge::PolygonShape::Lines, 
+            .vertices = 
+            { 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
+            } 
+        });
     }
 
     void Update(doge::Engine& e, doge::DeltaTime dt)
@@ -246,9 +303,22 @@ namespace TestScene
             count = 0;
         }
 
-        for (auto [entity, rgbd, scale, position, convex, coll] : e.Select<doge::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::ConvexCollider>().EntitiesAndComponents())
+        for (auto [entity, rgbd, scale, position, convex, coll, rot] : e.Select<doge::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
         {
-            if (doge::global::GetAABB(convex).top > e.window.settings.size.y / 2.f * 0.01)
+            if (entity == mouse_down_id)
+            {
+                auto body = doge::physics::GetBody(entity);
+
+                if (position.position != mouse_down_entity_pos)
+                {
+                    auto dir = (mouse_down_entity_pos - position.position);
+                    body.ApplyForce(doge::Vec2f(std::pow(10, dir.x), std::pow(10, dir.y)) * dir * 100.f);
+                }
+
+                if (rot.rotation != mouse_down_entity_rot)
+                    body.ApplyTorque((mouse_down_entity_rot - rot.rotation) * 1.f);
+            }
+            else if (doge::global::GetAABB(convex).top > e.window.settings.size.y / 2.f * 0.01)
                 e.DestroyEntity(entity);
         }
 
@@ -274,6 +344,18 @@ namespace TestScene
             doge::global::SetRotation(rot, 0);
             doge::global::SetScale(scale, doge::Vec2f::One());
             shape.size.Set(aabb.width, aabb.height);
+        }
+
+        if (mouse_down_id != -1)
+        {
+            for (auto [tag, line, pos] : e.Select<doge::Tag>().Where(
+                [](doge::EntityID entity, const doge::Tag& tag)
+                {
+                    return *tag.tags.begin() == "line";
+                }).Select<doge::PolygonShape, doge::Position>().Components())
+            {
+                line.vertices.at(1).position = e.window.MapPixelToCoords(e.window.window_io.GetMousePosition(), cam.GetComponent<doge::Camera>()) - pos.position;
+            }
         }
     }
 

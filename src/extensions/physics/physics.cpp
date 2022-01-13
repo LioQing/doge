@@ -39,6 +39,16 @@ namespace doge
         return Body(bodies.at(entity_id));
     }
 
+    bool physics::HasBody(EntityID entity_id)
+    {
+        return bodies.find(entity_id) != bodies.end();
+    }
+
+    bool physics::HasCompoundCollider(EntityID entity_id)
+    {
+        return compound_fixtures.find(entity_id) != compound_fixtures.end();
+    }
+
     physics::Collider physics::GetCollider(EntityID entity_id)
     {
         return Collider(GetBody(entity_id).b2_body->GetFixtureList());

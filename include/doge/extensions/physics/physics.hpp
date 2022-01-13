@@ -28,6 +28,10 @@ namespace doge
 
         static void SetBodyInit(EntityID entity_id, const BodyInit& init_values);
         static Body GetBody(EntityID entity_id);
+
+        static bool HasBody(EntityID entity_id);
+        static bool HasCompoundCollider(EntityID entity_id);
+
         static Collider GetCollider(EntityID entity_id);
         static Collider GetCollider(EntityID entity_id, Collider::Type type, std::size_t index);
 

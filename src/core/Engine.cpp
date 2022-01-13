@@ -184,6 +184,11 @@ namespace doge
         return Entity(lic::GetEntity(eid), GetPCNode(eid).get());
     }
 
+    bool Engine::HasEntity(EntityID eid) const
+    {
+        return lic::HasEntity(eid);
+    }
+
     void Engine::DestroyEntity(EntityID eid)
     {
         to_be_destroyed.push_back(eid);
