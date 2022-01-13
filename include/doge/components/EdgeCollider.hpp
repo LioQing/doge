@@ -7,7 +7,7 @@ namespace doge
 {
     struct EdgeCollider
     {
-        // collision only happen on right side of edge
+        // collision only happen on left side of edge
         std::vector<Vec2f> points;
 
         bool is_loop = false;

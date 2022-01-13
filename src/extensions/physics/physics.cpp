@@ -9,7 +9,7 @@ namespace doge
     std::unordered_map<EntityID, b2Body*> physics::bodies;
     std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, physics::Collider::Type::Count>> physics::compound_fixtures;
     std::unordered_map<EntityID, physics::BodyInit> physics::body_inits;
-    Vec2f physics::gravity = Vec2f(0.f, 0.98f);
+    Vec2f physics::gravity = Vec2f(0.f, 9.8f);
 
     void physics::Enable(Engine& engine)
     {
@@ -26,6 +26,17 @@ namespace doge
     void physics::Disable(Engine& engine)
     {
         engine.scenes.extensions.erase("doge_box2d");
+    }
+
+    void physics::SetGravity(const Vec2f& gravity)
+    {
+        world->SetGravity(cast::ToB2Vec2(gravity));
+        physics::gravity = gravity;
+    }
+
+    const Vec2f& physics::GetGravity()
+    {
+        return gravity;
     }
 
     void physics::SetBodyInit(EntityID entity_id, const BodyInit& init_values)

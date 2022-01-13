@@ -26,6 +26,9 @@ namespace doge
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
 
+        static void SetGravity(const Vec2f& gravity);
+        static const Vec2f& GetGravity();
+
         static void SetBodyInit(EntityID entity_id, const BodyInit& init_values);
         static Body GetBody(EntityID entity_id);
 
