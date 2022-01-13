@@ -131,7 +131,7 @@ namespace doge::io
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
             {
-                view->setSize(cast::ToSfVec2(engine.window.settings.size * cast::SizeFromRect(cam.port) * global::GetScale(entity)));
+                view->setSize(cast::ToSfVec2(engine.window.GetAutoResizedCameraSize(cam) * global::GetScale(entity)));
             }
             else
             {

@@ -69,6 +69,11 @@ namespace doge
         return window_io.TakeScreenshot();
     }
 
+    Vec2f Window::GetAutoResizedCameraSize(const Camera& cam) const
+    {
+        return settings.size * cast::SizeFromRect(cam.port);
+    }
+
     Vec2f Window::MapPixelToCoords(const Vec2i& pixel, const Component<Camera>& camera) const
     {
         auto entity = camera.GetEntity();

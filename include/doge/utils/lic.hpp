@@ -1,7 +1,6 @@
 #pragma once
 
 #include <algorithm>
-#include <any>
 #include <array>
 #include <atomic>
 #include <bitset>
@@ -13,6 +12,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <memory>
 
 namespace doge
 {
@@ -188,7 +188,7 @@ namespace doge
         };
 
         // Vector of vectors of components (std::vector<Component<TComp>>)
-        static std::array<std::any, LIC_MAX_COMPONENT> components;
+        static std::array<void*, LIC_MAX_COMPONENT> components;
 
         // Vector of destroyed components
         static std::array<std::vector<std::size_t>, LIC_MAX_COMPONENT> destroyed_components;
@@ -215,9 +215,9 @@ namespace doge
          * @return Reference to the vector containing all instances of component type TComp
          */
         template <typename TComp>
-        static std::vector<Component<TComp>>& GetComponentVec()
+        static std::vector<std::unique_ptr<Component<TComp>>>& GetComponentVec()
         {
-            return std::any_cast<std::vector<Component<TComp>>&>(components.at(GetComponentID<TComp>()));
+            return *static_cast<std::vector<std::unique_ptr<Component<TComp>>>*>(components.at(GetComponentID<TComp>()));
         }
 
     public:
@@ -240,7 +240,7 @@ namespace doge
         {
             static ComponentID new_id = [&]()
             {
-                components.at(next_component_id) = std::make_any<std::vector<Component<TComp>>>();
+                components.at(next_component_id) = new std::vector<std::unique_ptr<Component<TComp>>>();
                 destroyed_components.at(next_component_id) = std::vector<std::size_t>();
                 on_component_removals.at(next_component_id) = std::vector<std::vector<std::function<void()>>>();
                 return next_component_id++;
@@ -358,13 +358,13 @@ namespace doge
         static Component<TComp>& AddComponent(EntityID eid, TArgs&&... args)
         {
             ComponentID cid = GetComponentID<TComp>();
-            auto& component_vec = GetComponentVec<TComp>();
+            std::vector<std::unique_ptr<Component<TComp>>>& component_vec = GetComponentVec<TComp>();
             size_t i = 0;
 
             // Re-construct component if entity already has the component
             if (HasComponent(eid, cid))
             {
-                component_vec.at(entities.at(eid).component_indices.at(cid)) = Component<TComp>(TComp(std::forward<TArgs>(args)...), eid);
+                component_vec.at(entities.at(eid).component_indices.at(cid)) = std::make_unique<Component<TComp>>(TComp(std::forward<TArgs>(args)...), eid);
                 return GetComponent<TComp>(eid);
             }
 
@@ -372,21 +372,21 @@ namespace doge
             if (destroyed_components.at(cid).empty())
             {
                 i = component_vec.size();
-                component_vec.emplace_back(TComp(std::forward<TArgs>(args)...), eid);
+                component_vec.emplace_back(new Component<TComp>(TComp(std::forward<TArgs>(args)...), eid));
                 on_component_removals.at(cid).emplace_back(std::vector<std::function<void()>>());
             }
             else
             {
                 auto& available_slots = destroyed_components.at(cid);
                 i = available_slots.back();
-                component_vec.at(i) = Component<TComp>(TComp(std::forward<TArgs>(args)...), eid);
+                component_vec.at(i) = std::make_unique<Component<TComp>>(TComp(std::forward<TArgs>(args)...), eid);
                 available_slots.pop_back();
             }
 
             // Store component index and field in entity
             entities.at(eid).component_indices.emplace(cid, i);
             entities.at(eid).component_field.set(cid);
-            return component_vec.at(i);
+            return *component_vec.at(i);
         }
 
         /**
@@ -417,7 +417,7 @@ namespace doge
                 throw std::out_of_range(std::string("Component ") + typeid(TComp).name() + " not found in Entity " + std::to_string(eid));
             }
 
-            return GetComponentVec<TComp>().at(entities.at(eid).component_indices.at(GetComponentID<TComp>()));
+            return *GetComponentVec<TComp>().at(entities.at(eid).component_indices.at(GetComponentID<TComp>()));
         }
 
         /**

@@ -22,17 +22,16 @@ namespace ParticleSim
 
         // wall
         Entity wall = engine.AddEntity();
-        Vec2u window_size = engine.window.settings.size;
 
         wall.AddComponent<RigidBody>(RigidBody::Type::Static);
         wall.AddComponent(EdgeCollider
         {
             .points = 
             {
-                engine.window.MapPixelToCoords(Vec2i(0,             0            ), *cam_comp),
-                engine.window.MapPixelToCoords(Vec2i(0,             window_size.y), *cam_comp),
-                engine.window.MapPixelToCoords(Vec2i(window_size.x, window_size.y), *cam_comp),
-                engine.window.MapPixelToCoords(Vec2i(window_size.x, 0            ), *cam_comp),
+                Vec2f(-64, -36),
+                Vec2f(-64, 36),
+                Vec2f(64, 36),
+                Vec2f(64, -36),
             },
             .is_loop = true,
             .friction = 0.1f,
@@ -44,7 +43,7 @@ namespace ParticleSim
         {
             Entity particle = engine.AddEntity();
 
-            particle.AddComponent<Tag>(std::set{ std::string("particle") });
+            particle.AddComponent(Tag::Create("particle"));
 
             particle.AddComponent(CircleShape
             {
@@ -66,7 +65,7 @@ namespace ParticleSim
 
         // grab actions
         grab_line = engine.AddEntity();
-        grab_line.AddComponent<Tag>(std::set{ std::string("line") });
+        grab_line.AddComponent(Tag::Create("line"));
         grab_line.AddComponent<Position>();
         grab_line.AddComponent(PolygonShape
         { 
@@ -113,7 +112,7 @@ namespace ParticleSim
                     return;
                 
                 physics::GetBody(grab_particle).ApplyImpulse(
-                    (grab_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp)) * 100.f,
+                    (grab_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp)) * 1000.f,
                     grab_mouse_position
                 );
 
@@ -161,6 +160,7 @@ namespace ParticleSim
 int main()
 {
     Engine engine;
+    engine.window.settings.fps = 120;
 
     physics::Enable(engine);
 

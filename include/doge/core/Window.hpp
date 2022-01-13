@@ -39,6 +39,8 @@ namespace doge
 
         io::File::Image TakeScreenshot() const;
 
+        Vec2f GetAutoResizedCameraSize(const Camera& cam) const;
+
         Vec2f MapPixelToCoords(const Vec2i& pixel, const Component<Camera>& camera) const;
         Vec2i MapCoordsToPixel(const Vec2f& coords, const Component<Camera>& camera) const;
     };

@@ -2,7 +2,7 @@
 
 namespace doge
 {
-    std::array<std::any, lic::LIC_MAX_COMPONENT> lic::components;
+    std::array<void*, lic::LIC_MAX_COMPONENT> lic::components;
     std::array<std::vector<std::size_t>, lic::LIC_MAX_COMPONENT> lic::destroyed_components;
     std::array<std::vector<std::vector<std::function<void()>>>, lic::LIC_MAX_COMPONENT> lic::on_component_removals;
     std::vector<lic::EntityInfo> lic::entities;
