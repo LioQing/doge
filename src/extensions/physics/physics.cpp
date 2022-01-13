@@ -1,4 +1,4 @@
-#include <doge/extensions/physics.hpp>
+#include <doge/extensions/physics/physics.hpp>
 
 #include <doge/core/Engine.hpp>
 #include <doge/components.hpp>
@@ -7,8 +7,9 @@ namespace doge
 {
     std::unique_ptr<b2World> physics::world;
     std::unordered_map<EntityID, b2Body*> physics::bodies;
-    std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, 3>> physics::compound_fixtures;
-    Vec2f physics::gravity = Vec2f(0.f, 98.f);
+    std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, physics::Collider::Type::Count>> physics::compound_fixtures;
+    std::unordered_map<EntityID, physics::BodyInit> physics::body_inits;
+    Vec2f physics::gravity = Vec2f(0.f, 0.98f);
 
     void physics::Enable(Engine& engine)
     {
@@ -27,6 +28,27 @@ namespace doge
         engine.scenes.extensions.erase("doge_box2d");
     }
 
+    void physics::SetBodyInit(EntityID entity_id, const BodyInit& init_values)
+    {
+        if (!body_inits.emplace(entity_id, init_values).second)
+            throw std::invalid_argument(std::string("Failed to set BodyInit for Entity ") + std::to_string(entity_id));
+    }
+
+    physics::Body physics::GetBody(EntityID entity_id)
+    {
+        return Body(bodies.at(entity_id));
+    }
+
+    physics::Collider physics::GetCollider(EntityID entity_id)
+    {
+        return Collider(GetBody(entity_id).b2_body->GetFixtureList());
+    }
+
+    physics::Collider physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index)
+    {
+        return Collider(compound_fixtures.at(entity_id).at(type).at(index));
+    }
+
     void physics::Start(Engine& engine)
     {
         if (world)
@@ -37,7 +59,7 @@ namespace doge
     void physics::Update(Engine& engine, DeltaTime dt)
     {
         // helper functions
-        auto CreateBody = [](const Entity& entity, const RigidBody& rgbd) -> b2Body*
+        auto CreateBody = [&](const Entity& entity, const RigidBody& rgbd) -> b2Body*
         {
             b2BodyDef body_def;
             body_def.type = cast::ToB2BodyType(rgbd.type);
@@ -47,13 +69,25 @@ namespace doge
 
             body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
 
-            auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
-            body_def.linearVelocity = cast::ToB2Vec2(vel);
+            body_def.bullet = rgbd.continuous;
+            body_def.awake = rgbd.awake;
+            body_def.enabled = rgbd.enabled;
 
-            body_def.angularVelocity = entity.GetIfHasComponentElseDefault<AngularVelocity>().angular_velocity;
+            b2Body* body_ptr = world->CreateBody(&body_def);
 
-            b2Body* body = world->CreateBody(&body_def);
-            return body;
+            if (body_inits.find(entity.id) != body_inits.end())
+            {
+                Body body(body_ptr);
+                auto& init = body_inits.at(entity.id);
+
+                body.SetTransform(init.position, init.rotation);
+                body.SetVelocity(init.velocity);
+                body.SetAngularVelocity(init.angular_velocity);
+                body.SetDamping(init.damping);
+                body.SetAngularDamping(init.angular_damping);
+            }
+
+            return body_ptr;
         };
 
         auto AddFixture = []<typename TComp>(b2Body* body, const TComp& coll_comp, const b2Shape* shape)
@@ -61,8 +95,10 @@ namespace doge
             b2FixtureDef fixture_def;
             fixture_def.shape = shape;
             fixture_def.density = coll_comp.density;
-            fixture_def.restitution = coll_comp.restitution;
             fixture_def.friction = coll_comp.friction;
+            fixture_def.restitution = coll_comp.restitution;
+            fixture_def.restitutionThreshold = coll_comp.restitution_threshold;
+            fixture_def.isSensor = coll_comp.is_trigger;
 
             b2Fixture* fixture = body->CreateFixture(&fixture_def);
             return std::make_pair(body, fixture);
@@ -85,8 +121,10 @@ namespace doge
         auto SyncFixture = []<typename TComp>(b2Fixture* fixture, const TComp& coll)
         {
             fixture->SetDensity(coll.density);
-            fixture->SetRestitution(coll.restitution);
             fixture->SetFriction(coll.friction);
+            fixture->SetRestitution(coll.restitution);
+            fixture->SetRestitutionThreshold(coll.restitution_threshold);
+            fixture->SetSensor(coll.is_trigger);
         };
 
         // convex collider
@@ -134,8 +172,9 @@ namespace doge
         // circle collider
         auto SyncCircle = [](b2CircleShape& circle, const Entity& entity, const CircleCollider& coll)
         {
-            circle.m_radius = cast::ToB2Length(coll.radius);
-            circle.m_p = cast::ToB2Vec2(-coll.origin);
+            auto scale = global::GetScale(entity);
+            circle.m_radius = coll.radius * scale.x;
+            circle.m_p = cast::ToB2Vec2(-coll.origin * scale);
         };
 
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, CircleCollider>().EntitiesAndComponents())
@@ -166,7 +205,7 @@ namespace doge
         {
             auto scale = global::GetScale(entity);
             rect.SetAsBox(
-                cast::ToB2Length(coll.size.x * scale.x) / 2.f, cast::ToB2Length(coll.size.y * scale.y) / 2.f, 
+                coll.size.x * scale.x / 2.f, coll.size.y * scale.y / 2.f, 
                 cast::ToB2Vec2(-coll.origin), 
                 0
             );
@@ -252,7 +291,7 @@ namespace doge
                 if (body_itr == bodies.end())
                 {
                     body_itr = SaveBody(entity, rgbd, CreateBody(entity, rgbd));
-                    compound_fixtures.emplace(entity, std::array<std::vector<b2Fixture*>, 3>
+                    compound_fixtures.emplace(entity, std::array<std::vector<b2Fixture*>, Collider::Type::Count>
                     { 
                         std::vector<b2Fixture*>(coll.convex_colliders.size()), 
                         std::vector<b2Fixture*>(coll.circle_colliders.size()), 
@@ -275,7 +314,7 @@ namespace doge
                         fixture = next;
                     }
 
-                    fixtures = std::array<std::vector<b2Fixture*>, 3>
+                    fixtures = std::array<std::vector<b2Fixture*>, Collider::Type::Count>
                     { 
                         std::vector<b2Fixture*>(coll.convex_colliders.size()), 
                         std::vector<b2Fixture*>(coll.circle_colliders.size()), 
@@ -293,7 +332,7 @@ namespace doge
                     b2PolygonShape convex;
                     SyncConvex(convex, entity, convex_coll);
 
-                    fixtures.at(static_cast<uint8_t>(FixtureType::Convex)).at(i) = AddFixture(body, convex_coll, &convex).second;
+                    fixtures.at(Collider::Type::Convex).at(i) = AddFixture(body, convex_coll, &convex).second;
 
                     convex_coll.apply_changes = false;
                 }
@@ -306,7 +345,7 @@ namespace doge
                     b2CircleShape circle;
                     SyncCircle(circle, entity, circle_coll);
 
-                    fixtures.at(static_cast<uint8_t>(FixtureType::Circle)).at(i) = AddFixture(body, circle_coll, &circle).second;
+                    fixtures.at(Collider::Type::Circle).at(i) = AddFixture(body, circle_coll, &circle).second;
 
                     circle_coll.apply_changes = false;
                 }
@@ -318,12 +357,12 @@ namespace doge
 
                     b2PolygonShape rect;
                     rect.SetAsBox(
-                        cast::ToB2Length(rectangle_coll.size.x * scale.x) / 2.f, cast::ToB2Length(rectangle_coll.size.y * scale.y) / 2.f, 
+                        rectangle_coll.size.x * scale.x / 2.f, rectangle_coll.size.y * scale.y / 2.f, 
                         cast::ToB2Vec2(rectangle_coll.origin), 
                         0
                     );
 
-                    fixtures.at(static_cast<uint8_t>(FixtureType::Rectangle)).at(i) = AddFixture(body, rectangle_coll, &rect).second;
+                    fixtures.at(Collider::Type::Rectangle).at(i) = AddFixture(body, rectangle_coll, &rect).second;
 
                     rectangle_coll.apply_changes = false;
                 }
@@ -341,7 +380,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Convex)).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(Collider::Type::Convex).at(i);
                     auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
 
                     if (shape->m_count != convex_coll.points.size())
@@ -369,7 +408,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Circle)).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(Collider::Type::Circle).at(i);
                     auto* shape = static_cast<b2CircleShape*>(fixture->GetShape());
 
                     SyncFixture(fixture, circle_coll);
@@ -387,7 +426,7 @@ namespace doge
                         continue;
 
                     auto* body = body_itr->second;
-                    auto*& fixture = compound_fixtures.at(entity).at(static_cast<uint8_t>(FixtureType::Rectangle)).at(i);
+                    auto*& fixture = compound_fixtures.at(entity).at(Collider::Type::Rectangle).at(i);
                     auto* shape = static_cast<b2PolygonShape*>(fixture->GetShape());
 
                     SyncFixture(fixture, rectangle_coll);
@@ -409,14 +448,18 @@ namespace doge
                 auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
                 body_def.position = cast::ToB2Vec2(pos);
                 body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
-                auto vel = entity.GetIfHasComponentElseDefault<Velocity>().velocity;
-                body_def.linearVelocity = cast::ToB2Vec2(vel);
 
                 SaveBody(entity, rgbd, world->CreateBody(&body_def));
             }
             else
             {
                 b2Body* body = body_itr->second;
+
+                body->SetEnabled(rgbd.enabled);
+                if (!rgbd.enabled)
+                    continue;
+                
+                body->SetAwake(rgbd.awake);
 
                 auto pos = body->GetPosition();
                 if (entity.HasComponent<Position>())
@@ -426,19 +469,17 @@ namespace doge
                 if (entity.HasComponent<Rotation>())
                     angle = entity.GetComponent<Rotation>().rotation;
 
-                auto vel = body->GetLinearVelocity();
-                if (entity.HasComponent<Velocity>())
-                    vel = cast::ToB2Vec2(entity.GetComponent<Velocity>().velocity);
-
-                auto angular_vel = body->GetAngularVelocity();
-                if (entity.HasComponent<AngularVelocity>())
-                    angular_vel = entity.GetComponent<AngularVelocity>().angular_velocity;
-
                 body->SetTransform(pos, angle);
-                body->SetLinearVelocity(vel);
-                body->SetAngularVelocity(angular_vel);
+
+                if (cast::ToB2BodyType(rgbd.type) != body->GetType())
+                    body->SetType(cast::ToB2BodyType(rgbd.type));
+
+                body->SetBullet(rgbd.continuous);
             }
         }
+
+        // clear body inits
+        body_inits.clear();
     }
 
     void physics::FixedUpdate(Engine& engine, DeltaTime dt)
@@ -457,12 +498,6 @@ namespace doge
 
                 if (entity.HasComponent<Rotation>())
                     entity.GetComponent<Rotation>().rotation = body->GetAngle();
-
-                if (entity.HasComponent<Velocity>())
-                    entity.GetComponent<Velocity>().velocity = cast::FromB2Vec2(body->GetLinearVelocity());
-
-                if (entity.HasComponent<AngularVelocity>())
-                    entity.GetComponent<AngularVelocity>().angular_velocity = body->GetAngularVelocity();
             }
         }
     }

@@ -13,6 +13,9 @@ namespace doge
         std::vector<CircleCollider> circle_colliders;
         std::vector<RectangleCollider> rectangle_colliders;
         
+        bool is_enabled = true;
+        bool is_trigger = false;
+        
         // doge::physics check this every frame
         // after changes are applied, it will be reset to false
         bool apply_changes = false;

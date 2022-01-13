@@ -83,11 +83,14 @@ namespace doge
 
     Rectf global::GetAABB(const CircleShape& circle, const Entity& entity)
     {
-        return Rectf(
-            -circle.origin.x * GetScale(entity).x + GetPosition(entity).x,
-            -circle.origin.y * GetScale(entity).y + GetPosition(entity).y,
-            circle.radius * 2.f * GetScale(entity).x,
-            circle.radius * 2.f * GetScale(entity).y
+        auto scale = GetScale(entity);
+        auto rotation = GetRotation(entity);
+
+        auto end_x = (Vec2f(circle.radius, 0).Rotated(rotation) * scale).Magnitude();
+        auto end_y = (Vec2f(0, circle.radius).Rotated(rotation) * scale).Magnitude();
+        return cast::RectFromVec2(
+            ((-circle.origin + Vec2f(circle.radius, circle.radius)) * scale).Rotated(rotation) - Vec2f(end_x, end_y) + GetPosition(entity),
+            Vec2f(end_x, end_y) * 2.f
         );
     }
 

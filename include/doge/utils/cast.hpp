@@ -19,8 +19,6 @@ namespace doge
     {
         cast(const cast&) = delete;
 
-        static constexpr float ToB2Scale = .01f;
-
         template <typename T>
         static Vec2<T> FromSfVec2(const sf::Vector2<T>& v)
         {
@@ -75,16 +73,20 @@ namespace doge
             return Vec2<T>(r.width, r.height);
         }
 
+        template <typename T>
+        static std::pair<Vec2<T>, Vec2<T>> FromRect(const Rect<T>& r)
+        {
+            return std::make_pair(Vec2<T>(r.left, r.top), Vec2<T>(r.width, r.height));
+        }
+
         static Color FromSfColor(const sf::Color& color);
         static sf::Color ToSfColor(const Color& color);
 
         static Vec2f FromB2Vec2(const b2Vec2& v);
         static b2Vec2 ToB2Vec2(const Vec2f& v);
 
-        static float FromB2Length(float l);
-        static float ToB2Length(float l);
-
         static b2BodyType ToB2BodyType(RigidBody::Type type);
+        static RigidBody::Type FromB2BodyType(b2BodyType type);
 
         static float ToDegree(float radian);
         static float ToRadian(float degree);

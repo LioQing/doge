@@ -14,5 +14,9 @@ namespace doge
         };
 
         Type type = Type::Static;
+
+        bool continuous = false;
+        bool awake = true;
+        bool enabled = true;
     };
 }

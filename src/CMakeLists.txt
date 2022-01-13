@@ -24,14 +24,13 @@ set(SRC_FILES
     utils/Color.cpp
     core/Window.cpp
     utils/global.cpp
-    components/Velocity.cpp
     components/Scale.cpp
     components/Position.cpp
     core/Entity.cpp
     utils/default_functions.cpp
     core/PCNode.cpp
     core/Range.cpp
-    extensions/physics.cpp
+    extensions/physics/physics.cpp
     utils/math.cpp
     core/Texture.cpp
     core/Assets.cpp
@@ -39,6 +38,8 @@ set(SRC_FILES
     core/io/Input.cpp
     core/io/Event.cpp
     core/Events.cpp
+    extensions/physics/PhysicsBody.cpp
+    extensions/physics/PhysicsCollider.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

@@ -20,32 +20,33 @@ namespace doge
     
     Vec2f cast::FromB2Vec2(const b2Vec2& v)
     {
-        return Vec2f(v.x / ToB2Scale, v.y / ToB2Scale);
+        return Vec2f(v.x, v.y);
     }
 
     b2Vec2 cast::ToB2Vec2(const Vec2f& v)
     {
-        return b2Vec2(v.x * ToB2Scale, v.y * ToB2Scale);
-    }
-
-    float cast::FromB2Length(float l)
-    {
-        return l / ToB2Scale;
-    }
-
-    float cast::ToB2Length(float l)
-    {
-        return l * ToB2Scale;
+        return b2Vec2(v.x, v.y);
     }
 
     b2BodyType cast::ToB2BodyType(RigidBody::Type type)
     {
         switch (type)
         {
-            case RigidBody::Type::Static: return b2BodyType::b2_staticBody;
-            case RigidBody::Type::Kinematic: return b2BodyType::b2_kinematicBody;
-            case RigidBody::Type::Dynamic: return b2BodyType::b2_dynamicBody;
-            default: throw std::invalid_argument("False b2 body type");
+            case RigidBody::Type::Static:       return b2BodyType::b2_staticBody;
+            case RigidBody::Type::Kinematic:    return b2BodyType::b2_kinematicBody;
+            case RigidBody::Type::Dynamic:      return b2BodyType::b2_dynamicBody;
+            default: throw std::invalid_argument("Invalid b2 body type");
+        }
+    }
+
+    RigidBody::Type cast::FromB2BodyType(b2BodyType type)
+    {
+        switch (type)
+        {
+            case b2BodyType::b2_staticBody:     return RigidBody::Type::Static;
+            case b2BodyType::b2_kinematicBody:  return RigidBody::Type::Kinematic;
+            case b2BodyType::b2_dynamicBody:    return RigidBody::Type::Dynamic;
+            default: throw std::invalid_argument("Invalid b2 body type");
         }
     }
 
