@@ -11,3 +11,4 @@
 #include "io/Event.hpp"
 #include "io/SoundBuffer.hpp"
 #include "io/Sound.hpp"
+#include "io/Music.hpp"

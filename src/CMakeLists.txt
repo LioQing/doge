@@ -47,6 +47,7 @@ set(SRC_FILES
     extensions/physics/PhysicsCollider.cpp
     core/io/SoundBuffer.cpp
     core/io/Sound.cpp
+    core/io/Music.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

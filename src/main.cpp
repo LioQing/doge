@@ -57,11 +57,12 @@ namespace ParticleSim
             particle.AddComponent(CircleCollider
             {
                 .radius = .2f,
-                .friction = 0.1f,
+                .friction = 0.4f,
                 .restitution = 0.8f,
             });
 
             particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
+            particle.AddComponent<Rotation>();
         }
 
         // shoot actions
@@ -175,6 +176,9 @@ int main()
     glf.fixed_update    = ParticleSim::FixedUpdate;
 
     engine.AddScene("particle_sim", glf);
+
+    engine.assets.musics.at("bgm0").SetLoop(true);
+    engine.assets.musics.at("bgm0").Play();
 
     engine.StartScene("particle_sim", Window::Settings{ .size = Vec2u(1280, 720), .title = "Particle Simulation" });
 

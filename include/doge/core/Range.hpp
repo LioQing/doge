@@ -183,7 +183,7 @@ namespace doge
         {
             if (!active_scene_id.empty())
                 return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
-            return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
+            return ComponentContainer<true, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
         }
 
         template <typename... TOnlyComps>
@@ -191,7 +191,7 @@ namespace doge
         {
             if (!active_scene_id.empty())
                 return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
-            return ComponentContainer<false, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
+            return ComponentContainer<true, TOnlyComps...>(lic::Range<SceneInfo, TComps...>::entities);
         }
     };
 }

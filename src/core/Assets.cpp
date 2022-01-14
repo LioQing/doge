@@ -187,4 +187,39 @@ namespace doge
 
         return sounds.emplace(id, io::Sound(itr->second));
     }
+
+    std::string Assets::SearchForMusic(const std::string& filename) const
+    {
+        return SearchForAsset(filename, texture_sub_paths);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
+    Assets::LoadMusic(const std::string& id, const std::string& filename)
+    {
+        auto path = SearchForTexture(filename);
+
+        if (path == "")
+        {
+            std::cerr << "Cannot find path: " << filename << std::endl;
+            return std::make_pair(musics.end(), false);
+        }
+
+        auto p = musics.try_emplace(id);
+
+        if (!p.second || p.first->second.FromFile(path))
+            return p;
+        
+        return std::make_pair(musics.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
+    Assets::LoadMusic(const std::string& id, void* data, std::size_t size)
+    {
+        auto p = musics.try_emplace(id);
+
+        if (!p.second || p.first->second.FromMemory(data, size))
+            return p;
+
+        return std::make_pair(musics.end(), false);
+    }
 }

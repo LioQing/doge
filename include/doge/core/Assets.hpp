@@ -19,6 +19,7 @@ namespace doge
     {
         struct SoundBuffer;
         struct Sound;
+        struct Music;
     }
 
     struct Assets
@@ -31,6 +32,9 @@ namespace doge
         std::unordered_set<std::string> sound_sub_paths = { "sounds" };
         std::unordered_map<std::string, io::SoundBuffer> sound_buffers;
         std::unordered_map<std::string, io::Sound> sounds;
+
+        std::unordered_set<std::string> music_sub_paths = { "musics " };
+        std::unordered_map<std::string, io::Music> musics;
 
         void Clear();
 
@@ -85,5 +89,13 @@ namespace doge
             std::uint32_t channel_count, 
             std::uint32_t sample_rate
             );
+
+        std::string SearchForMusic(const std::string& filename) const;
+
+        std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
+        LoadMusic(const std::string& id, const std::string& filename);
+
+        std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
+        LoadMusic(const std::string& id, void* data, std::size_t size);
     };
 }
