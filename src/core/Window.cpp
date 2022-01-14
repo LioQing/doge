@@ -27,7 +27,7 @@ namespace doge
         settings.title = title;
     }
 
-    void Window::SetIcon(const io::File::Image& icon)
+    void Window::SetIcon(const io::Image& icon)
     {
         window_io.icon = icon;
     }
@@ -64,7 +64,7 @@ namespace doge
         return window_io.IsOpen();
     }
 
-    io::File::Image Window::TakeScreenshot() const
+    io::Image Window::TakeScreenshot() const
     {
         return window_io.TakeScreenshot();
     }

@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    Image::Image(const io::File::Image& image_io) : image_io(image_io)
+    Image::Image(const io::Image& image_io) : image_io(image_io)
     {
     }
 

@@ -9,8 +9,7 @@
 #include <doge/utils/Vec3.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/core/WindowSettings.hpp>
-#include <doge/core/io/Input.hpp>
-#include <doge/core/io/Event.hpp>
+#include <doge/core/io.hpp>
 #include <doge/events.hpp>
 
 namespace doge
@@ -94,17 +93,17 @@ namespace doge
         static WindowSettings::Style FromSfStyle(int style);
         static int ToSfStyle(WindowSettings::Style style);
 
-        static io::Input::Keyboard::Key FromSfKeyboardKey(sf::Keyboard::Key key);
-        static sf::Keyboard::Key ToSfKeyboardKey(io::Input::Keyboard::Key key);
+        static io::Keyboard::Key FromSfKeyboardKey(sf::Keyboard::Key key);
+        static sf::Keyboard::Key ToSfKeyboardKey(io::Keyboard::Key key);
 
-        static io::Input::Mouse::Wheel FromSfMouseWheel(sf::Mouse::Wheel wheel);
-        static sf::Mouse::Wheel ToSfMouseWheel(io::Input::Mouse::Wheel wheel);
+        static io::Mouse::Wheel FromSfMouseWheel(sf::Mouse::Wheel wheel);
+        static sf::Mouse::Wheel ToSfMouseWheel(io::Mouse::Wheel wheel);
 
-        static io::Input::Mouse::Button FromSfMouseButton(sf::Mouse::Button button);
-        static sf::Mouse::Button ToSfMouseButton(io::Input::Mouse::Button button);
+        static io::Mouse::Button FromSfMouseButton(sf::Mouse::Button button);
+        static sf::Mouse::Button ToSfMouseButton(io::Mouse::Button button);
 
-        static io::Input::Sensor::Type FromSfSensorType(sf::Sensor::Type type);
-        static sf::Sensor::Type ToSfSensorType(io::Input::Sensor::Type type);
+        static io::Sensor::Type FromSfSensorType(sf::Sensor::Type type);
+        static sf::Sensor::Type ToSfSensorType(io::Sensor::Type type);
 
         static io::Event::Content FromSfEvent(const sf::Event& event);
 

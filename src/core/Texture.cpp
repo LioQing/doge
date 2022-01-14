@@ -43,7 +43,7 @@ namespace doge
         return Recti(size.x * indices.x, size.y * indices.y, size.x, size.y);
     }
 
-    Texture::Texture(const io::File::Texture& texture_io) : texture_io(texture_io)
+    Texture::Texture(const io::Texture& texture_io) : texture_io(texture_io)
     {
     }
 

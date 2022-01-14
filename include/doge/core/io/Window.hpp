@@ -13,7 +13,7 @@
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/lev.hpp>
-#include <doge/core/io/File.hpp>
+#include <doge/core/io/Image.hpp>
 
 namespace doge
 {
@@ -28,7 +28,7 @@ namespace doge
             sf::RenderWindow window;
             sf::Clock clock;
             doge::Color background_color = doge::Color::Black();
-            File::Image icon;
+            Image icon;
 
             enum DrawableType
             {
@@ -52,7 +52,7 @@ namespace doge
 
             void Display();
 
-            File::Image TakeScreenshot() const;
+            Image TakeScreenshot() const;
 
             // delta time
 
@@ -68,7 +68,7 @@ namespace doge
 
             void SetTitle(const std::string& title);
 
-            void SetIcon(const File::Image& icon);
+            void SetIcon(const Image& icon);
 
             void SetVisible(bool visible);
 

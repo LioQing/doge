@@ -339,7 +339,7 @@ namespace doge::io
         window.display();
     }
 
-    File::Image Window::TakeScreenshot() const
+    Image Window::TakeScreenshot() const
     {
         sf::Vector2u size = window.getSize();
         sf::Texture texture;
@@ -347,7 +347,7 @@ namespace doge::io
         texture.update(window);
         sf::Image screenshot = texture.copyToImage();
 
-        return File::Image(screenshot);
+        return Image(screenshot);
     }
 
     // delta time
@@ -391,7 +391,7 @@ namespace doge::io
         window.setTitle(title);
     }
 
-    void Window::SetIcon(const File::Image& icon)
+    void Window::SetIcon(const Image& icon)
     {
         window.setIcon(icon.GetSize().x, icon.GetSize().y, icon.GetPixelPtr());
     }
@@ -443,7 +443,7 @@ namespace doge::io
 
     Vec2i Window::GetClientAreaPosition() const
     {
-        using m = io::Input::Mouse;
+        using m = io::Mouse;
 
         return m::GetPosition(*this) - m::GetPosition();
     }

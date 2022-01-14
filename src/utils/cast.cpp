@@ -86,35 +86,35 @@ namespace doge
         }
     }
 
-    io::Input::Keyboard::Key cast::FromSfKeyboardKey(sf::Keyboard::Key key)
+    io::Keyboard::Key cast::FromSfKeyboardKey(sf::Keyboard::Key key)
     {
         return key;
     }
 
-    sf::Keyboard::Key cast::ToSfKeyboardKey(io::Input::Keyboard::Key key)
+    sf::Keyboard::Key cast::ToSfKeyboardKey(io::Keyboard::Key key)
     {
         return key;        
     }
 
-    io::Input::Mouse::Wheel cast::FromSfMouseWheel(sf::Mouse::Wheel wheel)
+    io::Mouse::Wheel cast::FromSfMouseWheel(sf::Mouse::Wheel wheel)
     {
-        using dwheel = io::Input::Mouse::Wheel;
+        using dwheel = io::Mouse::Wheel;
         using sfwheel = sf::Mouse::Wheel;
 
         return wheel == sfwheel::HorizontalWheel ? dwheel::Horizontal : dwheel::Vertical;
     }
 
-    sf::Mouse::Wheel cast::ToSfMouseWheel(io::Input::Mouse::Wheel wheel)
+    sf::Mouse::Wheel cast::ToSfMouseWheel(io::Mouse::Wheel wheel)
     {
-        using dwheel = io::Input::Mouse::Wheel;
+        using dwheel = io::Mouse::Wheel;
         using sfwheel = sf::Mouse::Wheel;
 
         return wheel == dwheel::Horizontal ? sfwheel::HorizontalWheel : sfwheel::VerticalWheel;
     }
 
-    io::Input::Mouse::Button cast::FromSfMouseButton(sf::Mouse::Button button)
+    io::Mouse::Button cast::FromSfMouseButton(sf::Mouse::Button button)
     {
-        using dbutton = io::Input::Mouse::Button;
+        using dbutton = io::Mouse::Button;
         using sfbutton = sf::Mouse::Button;
 
         switch (button)
@@ -128,9 +128,9 @@ namespace doge
         }
     }
 
-    sf::Mouse::Button cast::ToSfMouseButton(io::Input::Mouse::Button button)
+    sf::Mouse::Button cast::ToSfMouseButton(io::Mouse::Button button)
     {
-        using dbutton = io::Input::Mouse::Button;
+        using dbutton = io::Mouse::Button;
         using sfbutton = sf::Mouse::Button;
 
         switch (button)
@@ -144,9 +144,9 @@ namespace doge
         }
     }
 
-    io::Input::Sensor::Type cast::FromSfSensorType(sf::Sensor::Type type)
+    io::Sensor::Type cast::FromSfSensorType(sf::Sensor::Type type)
     {
-        using dtype = io::Input::Sensor::Type;
+        using dtype = io::Sensor::Type;
         using sftype = sf::Sensor::Type;
 
         switch (type)
@@ -161,9 +161,9 @@ namespace doge
         }
     }
 
-    sf::Sensor::Type cast::ToSfSensorType(io::Input::Sensor::Type type)
+    sf::Sensor::Type cast::ToSfSensorType(io::Sensor::Type type)
     {
-        using dtype = io::Input::Sensor::Type;
+        using dtype = io::Sensor::Type;
         using sftype = sf::Sensor::Type;
 
         switch (type)

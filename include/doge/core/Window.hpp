@@ -24,7 +24,7 @@ namespace doge
 
         void SetTitle(const std::string& title);
 
-        void SetIcon(const io::File::Image& icon);
+        void SetIcon(const io::Image& icon);
         void SetIcon(const std::string& filename);
 
         void SetBackgroundColor(const Color& color);
@@ -37,7 +37,7 @@ namespace doge
 
         bool IsOpen() const;
 
-        io::File::Image TakeScreenshot() const;
+        io::Image TakeScreenshot() const;
 
         Vec2f GetAutoResizedCameraSize(const Camera& cam) const;
 

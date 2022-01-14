@@ -34,8 +34,13 @@ set(SRC_FILES
     utils/math.cpp
     core/Texture.cpp
     core/Assets.cpp
-    core/io/File.cpp
-    core/io/Input.cpp
+    core/io/Image.cpp
+    core/io/Texture.cpp
+    core/io/Keyboard.cpp
+    core/io/Mouse.cpp
+    core/io/Controller.cpp
+    core/io/Touch.cpp
+    core/io/Sensor.cpp
     core/io/Event.cpp
     core/Events.cpp
     extensions/physics/PhysicsBody.cpp
