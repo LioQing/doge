@@ -1,9 +1,9 @@
 #pragma once
 
 #include <vector>
-#include <doge/components/ConvexCollider.hpp>
-#include <doge/components/CircleCollider.hpp>
-#include <doge/components/RectangleCollider.hpp>
+#include <doge/extensions/physics/ConvexCollider.hpp>
+#include <doge/extensions/physics/CircleCollider.hpp>
+#include <doge/extensions/physics/RectangleCollider.hpp>
 
 namespace doge
 {

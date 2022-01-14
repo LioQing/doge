@@ -2,7 +2,7 @@
 #include <cmath>
 
 #include <doge/doge.hpp>
-#include <doge/extensions/physics/physics.hpp>
+#include <doge/extensions/physics.hpp>
 
 using namespace doge;
 
@@ -176,9 +176,6 @@ int main()
     glf.fixed_update    = ParticleSim::FixedUpdate;
 
     engine.AddScene("particle_sim", glf);
-
-    engine.assets.musics.at("bgm0").SetLoop(true);
-    engine.assets.musics.at("bgm0").Play();
 
     engine.StartScene("particle_sim", Window::Settings{ .size = Vec2u(1280, 720), .title = "Particle Simulation" });
 

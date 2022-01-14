@@ -2,6 +2,7 @@
 
 #include <doge/core/Engine.hpp>
 #include <doge/components.hpp>
+#include <doge/extensions/physics.hpp>
 
 namespace doge
 {
