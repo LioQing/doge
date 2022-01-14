@@ -29,14 +29,14 @@ namespace doge
         image_io.FromTexture(texture.texture_io);
     }
 
+    bool Image::ToFile(const std::string& filename) const 
+    {
+        return image_io.ToFile(filename);
+    }
+
     Vec2u Image::GetSize() const
     {
         return image_io.GetSize();
-    }
-
-    void Image::ToFile(const std::string& filename) const 
-    {
-        image_io.ToFile(filename);
     }
 
     void Image::MaskColor(const Color& color, std::uint8_t alpha)

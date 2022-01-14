@@ -8,16 +8,16 @@ using namespace doge;
 
 namespace ParticleSim
 {
-    int grab_particle = -1;
-    Vec2f grab_particle_position;
-    Vec2f grab_mouse_position;
-    Entity grab_line;
+    int shoot_particle = -1;
+    Vec2f shoot_particle_position;
+    Vec2f shoot_mouse_position;
+    Entity shoot_line;
     Component<Camera>* cam_comp;
 
     void Start(Engine& engine)
     {
         // cam
-        Entity cam = engine.AddCamera(Vec2f(128, 72));
+        Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
         cam_comp = &cam.GetComponent<Camera>();
 
         // wall
@@ -28,10 +28,10 @@ namespace ParticleSim
         {
             .points = 
             {
-                Vec2f(-64, -36),
-                Vec2f(-64, 36),
-                Vec2f(64, 36),
-                Vec2f(64, -36),
+                Vec2f(-6.4, -3.6),
+                Vec2f(-6.4, 3.6),
+                Vec2f(6.4, 3.6),
+                Vec2f(6.4, -3.6),
             },
             .is_loop = true,
             .friction = 0.1f,
@@ -47,27 +47,28 @@ namespace ParticleSim
 
             particle.AddComponent(CircleShape
             {
-                .radius = 2.f,
-                .origin = { 2.f, 2.f },
-                .color = Color::White(),
+                .radius = .2f,
+                .origin = { .2f, .2f },
+                .texture_id = "missing_texture",
+                .texture_rectangle = Recti(0, 0, 32, 32),
             });
 
-            particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic);
+            particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
             particle.AddComponent(CircleCollider
             {
-                .radius = 2.f,
+                .radius = .2f,
                 .friction = 0.1f,
                 .restitution = 0.8f,
             });
 
-            particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * 5.f, 5.f));
+            particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
         }
 
-        // grab actions
-        grab_line = engine.AddEntity();
-        grab_line.AddComponent(Tag::Create("line"));
-        grab_line.AddComponent<Position>();
-        grab_line.AddComponent(PolygonShape
+        // shoot actions
+        shoot_line = engine.AddEntity();
+        shoot_line.AddComponent(Tag::Create("line"));
+        shoot_line.AddComponent<Position>();
+        shoot_line.AddComponent(PolygonShape
         { 
             .type = PolygonShape::Lines, 
             .vertices = 
@@ -86,16 +87,16 @@ namespace ParticleSim
                     { return *tag.tags.begin() == "particle"; })
                     .Entities())
                 {
-                    grab_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
-                    if (!physics::GetCollider(entity).TestPoint(grab_mouse_position))
+                    shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
+                    if (!physics::GetCollider(entity).TestPoint(shoot_mouse_position))
                         continue;
 
-                    grab_line.GetComponent<Position>().position = grab_mouse_position;
-                    for (auto& vertex : grab_line.GetComponent<PolygonShape>().vertices)
+                    shoot_line.GetComponent<Position>().position = shoot_mouse_position;
+                    for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
                         vertex.color = Color::White();
                     
-                    grab_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
-                    grab_particle = entity.id;
+                    shoot_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
+                    shoot_particle = entity.id;
 
                     return;
                 }
@@ -106,27 +107,28 @@ namespace ParticleSim
         {
             if (event.button == event::MouseButton::Button::Left)
             {
-                if (grab_particle == -1) return;
+                if (shoot_particle == -1) return;
 
-                if (!engine.HasEntity(grab_particle) || !doge::physics::HasBody(grab_particle))
+                if (!engine.HasEntity(shoot_particle) || !doge::physics::HasBody(shoot_particle))
                     return;
                 
-                physics::GetBody(grab_particle).ApplyImpulse(
-                    (grab_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp)) * 1000.f,
-                    grab_mouse_position
-                );
+                auto impulse = (shoot_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp));
+                physics::GetBody(shoot_particle).ApplyImpulse(impulse, shoot_mouse_position);
 
-                for (auto& vertex : grab_line.GetComponent<PolygonShape>().vertices)
+                for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
                     vertex.color = Color::Transparent();
 
-                grab_particle = -1;
+                shoot_particle = -1;
+
+                engine.assets.sounds.at("shoot").SetVolume(std::clamp(impulse.Magnitude() * 10.f, 0.f, 100.f));
+                engine.assets.sounds.at("shoot").Play();
             }
         };
     }
 
     void Update(Engine& engine, DeltaTime dt)
     {
-        if (grab_particle != -1)
+        if (shoot_particle != -1)
         {
             for (auto [tag, line, pos] : engine.Select<Tag>().Where(
                 [](EntityID entity, const Tag& tag)
@@ -146,12 +148,12 @@ namespace ParticleSim
             { return *tag.tags.begin() == "particle"; })
             .Select<Position>().EntitiesAndComponents())
         {
-            if (entity != grab_particle)
+            if (entity != shoot_particle)
                 continue;
             
             physics::Body body = physics::GetBody(entity);
 
-            Vec2f diff = grab_particle_position - position.position;
+            Vec2f diff = shoot_particle_position - position.position;
             body.SetVelocity(diff);
         }
     }
@@ -162,7 +164,10 @@ int main()
     Engine engine;
     engine.window.settings.fps = 120;
 
-    physics::Enable(engine);
+    engine.assets.AddSound("shoot", "shoot", "shoot.wav");
+
+    physics::Enable(engine); 
+    physics::SetGravity(Vec2f(0, 9.8));
 
     GameLoopFunctions glf;
     glf.start           = ParticleSim::Start;

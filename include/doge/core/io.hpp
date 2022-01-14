@@ -9,3 +9,5 @@
 #include "io/Sensor.hpp"
 #include "io/Window.hpp"
 #include "io/Event.hpp"
+#include "io/SoundBuffer.hpp"
+#include "io/Sound.hpp"

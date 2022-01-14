@@ -18,7 +18,9 @@ namespace doge
         bool FromMemory(void* data, std::size_t size);
         void FromTexture(const Texture& texture);
 
-        void ToFile(const std::string& filename) const;
+        bool ToFile(const std::string& filename) const;
+
+        Vec2u GetSize() const;
 
         void MaskColor(const Color& color, std::uint8_t alpha = 0);
         void SetPixel(std::uint32_t x, std::uint32_t y, const Color& color);
@@ -27,7 +29,5 @@ namespace doge
 
         void FlipHorizontally();
         void FlipVertically();
-
-        Vec2u GetSize() const;
     };
 }

@@ -12,7 +12,7 @@ include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
 set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
 set(SFML_STATIC_LIBRARIES TRUE)
-find_package(SFML 2.5 COMPONENTS system graphics window REQUIRED)
+find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
 
 set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Debug)
 
@@ -45,6 +45,8 @@ set(SRC_FILES
     core/Events.cpp
     extensions/physics/PhysicsBody.cpp
     extensions/physics/PhysicsCollider.cpp
+    core/io/SoundBuffer.cpp
+    core/io/Sound.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
@@ -54,6 +56,7 @@ set(SFML_LIBS
     sfml-graphics
     sfml-window
     sfml-system
+    sfml-audio
 )
 
 set(BOX2D_LIB ${BOX2D_DIR}/box2d.lib)

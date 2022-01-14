@@ -30,7 +30,8 @@ namespace doge
 
     void physics::SetGravity(const Vec2f& gravity)
     {
-        world->SetGravity(cast::ToB2Vec2(gravity));
+        if (world)
+            world->SetGravity(cast::ToB2Vec2(gravity));
         physics::gravity = gravity;
     }
 
