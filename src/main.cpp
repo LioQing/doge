@@ -3,6 +3,7 @@
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
+#include <doge/extensions/fsm.hpp>
 
 using namespace doge;
 
@@ -49,8 +50,8 @@ namespace ParticleSim
             {
                 .radius = .2f,
                 .origin = { .2f, .2f },
-                .texture_id = "missing_texture",
-                .texture_rectangle = Recti(0, 0, 32, 32),
+                //.texture_id = "missing_texture",
+                //.texture_rectangle = Recti(0, 0, 32, 32),
             });
 
             particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
@@ -63,6 +64,31 @@ namespace ParticleSim
 
             particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
             particle.AddComponent<Rotation>();
+            
+            auto& fsm = particle.AddComponent(StateMachine
+            {
+                .state = 0,
+                .transition = [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
+                {
+                    if (shoot_particle == entity.id)
+                        return 2;
+
+                    if (physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
+                        return 1;
+                    
+                    return 0;
+                }
+            });
+
+            fsm.on_entry += [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
+            {
+                if (state == 0)
+                    entity.GetComponent<CircleShape>().color = Color::Green();
+                else if (state == 1)
+                    entity.GetComponent<CircleShape>().color = Color::Red();
+                else if (state == 2)
+                    entity.GetComponent<CircleShape>().color = Color::Blue();
+            };
         }
 
         // shoot actions
@@ -131,11 +157,10 @@ namespace ParticleSim
     {
         if (shoot_particle != -1)
         {
-            for (auto [tag, line, pos] : engine.Select<Tag>().Where(
-                [](EntityID entity, const Tag& tag)
-                {
-                    return *tag.tags.begin() == "line";
-                }).Select<PolygonShape, Position>().Components())
+            for (auto [tag, line, pos] : engine.Select<Tag>()
+                .Where([](EntityID entity, const Tag& tag)
+                { return *tag.tags.begin() == "line"; })
+                .Select<PolygonShape, Position>().Components())
             {
                 line.vertices.at(1).position = engine.window.MapPixelToCoords(engine.window.window_io.GetMousePosition(), *cam_comp) - pos.position;
             }
@@ -169,6 +194,8 @@ int main()
 
     physics::Enable(engine); 
     physics::SetGravity(Vec2f(0, 9.8));
+
+    fsm::Enable(engine);
 
     GameLoopFunctions glf;
     glf.start           = ParticleSim::Start;

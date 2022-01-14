@@ -20,13 +20,13 @@ namespace doge
         glf.fixed_update = FixedUpdate;
         glf.finish = Finish;
         
-        engine.scenes.extensions.emplace("doge_box2d", glf);
+        engine.scenes.extensions.emplace("doge_physics", glf);
         world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
     }
 
     void physics::Disable(Engine& engine)
     {
-        engine.scenes.extensions.erase("doge_box2d");
+        engine.scenes.extensions.erase("doge_physics");
     }
 
     void physics::SetGravity(const Vec2f& gravity)
@@ -74,9 +74,6 @@ namespace doge
 
     void physics::Start(Engine& engine)
     {
-        if (world)
-            world.reset();
-        world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
     }
 
     void physics::Update(Engine& engine, DeltaTime dt)
@@ -527,7 +524,6 @@ namespace doge
 
     void physics::Finish(Engine& engine)
     {
-        world.reset();
         bodies.clear();
     }
 }
