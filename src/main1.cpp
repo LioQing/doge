@@ -68,7 +68,8 @@ namespace ParticleSim
             auto& fsm = particle.AddComponent(StateMachine
             {
                 .state = 0,
-                .transition = [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
+                .transition = 
+                [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
                 {
                     if (shoot_particle == entity.id)
                         return 2;
@@ -80,7 +81,7 @@ namespace ParticleSim
                 }
             });
 
-            fsm.on_entry += [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
+            fsm.on_entry += [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
             {
                 if (state == 0)
                     entity.GetComponent<CircleShape>().color = Color::Green();

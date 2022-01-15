@@ -8,11 +8,13 @@ namespace doge
 
     struct fsm
     {
-        using StateType = std::uint32_t;
+        using State = std::uint64_t;
 
         fsm(const fsm&) = delete;
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
+
+        static void ManualUpdate(Engine& engine, DeltaTime dt = 0, bool is_fixed_update = false);
 
     private:
 

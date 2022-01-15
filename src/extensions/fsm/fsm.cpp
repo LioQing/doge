@@ -19,15 +19,15 @@ namespace doge
         engine.scenes.extensions.erase("doge_fsm");
     }
 
-    void fsm::Update(Engine& engine, DeltaTime dt)
+    void fsm::ManualUpdate(Engine& engine, DeltaTime dt, bool is_fixed_update)
     {
         for (auto [entity, fsm] : engine
             .Select<StateMachine>()
-            .Where([](const Entity& _, const StateMachine& fsm)
-            { return !fsm.is_fixed_update; })
+            .Where([is_fixed_update](const Entity& _, const StateMachine& fsm)
+            { return fsm.is_fixed_update == is_fixed_update; })
             .EntitiesAndComponents())
         {
-            fsm::StateType new_state = fsm.transition(fsm.state, entity, engine, dt);
+            fsm::State new_state = fsm.transition(fsm.state, entity, engine, dt);
 
             if (new_state == fsm.state)
                 continue;
@@ -38,22 +38,13 @@ namespace doge
         }
     }
 
+    void fsm::Update(Engine& engine, DeltaTime dt)
+    {
+        ManualUpdate(engine, dt, false);
+    }
+
     void fsm::FixedUpdate(Engine& engine, DeltaTime dt)
     {
-        for (auto [entity, fsm] : engine
-            .Select<StateMachine>()
-            .Where([](const Entity& _, const StateMachine& fsm)
-            { return fsm.is_fixed_update; })
-            .EntitiesAndComponents())
-        {
-            fsm::StateType new_state = fsm.transition(fsm.state, entity, engine, dt);
-
-            if (new_state == fsm.state)
-                continue;
-
-            fsm.on_exit(fsm.state, entity, engine, dt);
-            fsm.state = new_state;
-            fsm.on_entry(fsm.state, entity, engine, dt);
-        }
+        ManualUpdate(engine, dt, true);
     }
 }
