@@ -63,6 +63,10 @@ namespace doge::io
                 shape.setTexture(&engine.assets.textures.at(comp.texture_id).texture_io.texture);
                 shape.setTextureRect(cast::ToSfRect(comp.texture_rectangle));
             }
+            else
+            {
+                shape.setTexture(nullptr);
+            }
         };
 
         auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(const DrawableKey& key, Component<TComp>& comp)
@@ -271,6 +275,10 @@ namespace doge::io
             if (polygon_comp.texture_id != "")
             {
                 vertices.texture = &engine.assets.textures.at(polygon_comp.texture_id).texture_io.texture;
+            }
+            else
+            {
+                vertices.texture = nullptr;
             }
         };
 

@@ -50,8 +50,7 @@ namespace ParticleSim
             {
                 .radius = .2f,
                 .origin = { .2f, .2f },
-                //.texture_id = "missing_texture",
-                //.texture_rectangle = Recti(0, 0, 32, 32),
+                .texture_rectangle = Recti(0, 0, 32, 32),
             });
 
             particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
@@ -65,30 +64,53 @@ namespace ParticleSim
             particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
             particle.AddComponent<Rotation>();
             
-            auto& fsm = particle.AddComponent(StateMachine
-            {
-                .state = 0,
-                .transition = 
-                [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+            auto& fsm = particle.AddComponent(StateMachines
+            (
                 {
-                    if (shoot_particle == entity.id)
-                        return 2;
+                    StateMachine // color: 0 - white (still), 1 - red (moving), 2 - blue (grabbed)
+                    {
+                        .state = 0,
+                        .transition = 
+                        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+                        {
+                            if (shoot_particle == entity.id)
+                                return 2;
 
-                    if (physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
-                        return 1;
-                    
-                    return 0;
+                            if (physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
+                                return 1;
+                            
+                            return 0;
+                        }
+                    },
+                    StateMachine // movement: 0 - grab, 1 - free
+                    {
+                        .state = 0,
+                    },
                 }
-            });
+            ));
 
-            fsm.on_entry += [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+            fsm.state_machines.at(0).on_entry += 
+            [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
             {
                 if (state == 0)
-                    entity.GetComponent<CircleShape>().color = Color::Green();
+                    entity.GetComponent<CircleShape>().color = Color::White();
                 else if (state == 1)
                     entity.GetComponent<CircleShape>().color = Color::Red();
                 else if (state == 2)
                     entity.GetComponent<CircleShape>().color = Color::Blue();
+            };
+
+            fsm.state_machines.at(1).on_entry += 
+            [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+            {
+                if (state == 0)
+                {
+                    entity.GetComponent<CircleShape>().texture_id = "";
+                }
+                else if (state == 1)
+                {
+                    entity.GetComponent<CircleShape>().texture_id = "missing_texture";
+                }
             };
         }
 
@@ -131,6 +153,15 @@ namespace ParticleSim
                     return;
                 }
             }
+            else if (event.button == event::MouseButton::Button::Right)
+            {
+                for (auto [entity, fsm] : engine
+                    .Select<CircleShape, StateMachines>()
+                    .EntitiesAndOnlyComponents<StateMachines>())
+                {
+                    fsm::ManualTransition(fsm.state_machines.at(1), 1, entity, engine);
+                }
+            }
         };
 
         engine.events.on_mouse_button_released += [&](const event::MouseButton& event)
@@ -153,7 +184,16 @@ namespace ParticleSim
                 engine.assets.sounds.at("shoot").SetVolume(std::clamp(impulse.Magnitude() * 10.f, 0.f, 100.f));
                 engine.assets.sounds.at("shoot").Play();
 
-                    engine.window.window_io.SetMouseCursor(engine.assets.cursors.at("normal"));
+                engine.window.window_io.SetMouseCursor(engine.assets.cursors.at("normal"));
+            }
+            else if (event.button == event::MouseButton::Button::Right)
+            {
+                for (auto [entity, fsm] : engine
+                    .Select<CircleShape, StateMachines>()
+                    .EntitiesAndOnlyComponents<StateMachines>())
+                {
+                    fsm::ManualTransition(fsm.state_machines.at(1), 0, entity, engine);
+                }
             }
         };
     }

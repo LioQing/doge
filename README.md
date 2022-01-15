@@ -15,3 +15,5 @@ This library uses [SFML](https://www.sfml-dev.org/) for cross-platform IO functi
 ## Built-in Extensions
 
 physics: provide rigid body physics simulation (with [Box2D](https://box2d.org/))
+
+fsm: provide simple [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) functionalities

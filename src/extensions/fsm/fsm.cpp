@@ -2,6 +2,7 @@
 
 #include <doge/core.hpp>
 #include <doge/extensions/fsm/StateMachine.hpp>
+#include <doge/extensions/fsm/StateMachines.hpp>
 
 namespace doge
 {
@@ -19,32 +20,45 @@ namespace doge
         engine.scenes.extensions.erase("doge_fsm");
     }
 
-    void fsm::ManualUpdate(Engine& engine, DeltaTime dt, bool is_fixed_update)
+    void fsm::ManualTransition(StateMachine& state_machine, fsm::State new_state, Entity entity, Engine& engine, DeltaTime dt, bool force_call_event)
+    {
+        if (!force_call_event && state_machine.state == new_state)
+            return;
+        
+        state_machine.on_exit(state_machine.state, entity, engine, dt);
+        state_machine.state = new_state;
+        state_machine.on_entry(state_machine.state, entity, engine, dt);
+    }
+
+    void fsm::ManualUpdate(Engine& engine, DeltaTime dt, StateMachine::AutoUpdate auto_update)
     {
         for (auto [entity, fsm] : engine
             .Select<StateMachine>()
-            .Where([is_fixed_update](const Entity& _, const StateMachine& fsm)
-            { return fsm.is_fixed_update == is_fixed_update; })
+            .Where([auto_update](const Entity& _, const StateMachine& fsm)
+            { return fsm.auto_update == auto_update; })
             .EntitiesAndComponents())
         {
-            fsm::State new_state = fsm.transition(fsm.state, entity, engine, dt);
+            if (fsm.transition)
+                ManualTransition(fsm, fsm.transition(fsm.state, entity, engine, dt), entity, engine, dt);
+        }
 
-            if (new_state == fsm.state)
-                continue;
-
-            fsm.on_exit(fsm.state, entity, engine, dt);
-            fsm.state = new_state;
-            fsm.on_entry(fsm.state, entity, engine, dt);
+        for (auto [entity, fsms] : engine.Select<StateMachines>().EntitiesAndComponents())
+        {
+            for (auto& fsm : fsms.state_machines)
+            {
+                if (fsm.transition)
+                    ManualTransition(fsm, fsm.transition(fsm.state, entity, engine, dt), entity, engine, dt);
+            }
         }
     }
 
     void fsm::Update(Engine& engine, DeltaTime dt)
     {
-        ManualUpdate(engine, dt, false);
+        ManualUpdate(engine, dt, StateMachine::AutoUpdate::Update);
     }
 
     void fsm::FixedUpdate(Engine& engine, DeltaTime dt)
     {
-        ManualUpdate(engine, dt, true);
+        ManualUpdate(engine, dt, StateMachine::AutoUpdate::FixedUpdate);
     }
 }
