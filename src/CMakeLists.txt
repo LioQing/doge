@@ -49,6 +49,7 @@ set(SRC_FILES
     core/io/Sound.cpp
     core/io/Music.cpp
     extensions/fsm/fsm.cpp
+    core/io/Cursor.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

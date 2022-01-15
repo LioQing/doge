@@ -8,8 +8,11 @@
 
 namespace doge
 {
-    struct Image;
-    
+    namespace io
+    {
+        struct Image;
+    }
+
     struct Texture
     {
         struct SpriteSheet
@@ -51,7 +54,7 @@ namespace doge
         bool Create(const Vec2u& size);
         bool FromFile(const std::string& filename, const Recti& area = Recti());
         bool FromMemory(void* data, std::size_t size, const Recti& area = Recti());
-        bool FromImage(const Image& image, const Recti& area = Recti());
+        bool FromImage(const io::Image& image, const Recti& area = Recti());
 
         void SetRenderOptions(RenderOptions options);
         bool IsSmooth() const;

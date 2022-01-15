@@ -14,6 +14,7 @@
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/lev.hpp>
 #include <doge/core/io/Image.hpp>
+#include <doge/core/io/Cursor.hpp>
 
 namespace doge
 {
@@ -73,6 +74,12 @@ namespace doge
             void SetVisible(bool visible);
 
             void SetVSyncEnabled(bool enabled);
+
+            void SetMouseCursorVisible(bool visible);
+
+            void SetMouseCursorGrabbed(bool grabbed);
+
+            void SetMouseCursor(const Cursor& cursor);
 
             bool IsOpen() const;
 

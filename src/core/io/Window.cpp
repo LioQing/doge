@@ -406,6 +406,21 @@ namespace doge::io
         window.setVerticalSyncEnabled(enabled);
     }
 
+    void Window::SetMouseCursorVisible(bool visible)
+    {
+        window.setMouseCursorVisible(visible);
+    }
+
+    void Window::SetMouseCursorGrabbed(bool grabbed)
+    {
+        window.setMouseCursorGrabbed(grabbed);
+    }
+
+    void Window::SetMouseCursor(const io::Cursor& cursor)
+    {
+        window.setMouseCursor(cursor.cursor);
+    }
+
     bool Window::IsOpen() const
     {
         return window.isOpen();

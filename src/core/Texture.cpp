@@ -1,6 +1,6 @@
 #include <doge/core/Texture.hpp>
 
-#include <doge/core/Image.hpp>
+#include <doge/core/io/Image.hpp>
 #include <cassert>
 
 namespace doge
@@ -62,9 +62,9 @@ namespace doge
         return texture_io.FromMemory(data, size, area);
     }
 
-    bool Texture::FromImage(const Image& image, const Recti& area)
+    bool Texture::FromImage(const io::Image& image, const Recti& area)
     {
-        return texture_io.FromImage(image.image_io, area);
+        return texture_io.FromImage(image, area);
     }
     
     void Texture::SetRenderOptions(RenderOptions options)

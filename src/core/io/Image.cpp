@@ -25,7 +25,7 @@ namespace doge::io
         return image.loadFromMemory(data, size);
     }
 
-    void Image::FromTexture(const Texture& texture)
+    void Image::DownloadFromTexture(const Texture& texture)
     {
         image = texture.texture.copyToImage();
     }

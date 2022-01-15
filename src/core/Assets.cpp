@@ -69,7 +69,7 @@ namespace doge
     }
 
     std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
-    Assets::LoadTexture(const std::string& id, const Image& image, const Recti& area)
+    Assets::LoadTexture(const std::string& id, const io::Image& image, const Recti& area)
     {
         Texture texture;
 
@@ -77,6 +77,104 @@ namespace doge
             return textures.emplace(id, texture);
         
         return std::make_pair(textures.end(), false);
+    }
+
+    std::string Assets::SearchForImage(const std::string& filename) const
+    {
+        return SearchForAsset(filename, image_sub_paths);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Image>::iterator, bool>
+    Assets::LoadImage(const std::string& id, const std::string& filename)
+    {
+        io::Image image;
+        auto path = SearchForImage(filename);
+
+        if (path == "")
+        {
+            std::cerr << "Cannot find path: " << filename << std::endl;
+            return std::make_pair(images.end(), false);
+        }
+
+        if (image.FromFile(path))
+            return images.emplace(id, image);
+        
+        return std::make_pair(images.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Image>::iterator, bool>
+    Assets::LoadImage(const std::string& id, void* data, std::size_t size)
+    {
+        io::Image image;
+
+        if (image.FromMemory(data, size))
+            return images.emplace(id, image);
+
+        return std::make_pair(images.end(), false);
+    }
+
+    std::string Assets::SearchForCursor(const std::string& filename) const
+    {
+        return SearchForAsset(filename, cursor_sub_paths);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
+    Assets::LoadCursor(const std::string& id, const std::string& filename, const Vec2u& hotspot)
+    {
+        io::Cursor cursor;
+        auto path = SearchForImage(filename);
+
+        if (path == "")
+        {
+            std::cerr << "Cannot find path: " << filename << std::endl;
+            return std::make_pair(cursors.end(), false);
+        }
+
+        auto p = cursors.try_emplace(id);
+
+        if (!p.second || p.first->second.FromFile(path))
+            return p;
+        
+        return std::make_pair(cursors.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
+    Assets::LoadCursor(const std::string& id, const io::Image& image, const Vec2u& hotspot)
+    {
+        io::Cursor cursor;
+
+        auto p = cursors.try_emplace(id);
+
+        if (!p.second || p.first->second.FromImage(image, hotspot))
+            return p;
+
+        return std::make_pair(cursors.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
+    Assets::LoadCursor(const std::string& id, const std::uint8_t* pixels, const Vec2u& size, const Vec2u& hotspot)
+    {
+        io::Cursor cursor;
+
+        auto p = cursors.try_emplace(id);
+
+        if (!p.second || p.first->second.FromPixels(pixels, size, hotspot))
+            return p;
+
+        return std::make_pair(cursors.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
+    Assets::LoadCursor(const std::string& id, io::Cursor::Type type)
+    {
+        io::Cursor cursor;
+
+        auto p = cursors.try_emplace(id);
+
+        if (!p.second || p.first->second.FromSystem(type))
+            return p;
+
+        return std::make_pair(cursors.end(), false);
     }
 
     std::string Assets::SearchForSound(const std::string& filename) const
@@ -190,13 +288,13 @@ namespace doge
 
     std::string Assets::SearchForMusic(const std::string& filename) const
     {
-        return SearchForAsset(filename, texture_sub_paths);
+        return SearchForAsset(filename, music_sub_paths);
     }
 
     std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
     Assets::LoadMusic(const std::string& id, const std::string& filename)
     {
-        auto path = SearchForTexture(filename);
+        auto path = SearchForMusic(filename);
 
         if (path == "")
         {

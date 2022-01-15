@@ -9,7 +9,6 @@
 #include "core/Component.hpp"
 #include "core/Assets.hpp"
 #include "core/Texture.hpp"
-#include "core/Image.hpp"
 #include "core/Scenes.hpp"
 #include "core/io.hpp"
 #include "core/Events.hpp"

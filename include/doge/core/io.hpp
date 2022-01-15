@@ -12,3 +12,4 @@
 #include "io/SoundBuffer.hpp"
 #include "io/Sound.hpp"
 #include "io/Music.hpp"
+#include "io/Cursor.hpp"
