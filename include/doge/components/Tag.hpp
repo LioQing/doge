@@ -15,10 +15,10 @@ namespace doge
             return Tag(std::unordered_set{ tag });
         }
 
-        template <std::convertible_to<std::string>... TTags>
-        static Tag Create(TTags&&... tags)
+        template <std::convertible_to<std::string>... Tags>
+        static Tag Create(Tags&&... tags)
         {
-            return Tag(std::unordered_set{ std::string(tags)... });
+            return Tag(std::unordered_set{ static_cast<std::string>(tags)... });
         }
     };
 }

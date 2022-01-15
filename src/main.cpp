@@ -1,210 +1,387 @@
 #include <iostream>
-#include <cmath>
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
-#include <doge/extensions/fsm.hpp>
+#include <box2d/box2d.h>
+#include <ctime>
+#include <algorithm>
+#include <numbers>
 
-using namespace doge;
-
-namespace ParticleSim
+namespace TestScene
 {
-    int shoot_particle = -1;
-    Vec2f shoot_particle_position;
-    Vec2f shoot_mouse_position;
-    Entity shoot_line;
-    Component<Camera>* cam_comp;
-
-    void Start(Engine& engine)
+    doge::Entity AddGreenRect(doge::Engine& e)
     {
-        // cam
-        Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
-        cam_comp = &cam.GetComponent<Camera>();
+        auto my_shape = e.AddEntity("Test", "test");
 
-        // wall
-        Entity wall = engine.AddEntity();
+        my_shape.AddComponent(doge::RigidBody
+        {
+            .type = doge::RigidBody::Type::Dynamic, 
+            //.continuous = true,
+        });
 
-        wall.AddComponent<RigidBody>(RigidBody::Type::Static);
-        wall.AddComponent(EdgeCollider
+        my_shape.AddComponent(doge::ConvexCollider
+        {
+            .points =
+            {
+                { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
+            },
+            .density = 1.f,
+            .friction = .3f,
+            .restitution = .5f,
+        });
+
+        my_shape.AddComponent<doge::Position>();
+        my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
+        // my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
+        // my_shape.AddComponent<doge::AngularVelocity>(20);
+
+        doge::physics::BodyInit init;
+        init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f * 0.01;
+        init.angular_velocity = 20.f;
+        doge::physics::SetBodyInit(my_shape, init);
+
+        my_shape.AddComponent(doge::ConvexShape
+        {
+            .points =
+            {
+                { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
+            },
+            .color = doge::Color(0x00FF0088),
+        });
+
+        my_shape.AddComponent<doge::Scale>(0.02, 0.02);
+
+        return my_shape;
+    }
+
+    void AddBlocks(doge::Engine& e)
+    {
+        for (auto i = 0; i < 10; ++i)
+        {
+            auto entity = AddGreenRect(e);
+            entity.GetComponent<doge::Position>().position = doge::Vec2f(50.f * i, 0.f) * 0.01;
+        }
+
+        for (auto i = 1; i < 11; ++i)
+        {
+            auto my_shape = e.AddEntity();
+
+            my_shape.AddComponent(doge::RigidBody
+            {
+                .type = doge::RigidBody::Type::Dynamic, 
+            });
+
+            my_shape.AddComponent(doge::CompoundCollider::Create
+            (
+                doge::CircleCollider
+                {
+                    .radius = 10.f,
+                    .origin = { 15, 0 },
+                    .density = 1.f,
+                    .friction = .3f,
+                    .restitution = .5f,
+                },
+                doge::RectangleCollider
+                {
+                    .size = { 30, 8 },
+                    .origin = { 0, 0 },
+                    .density = 1.f,
+                    .friction = .3f,
+                    .restitution = .5f,
+                }
+            ));
+
+            my_shape.AddComponent<doge::Position>(-i * 0.5, 0);
+            my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
+            // my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
+            // my_shape.AddComponent<doge::AngularVelocity>(20);
+            my_shape.AddComponent<doge::Scale>(0.01, 0.01);
+
+            doge::physics::BodyInit init;
+            init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f * 0.01;
+            init.angular_velocity = 20.f;
+            doge::physics::SetBodyInit(my_shape, init);
+
+            auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
+            (
+                doge::CircleShape
+                {
+                    .radius = 10.f,
+                    .origin = doge::Vec2f(25.f, 10.f),
+                    .color = doge::Color(0x0000FF88),
+                },
+                doge::RectangleShape
+                {
+                    .size = { 30, 8 },
+                    .origin = { 15, 4 },
+                    .color = doge::Color(0x0000FF88),
+                }
+            ));
+
+            auto aabb = e.AddEntity();
+            aabb.SetParent(my_shape);
+            aabb.AddComponent(doge::Tag::Create(std::to_string(my_shape.id)));
+            aabb.AddComponent(doge::RectangleShape
+            {
+                .color = doge::Color::Transparent(),
+                .outline_color = doge::Color::White(),
+                .outline_thickness = 0.01f,
+            });
+            aabb.AddComponent<doge::Position>();
+            aabb.AddComponent<doge::Scale>();
+            aabb.AddComponent<doge::Rotation>();
+        }
+
+        auto my_sprite = e.AddEntity();
+        my_sprite.AddComponent(doge::Sprite
+        {
+            .texture_rectangle = { 0, 0, 100, 100 },
+            .origin = { 50, 50 },
+        });
+        my_sprite.AddComponent(doge::RigidBody{ .type = doge::RigidBody::Type::Dynamic });
+        my_sprite.AddComponent<doge::Position>(0, -2);
+        my_sprite.AddComponent<doge::Rotation>();
+        my_sprite.AddComponent(doge::RectangleCollider
+        {
+            .size = { 100, 100 },
+        });
+        my_sprite.AddComponent<doge::Scale>(0.01, 0.01);
+    }
+
+    int count = 0;
+    doge::Entity cam;
+    doge::Vec2f mouse_down;
+    doge::Vec2f mouse_down_entity_pos;
+    float mouse_down_entity_rot;
+    int mouse_down_id = -1;
+    doge::Entity line;
+
+    void Start(doge::Engine& e)
+    {
+        count = 0;
+
+        cam = e.AddCamera();
+        cam.AddComponent<doge::Position>();
+        cam.AddComponent<doge::Rotation>();
+        cam.AddComponent<doge::Scale>(0.01, 0.01);
+
+        auto ground = e.AddEntity();
+        ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
+        ground.AddComponent(doge::EdgeCollider
+        {
+            .points = // shape: /\.
+            { 
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
+                doge::Vec2f(0, -100), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
+            },
+        });
+        ground.AddComponent<doge::Position>(0.f, (e.window.settings.size.y / 2.f - 100.f) * 0.01);
+
+        ground.AddComponent(doge::ConvexShape
+        {
+            .points = // shape: /\.
+            { 
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
+                doge::Vec2f(0, -100), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
+            },
+            .color = doge::Color::Red(),
+        });
+
+        ground.AddComponent<doge::Scale>(0.01, 0.01);
+
+        auto my_custom_shape = e.AddEntity();
+        my_custom_shape.AddComponent(doge::PolygonShape
+        {
+            .type = doge::PolygonShape::Type::Triangles,
+            .vertices = 
+            {
+                doge::PolygonShape::Vertex({ 0, 0 }, doge::Color::Red()),
+                doge::PolygonShape::Vertex({ 100, 100 }, doge::Color::Green()),
+                doge::PolygonShape::Vertex({ 100, 0 }, doge::Color::Blue()),
+            },
+            .origin = { 50, 50 },
+            .texture_id = "missing_texture",
+        });
+        my_custom_shape.AddComponent(doge::RigidBody(doge::RigidBody::Kinematic));
+        my_custom_shape.AddComponent(doge::ConvexCollider
         {
             .points = 
             {
-                Vec2f(-6.4, -3.6),
-                Vec2f(-6.4, 3.6),
-                Vec2f(6.4, 3.6),
-                Vec2f(6.4, -3.6),
+                doge::Vec2f(0, 0),
+                doge::Vec2f(100, 100),
+                doge::Vec2f(100, 0),
             },
-            .is_loop = true,
-            .friction = 0.1f,
-            .restitution = 0.8f,
+            .origin = { 50, 50 },
         });
+        my_custom_shape.AddComponent<doge::Rotation>();
+        my_custom_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
-        // particles
-        for (std::size_t i = 1; i <= 20; ++i)
+        doge::physics::SetBodyInit(my_custom_shape.id, doge::physics::BodyInit{ .angular_velocity = 5.f });
+
+        AddBlocks(e);
+
+        e.events.on_key_pressed += [&e](const doge::event::Key& key)
         {
-            Entity particle = engine.AddEntity();
-
-            particle.AddComponent(Tag::Create("particle"));
-
-            particle.AddComponent(CircleShape
+            if (key.key == doge::event::Key::Code::Space)
             {
-                .radius = .2f,
-                .origin = { .2f, .2f },
-                //.texture_id = "missing_texture",
-                //.texture_rectangle = Recti(0, 0, 32, 32),
-            });
+                auto scrnshot = e.window.TakeScreenshot();
 
-            particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
-            particle.AddComponent(CircleCollider
-            {
-                .radius = .2f,
-                .friction = 0.4f,
-                .restitution = 0.8f,
-            });
+                scrnshot.ToFile("screenshot.png");
+            }
+        };
 
-            particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
-            particle.AddComponent<Rotation>();
-            
-            auto& fsm = particle.AddComponent(StateMachine
-            {
-                .state = 0,
-                .transition = [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
-                {
-                    if (shoot_particle == entity.id)
-                        return 2;
-
-                    if (physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
-                        return 1;
-                    
-                    return 0;
-                }
-            });
-
-            fsm.on_entry += [&](fsm::StateType state, Entity entity, Engine& engine, DeltaTime dt)
-            {
-                if (state == 0)
-                    entity.GetComponent<CircleShape>().color = Color::Green();
-                else if (state == 1)
-                    entity.GetComponent<CircleShape>().color = Color::Red();
-                else if (state == 2)
-                    entity.GetComponent<CircleShape>().color = Color::Blue();
-            };
-        }
-
-        // shoot actions
-        shoot_line = engine.AddEntity();
-        shoot_line.AddComponent(Tag::Create("line"));
-        shoot_line.AddComponent<Position>();
-        shoot_line.AddComponent(PolygonShape
-        { 
-            .type = PolygonShape::Lines, 
-            .vertices = 
-            { 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent()), 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent()), 
-            } 
-        });
-
-        engine.events.on_mouse_button_pressed += [&](const event::MouseButton& event)
+        e.events.on_mouse_button_pressed += [&](const doge::event::MouseButton& button)
         {
-            if (event.button == event::MouseButton::Button::Left)
+            if (button.button == doge::event::MouseButton::Button::Left)
             {
-                for (auto entity : engine.Select<Tag>()
-                    .Where([](const Entity& _, const Tag& tag)
-                    { return *tag.tags.begin() == "particle"; })
-                    .Entities())
+                for (auto entity : e.Select<doge::ConvexCollider>().Entities())
                 {
-                    shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
-                    if (!physics::GetCollider(entity).TestPoint(shoot_mouse_position))
+                    mouse_down = e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>());
+                    if (!doge::physics::GetCollider(entity).TestPoint(mouse_down))
                         continue;
 
-                    shoot_line.GetComponent<Position>().position = shoot_mouse_position;
-                    for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                        vertex.color = Color::White();
-                    
-                    shoot_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
-                    shoot_particle = entity.id;
+                    line.GetComponent<doge::Position>().position = mouse_down;
+                    mouse_down_entity_pos = entity.GetIfHasComponentElseDefault<doge::Position>().position;
+                    mouse_down_entity_rot = entity.GetIfHasComponentElseDefault<doge::Rotation>().rotation;
+                    mouse_down_id = entity.id;
+
+                    std::cout << mouse_down_id << mouse_down_entity_pos << std::endl;
 
                     return;
                 }
             }
         };
 
-        engine.events.on_mouse_button_released += [&](const event::MouseButton& event)
+        e.events.on_mouse_button_released += [&](const doge::event::MouseButton& button)
         {
-            if (event.button == event::MouseButton::Button::Left)
+            if (button.button == doge::event::MouseButton::Button::Left)
             {
-                if (shoot_particle == -1) return;
+                if (mouse_down_id == -1) return;
 
-                if (!engine.HasEntity(shoot_particle) || !doge::physics::HasBody(shoot_particle))
+                std::cout << line << " " << mouse_down_id << std::endl;
+
+                if (!e.HasEntity(mouse_down_id) || !doge::physics::HasBody(mouse_down_id))
                     return;
                 
-                auto impulse = (shoot_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp));
-                physics::GetBody(shoot_particle).ApplyImpulse(impulse, shoot_mouse_position);
-
-                for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                    vertex.color = Color::Transparent();
-
-                shoot_particle = -1;
-
-                engine.assets.sounds.at("shoot").SetVolume(std::clamp(impulse.Magnitude() * 10.f, 0.f, 100.f));
-                engine.assets.sounds.at("shoot").Play();
+                doge::physics::GetBody(mouse_down_id).ApplyImpulse((mouse_down - e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>())), mouse_down);
+                mouse_down_id = -1;
             }
         };
+
+        line = e.AddEntity();
+        line.AddComponent(doge::Tag::Create("line"));
+        line.AddComponent<doge::Position>();
+        line.AddComponent(doge::PolygonShape
+        { 
+            .type = doge::PolygonShape::Lines, 
+            .vertices = 
+            { 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
+            } 
+        });
     }
 
-    void Update(Engine& engine, DeltaTime dt)
+    void Update(doge::Engine& e, doge::DeltaTime dt)
     {
-        if (shoot_particle != -1)
+        if (++count > 100)
         {
-            for (auto [tag, line, pos] : engine.Select<Tag>()
-                .Where([](EntityID entity, const Tag& tag)
-                { return *tag.tags.begin() == "line"; })
-                .Select<PolygonShape, Position>().Components())
+            AddBlocks(e);
+            count = 0;
+        }
+
+        for (auto [entity, rgbd, scale, position, convex, coll, rot] : e.Select<doge::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
+        {
+            if (entity == mouse_down_id)
             {
-                line.vertices.at(1).position = engine.window.MapPixelToCoords(engine.window.window_io.GetMousePosition(), *cam_comp) - pos.position;
+                auto body = doge::physics::GetBody(entity);
+
+                if (position.position != mouse_down_entity_pos)
+                {
+                    auto dir = (mouse_down_entity_pos - position.position);
+                    body.ApplyForce(doge::Vec2f(std::pow(10, dir.x), std::pow(10, dir.y)) * dir * 100.f);
+                }
+
+                if (rot.rotation != mouse_down_entity_rot)
+                    body.ApplyTorque((mouse_down_entity_rot - rot.rotation) * 1.f);
+            }
+            else if (doge::global::GetAABB(convex).top > e.window.settings.size.y / 2.f * 0.01)
+                e.DestroyEntity(entity);
+        }
+
+        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider>().EntitiesAndComponents())
+        {
+            auto aabb = doge::global::GetAABB(shape.circle_shapes.at(0), entity);
+
+            if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
+                e.DestroyEntity(entity);
+        }
+
+        for (auto [sprite] : e.Select<doge::Sprite>().Components())
+        {
+            if (doge::global::GetAABB(sprite).top > e.window.settings.size.y / 2.f * 0.01)
+                e.DestroyEntity(sprite.GetEntity());
+        }
+
+        for (auto [tag, position, shape, rot, scale] : e.Select<doge::Tag, doge::Position, doge::RectangleShape, doge::Rotation, doge::Scale>().Components())
+        {
+            auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::CompoundSprite>();
+            doge::Rectf aabb = doge::global::GetAABB(comp.circle_shapes.at(0), comp.GetEntity());
+            doge::global::SetPosition(position, doge::cast::PosFromRect(aabb));
+            doge::global::SetRotation(rot, 0);
+            doge::global::SetScale(scale, doge::Vec2f::One());
+            shape.size.Set(aabb.width, aabb.height);
+        }
+
+        if (mouse_down_id != -1)
+        {
+            for (auto [tag, line, pos] : e.Select<doge::Tag>().Where(
+                [](doge::EntityID entity, const doge::Tag& tag)
+                {
+                    return *tag.tags.begin() == "line";
+                }).Select<doge::PolygonShape, doge::Position>().Components())
+            {
+                line.vertices.at(1).position = e.window.MapPixelToCoords(e.window.window_io.GetMousePosition(), cam.GetComponent<doge::Camera>()) - pos.position;
             }
         }
     }
 
-    void FixedUpdate(Engine& engine, DeltaTime dt)
+    void FixedUpdate(doge::Engine& e, doge::DeltaTime dt)
     {
-        for (auto [entity, tag, position] : engine.Select<Tag>()
-            .Where([](const Entity& _, const Tag& tag)
-            { return *tag.tags.begin() == "particle"; })
-            .Select<Position>().EntitiesAndComponents())
-        {
-            if (entity != shoot_particle)
-                continue;
-            
-            physics::Body body = physics::GetBody(entity);
-
-            Vec2f diff = shoot_particle_position - position.position;
-            body.SetVelocity(diff);
-        }
     }
-}
+
+    void Finish(doge::Engine& e)
+    {
+        doge::default_functions::Finish(e);
+    }
+};
 
 int main()
 {
-    Engine engine;
-    engine.window.settings.fps = 120;
+    srand(time(0));
+    doge::Engine e;
+    e.window.settings.title = "doge test";
+    e.window.settings.fps = 120;
+    e.window.settings.v_sync = true;
+    e.scenes.fixed_time_step = 20;
 
-    engine.assets.AddSound("shoot", "shoot", "shoot.wav");
+    e.window.SetIcon("assets/textures/missing_texture.png");
 
-    physics::Enable(engine); 
-    physics::SetGravity(Vec2f(0, 9.8));
+    doge::GameLoopFunctions test;
+    test.start = TestScene::Start;
+    test.update = TestScene::Update;
+    test.fixed_update = TestScene::FixedUpdate;
+    test.finish = TestScene::Finish;
 
-    fsm::Enable(engine);
+    e.AddScene("Test", test);
 
-    GameLoopFunctions glf;
-    glf.start           = ParticleSim::Start;
-    glf.update          = ParticleSim::Update;
-    glf.fixed_update    = ParticleSim::FixedUpdate;
+    doge::physics::Enable(e);
 
-    engine.AddScene("particle_sim", glf);
+    e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Style::Default));
 
-    engine.StartScene("particle_sim", Window::Settings{ .size = Vec2u(1280, 720), .title = "Particle Simulation" });
+    doge::physics::Disable(e);
 
     return 0;
 }

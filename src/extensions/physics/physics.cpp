@@ -26,6 +26,7 @@ namespace doge
 
     void physics::Disable(Engine& engine)
     {
+        world.release();
         engine.scenes.extensions.erase("doge_physics");
     }
 
@@ -130,8 +131,12 @@ namespace doge
 
             rgbd.OnRemoval([&, eid]()
             {
+                if (bodies.find(eid) == bodies.end())
+                    return;
+                
                 if (world)
                     world->DestroyBody(bodies.at(eid));
+                
                 bodies.erase(eid);
             });
 
