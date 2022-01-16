@@ -170,9 +170,9 @@ namespace doge
         auto e = lic::AddEntity();
 
         if (all_scenes)
-            e.AddComponent<SceneInfo>();
+            e.AddComponent<EntityInfo>(true);
         else
-            e.AddComponent<SceneInfo>(std::vector<std::string>({ scenes.active_scene_id }));
+            e.AddComponent<EntityInfo>(true, std::vector<std::string>({ scenes.active_scene_id }));
         
         auto node = PCNode::AddNode(e);
 

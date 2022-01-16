@@ -10,7 +10,7 @@
 #include <unordered_set>
 
 #include <doge/utils.hpp>
-#include <doge/components/SceneInfo.hpp>
+#include <doge/components/EntityInfo.hpp>
 #include <doge/core/io.hpp>
 #include <doge/core/GameLoopFunctions.hpp>
 #include <doge/core/Window.hpp>
@@ -55,7 +55,7 @@ namespace doge
         Entity AddEntity(T... scene_ids)
         {
             auto e = lic::AddEntity();
-            e.AddComponent<SceneInfo>(std::vector<std::string>({ scene_ids... }));
+            e.AddComponent<EntityInfo>(true, std::vector<std::string>({ scene_ids... }));
         
             auto node = PCNode::AddNode(e);
 
@@ -86,9 +86,13 @@ namespace doge
         std::vector<Entity> GetChildren(EntityID eid) const;
 
         template <typename... TComps>
-        Range<TComps...> Select() const
+        Range<TComps...> Select(bool include_disabled = false) const
         {
-            return Range<TComps...>(lic::Select<SceneInfo, TComps...>(), scenes.active_scene_id);
+            if (include_disabled)
+                return Range<TComps...>(lic::Select<EntityInfo, TComps...>(), scenes.active_scene_id);
+            return Range<TComps...>(lic::Select<EntityInfo, TComps...>().Where(
+                [](lic::Entity entity, EntityInfo entity_info, TComps... c){ return entity_info.enabled; }), 
+                scenes.active_scene_id);
         }
 
         // assets

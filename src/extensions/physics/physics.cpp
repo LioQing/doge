@@ -152,6 +152,25 @@ namespace doge
             fixture->SetSensor(coll.is_trigger);
         };
 
+        // enable disable
+        for (auto [entity, entity_info, rgbd] : engine.Select<EntityInfo, RigidBody>(true).EntitiesAndComponents())
+        {
+            auto body_itr = bodies.find(rgbd.entity_id);
+            if (body_itr != bodies.end())
+            {
+                b2Body* body = body_itr->second;
+                bool is_enabled = entity_info.enabled && rgbd.enabled;
+
+                if (is_enabled != body->IsEnabled())
+                    body->SetEnabled(is_enabled);
+
+                if (!is_enabled)
+                    continue;
+                
+                body->SetAwake(rgbd.awake);
+            }
+        }
+
         // convex collider
         auto SyncConvex = [](b2PolygonShape& convex, const Entity& entity, const ConvexCollider& coll)
         {
@@ -479,12 +498,6 @@ namespace doge
             else
             {
                 b2Body* body = body_itr->second;
-
-                body->SetEnabled(rgbd.enabled);
-                if (!rgbd.enabled)
-                    continue;
-                
-                body->SetAwake(rgbd.awake);
 
                 auto pos = body->GetPosition();
                 if (entity.HasComponent<Position>())

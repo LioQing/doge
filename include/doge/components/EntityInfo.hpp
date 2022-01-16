@@ -5,8 +5,9 @@
 
 namespace doge
 {
-    struct SceneInfo
+    struct EntityInfo
     {
+        bool enabled = true;
         std::vector<std::string> scene_ids; // no scene id represent all scene
     };
 }

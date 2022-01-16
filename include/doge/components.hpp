@@ -6,7 +6,7 @@
 #include "components/RectangleShape.hpp"
 #include "components/Rotation.hpp"
 #include "components/Scale.hpp"
-#include "components/SceneInfo.hpp"
+#include "components/EntityInfo.hpp"
 #include "components/Camera.hpp"
 #include "components/RigidBody.hpp"
 #include "components/Tag.hpp"
