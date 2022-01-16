@@ -179,7 +179,7 @@ namespace ParticleSim
                 for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
                     vertex.color = Color::Transparent();
 
-                engine.GetEntity(shoot_particle).GetComponent<EntityInfo>().enabled = false;
+                // engine.GetEntity(shoot_particle).GetComponent<EntityInfo>().enabled = false;
 
                 shoot_particle = -1;
 
