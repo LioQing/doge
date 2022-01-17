@@ -21,7 +21,7 @@ namespace doge
         glf.finish = Finish;
         
         engine.scenes.extensions.emplace("doge_physics", glf);
-        world = std::make_unique<b2World>(cast::ToB2Vec2(gravity));
+        world = std::make_unique<b2World>(ToB2Vec2(gravity));
     }
 
     void physics::Disable(Engine& engine)
@@ -33,7 +33,7 @@ namespace doge
     void physics::SetGravity(const Vec2f& gravity)
     {
         if (world)
-            world->SetGravity(cast::ToB2Vec2(gravity));
+            world->SetGravity(ToB2Vec2(gravity));
         physics::gravity = gravity;
     }
 
@@ -72,6 +72,38 @@ namespace doge
     {
         return Collider(compound_fixtures.at(entity_id).at(type).at(index));
     }
+    
+    Vec2f physics::FromB2Vec2(const b2Vec2& v)
+    {
+        return Vec2f(v.x, v.y);
+    }
+
+    b2Vec2 physics::ToB2Vec2(const Vec2f& v)
+    {
+        return b2Vec2(v.x, v.y);
+    }
+
+    b2BodyType physics::ToB2BodyType(RigidBody::Type type)
+    {
+        switch (type)
+        {
+            case RigidBody::Type::Static:       return b2BodyType::b2_staticBody;
+            case RigidBody::Type::Kinematic:    return b2BodyType::b2_kinematicBody;
+            case RigidBody::Type::Dynamic:      return b2BodyType::b2_dynamicBody;
+            default: throw std::invalid_argument("Invalid b2 body type");
+        }
+    }
+
+    RigidBody::Type physics::FromB2BodyType(b2BodyType type)
+    {
+        switch (type)
+        {
+            case b2BodyType::b2_staticBody:     return RigidBody::Type::Static;
+            case b2BodyType::b2_kinematicBody:  return RigidBody::Type::Kinematic;
+            case b2BodyType::b2_dynamicBody:    return RigidBody::Type::Dynamic;
+            default: throw std::invalid_argument("Invalid b2 body type");
+        }
+    }
 
     void physics::Start(Engine& engine)
     {
@@ -83,10 +115,10 @@ namespace doge
         auto CreateBody = [&](const Entity& entity, const RigidBody& rgbd) -> b2Body*
         {
             b2BodyDef body_def;
-            body_def.type = cast::ToB2BodyType(rgbd.type);
+            body_def.type = ToB2BodyType(rgbd.type);
 
             auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
-            body_def.position = cast::ToB2Vec2(pos);
+            body_def.position = ToB2Vec2(pos);
 
             body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
 
@@ -177,7 +209,7 @@ namespace doge
             auto scale = global::GetScale(entity);
             std::vector<b2Vec2> vertices;
             std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-            [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
+            [&](const Vec2f& v) { return ToB2Vec2((v - coll.origin) * scale); });
             convex.Set(vertices.data(), vertices.size());
         };
 
@@ -218,7 +250,7 @@ namespace doge
         {
             auto scale = global::GetScale(entity);
             circle.m_radius = coll.radius * scale.x;
-            circle.m_p = cast::ToB2Vec2(-coll.origin * scale);
+            circle.m_p = ToB2Vec2(-coll.origin * scale);
         };
 
         for (auto [entity, rgbd, coll] : engine.Select<RigidBody, CircleCollider>().EntitiesAndComponents())
@@ -250,7 +282,7 @@ namespace doge
             auto scale = global::GetScale(entity);
             rect.SetAsBox(
                 coll.size.x * scale.x / 2.f, coll.size.y * scale.y / 2.f, 
-                cast::ToB2Vec2(-coll.origin), 
+                ToB2Vec2(-coll.origin), 
                 0
             );
         };
@@ -284,7 +316,7 @@ namespace doge
             auto scale = global::GetScale(entity);
             std::vector<b2Vec2> vertices;
             std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
-            [&](const Vec2f& v) { return cast::ToB2Vec2((v - coll.origin) * scale); });
+            [&](const Vec2f& v) { return ToB2Vec2((v - coll.origin) * scale); });
             if (coll.is_loop)
                 chain.CreateLoop(vertices.data(), vertices.size());
             else
@@ -402,7 +434,7 @@ namespace doge
                     b2PolygonShape rect;
                     rect.SetAsBox(
                         rectangle_coll.size.x * scale.x / 2.f, rectangle_coll.size.y * scale.y / 2.f, 
-                        cast::ToB2Vec2(rectangle_coll.origin), 
+                        ToB2Vec2(rectangle_coll.origin), 
                         0
                     );
 
@@ -488,9 +520,9 @@ namespace doge
             if (body_itr == bodies.end())
             {
                 b2BodyDef body_def;
-                body_def.type = cast::ToB2BodyType(rgbd.type);
+                body_def.type = ToB2BodyType(rgbd.type);
                 auto pos = entity.GetIfHasComponentElseDefault<Position>().position;
-                body_def.position = cast::ToB2Vec2(pos);
+                body_def.position = ToB2Vec2(pos);
                 body_def.angle = entity.GetIfHasComponentElseDefault<Rotation>().rotation;
 
                 SaveBody(entity, rgbd, world->CreateBody(&body_def));
@@ -501,7 +533,7 @@ namespace doge
 
                 auto pos = body->GetPosition();
                 if (entity.HasComponent<Position>())
-                    pos = cast::ToB2Vec2(entity.GetComponent<Position>().position);
+                    pos = ToB2Vec2(entity.GetComponent<Position>().position);
 
                 auto angle = body->GetAngle();
                 if (entity.HasComponent<Rotation>())
@@ -509,8 +541,8 @@ namespace doge
 
                 body->SetTransform(pos, angle);
 
-                if (cast::ToB2BodyType(rgbd.type) != body->GetType())
-                    body->SetType(cast::ToB2BodyType(rgbd.type));
+                if (ToB2BodyType(rgbd.type) != body->GetType())
+                    body->SetType(ToB2BodyType(rgbd.type));
 
                 body->SetBullet(rgbd.continuous);
             }
@@ -532,7 +564,7 @@ namespace doge
                 b2Body* body = body_itr->second;
 
                 if (entity.HasComponent<Position>())
-                    entity.GetComponent<Position>().position = cast::FromB2Vec2(body->GetPosition());
+                    entity.GetComponent<Position>().position = FromB2Vec2(body->GetPosition());
 
                 if (entity.HasComponent<Rotation>())
                     entity.GetComponent<Rotation>().rotation = body->GetAngle();

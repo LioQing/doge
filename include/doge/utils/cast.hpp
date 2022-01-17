@@ -81,12 +81,6 @@ namespace doge
         static Color FromSfColor(const sf::Color& color);
         static sf::Color ToSfColor(const Color& color);
 
-        static Vec2f FromB2Vec2(const b2Vec2& v);
-        static b2Vec2 ToB2Vec2(const Vec2f& v);
-
-        static b2BodyType ToB2BodyType(RigidBody::Type type);
-        static RigidBody::Type FromB2BodyType(b2BodyType type);
-
         static float ToDegree(float radian);
         static float ToRadian(float degree);
 

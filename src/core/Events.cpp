@@ -17,8 +17,8 @@ namespace doge
         {
             case t::Closed:                     on_window_closed                (                                               ); return;
             case t::Resized:                    on_window_resized               (std::get<event::Size             >(event.event)); return;
-            case t::LostFocus:                  on_window_lost_focus            (                                               ); return;
-            case t::GainedFocus:                on_window_gained_focus          (                                               ); return;
+            case t::LostFocus:                  on_window_focus_lost            (                                               ); return;
+            case t::GainedFocus:                on_window_focus_gained          (                                               ); return;
             case t::TextEntered:                on_text_entered                 (std::get<event::Text             >(event.event)); return;
             case t::KeyPressed:                 on_key_pressed                  (std::get<event::Key              >(event.event)); return;
             case t::KeyReleased:                on_key_released                 (std::get<event::Key              >(event.event)); return;

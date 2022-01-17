@@ -10,8 +10,8 @@ namespace doge
     {
         Event<                          > on_window_closed;
         Event<event::Size               > on_window_resized;
-        Event<                          > on_window_lost_focus;
-        Event<                          > on_window_gained_focus;
+        Event<                          > on_window_focus_lost;
+        Event<                          > on_window_focus_gained;
         Event<event::Text               > on_text_entered;
         Event<event::Key                > on_key_pressed;
         Event<event::Key                > on_key_released;

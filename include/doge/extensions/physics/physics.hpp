@@ -38,6 +38,12 @@ namespace doge
         static Collider GetCollider(EntityID entity_id);
         static Collider GetCollider(EntityID entity_id, Collider::Type type, std::size_t index);
 
+        static Vec2f FromB2Vec2(const b2Vec2& v);
+        static b2Vec2 ToB2Vec2(const Vec2f& v);
+
+        static b2BodyType ToB2BodyType(RigidBody::Type type);
+        static RigidBody::Type FromB2BodyType(b2BodyType type);
+
     private:
 
         static std::unique_ptr<b2World> world;

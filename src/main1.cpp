@@ -4,6 +4,7 @@
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
 #include <doge/extensions/fsm.hpp>
+#include <doge/extensions/gui.hpp>
 
 using namespace doge;
 

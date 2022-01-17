@@ -30,7 +30,6 @@ set(SRC_FILES
     utils/default_functions.cpp
     core/PCNode.cpp
     core/Range.cpp
-    extensions/physics/physics.cpp
     utils/math.cpp
     core/Texture.cpp
     core/Assets.cpp
@@ -43,13 +42,22 @@ set(SRC_FILES
     core/io/Sensor.cpp
     core/io/Event.cpp
     core/Events.cpp
-    extensions/physics/PhysicsBody.cpp
-    extensions/physics/PhysicsCollider.cpp
     core/io/SoundBuffer.cpp
     core/io/Sound.cpp
     core/io/Music.cpp
-    extensions/fsm/fsm.cpp
     core/io/Cursor.cpp
+
+    # physics
+    extensions/physics/physics.cpp
+    extensions/physics/PhysicsBody.cpp
+    extensions/physics/PhysicsCollider.cpp
+
+    # fsm
+    extensions/fsm/fsm.cpp
+
+    # gui
+    extensions/gui/gui.cpp
+    extensions/gui/GUIElement.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
@@ -71,7 +79,7 @@ add_executable(test
     main1.cpp
 )
 
-target_link_libraries(test ${PROJECT_NAME}-static ${SFML_LIBS})
+target_link_libraries(test ${PROJECT_NAME}-static)
 
 add_custom_command(TARGET test PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
