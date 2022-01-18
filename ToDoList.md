@@ -14,10 +14,10 @@
       - [ ] combo box
       - [ ] text box
     - [ ] containers
-      - [ ] grid
-      - [ ] list (specialization of scrollable)
-      - [ ] scrollable (elements are free to move)
       - [ ] window (elements are free to move)
+      - [ ] scrollable (elements are free to move)
+      - [ ] grid
+      - [ ] list
     - [ ] outputs
       - [ ] dialog box
       - [ ] text
@@ -28,7 +28,7 @@
     - [ ] draggable
   - [ ] assets
 - [ ] extension: advanced sprites
-  - [ ] remove sprite sheet member of texture and unify all io classes
+  - [x] remove sprite sheet member of texture and unify all io classes into doge::io
   - [ ] texture atlas
   - [ ] nine slice
 

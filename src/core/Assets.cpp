@@ -39,10 +39,10 @@ namespace doge
         return SearchForAsset(filename, texture_sub_paths);
     }
 
-    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, const std::string& filename, const Recti& area)
     {
-        Texture texture;
+        io::Texture texture;
         auto path = SearchForTexture(filename);
 
         if (path == "")
@@ -57,10 +57,10 @@ namespace doge
         return std::make_pair(textures.end(), false);
     }
 
-    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& area)
     {
-        Texture texture;
+        io::Texture texture;
 
         if (texture.FromMemory(data, size, area))
             return textures.emplace(id, texture);
@@ -68,10 +68,10 @@ namespace doge
         return std::make_pair(textures.end(), false);
     }
 
-    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, const io::Image& image, const Recti& area)
     {
-        Texture texture;
+        io::Texture texture;
 
         if (texture.FromImage(image, area))
             return textures.emplace(id, texture);

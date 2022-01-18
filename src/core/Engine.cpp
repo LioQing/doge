@@ -16,7 +16,7 @@ namespace doge
         window.CreateWindow();
 
         if (assets.LoadTexture("missing_texture", "missing_texture.png").second)
-            assets.textures.at("missing_texture").SetRenderOptions(Texture::RenderOptions::Repeated);
+            assets.textures.at("missing_texture").SetRepeated(true);
     }
 
     void Engine::CloseWindow()

@@ -60,7 +60,7 @@ namespace doge::io
             shape.setOutlineThickness(comp.outline_thickness);
             if (comp.texture_id != "")
             {
-                shape.setTexture(&engine.assets.textures.at(comp.texture_id).texture_io.texture);
+                shape.setTexture(&engine.assets.textures.at(comp.texture_id).texture);
                 shape.setTextureRect(cast::ToSfRect(comp.texture_rectangle));
             }
             else
@@ -229,7 +229,7 @@ namespace doge::io
         auto SyncSprite = [&](sf::Sprite& sprite, const Sprite& sprite_comp, const Entity& entity)
         {
             SyncTransformable(sprite, sprite_comp, entity);
-            sprite.setTexture(engine.assets.textures.at(sprite_comp.texture_id).texture_io.texture);
+            sprite.setTexture(engine.assets.textures.at(sprite_comp.texture_id).texture);
             sprite.setTextureRect(cast::ToSfRect(sprite_comp.texture_rectangle));
             sprite.setColor(cast::ToSfColor(sprite_comp.color));
         };
@@ -274,7 +274,7 @@ namespace doge::io
 
             if (polygon_comp.texture_id != "")
             {
-                vertices.texture = &engine.assets.textures.at(polygon_comp.texture_id).texture_io.texture;
+                vertices.texture = &engine.assets.textures.at(polygon_comp.texture_id).texture;
             }
             else
             {

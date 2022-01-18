@@ -3,7 +3,6 @@
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Color.hpp>
-#include <doge/core/Texture.hpp>
 
 namespace doge
 {

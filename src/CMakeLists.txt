@@ -31,7 +31,6 @@ set(SRC_FILES
     core/PCNode.cpp
     core/Range.cpp
     utils/math.cpp
-    core/Texture.cpp
     core/Assets.cpp
     core/io/Image.cpp
     core/io/Texture.cpp

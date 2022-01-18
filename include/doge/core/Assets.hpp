@@ -13,12 +13,12 @@ namespace doge
 {
     struct Engine;
     struct Entity;
-    struct Texture;
     struct Prefab;
 
     namespace io
     {
         struct Image;
+        struct Texture;
         struct Cursor;
         struct SoundBuffer;
         struct Sound;
@@ -30,7 +30,7 @@ namespace doge
         std::unordered_set<std::string> asset_paths = { "assets" };
 
         std::unordered_set<std::string> texture_sub_paths = { "textures" };
-        std::unordered_map<std::string, Texture> textures; // require windows to be created
+        std::unordered_map<std::string, io::Texture> textures; // require windows to be created
         
         std::unordered_set<std::string> image_sub_paths = { "images" };
         std::unordered_map<std::string, io::Image> images;
@@ -51,13 +51,13 @@ namespace doge
 
         std::string SearchForTexture(const std::string& filename) const;
 
-        std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, const std::string& filename, const Recti& area = Recti());
 
-        std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& area = Recti());
 
-        std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, const io::Image& image, const Recti& area = Recti());
 
         std::string SearchForImage(const std::string& filename) const;
