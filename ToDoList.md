@@ -3,6 +3,9 @@
 - [x] enable disable for entities
 - [ ] render layer for drawable components
 - [ ] visibility component to support drawable to be only on drawn on certain camera
+- [ ] extension: physics
+  - [ ] collider take reference of rgbd, so parent child entities can use one rgbd
+
 - [ ] extension: gui
   - [ ] main class gui
   - [ ] widgets
@@ -27,7 +30,7 @@
     - [ ] padding
     - [ ] draggable
   - [ ] assets
-- [ ] extension: advanced sprites
+- [ ] advance sprite
   - [x] remove sprite sheet member of texture and unify all io classes into doge::io
   - [ ] texture atlas
   - [ ] nine slice

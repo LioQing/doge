@@ -6,3 +6,4 @@
 #include "physics/ConvexCollider.hpp"
 #include "physics/EdgeCollider.hpp"
 #include "physics/RectangleCollider.hpp"
+#include "physics/RigidBody.hpp"

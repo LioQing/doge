@@ -2,7 +2,7 @@
 
 #include <box2d/box2d.h>
 #include <doge/core/Entity.hpp>
-#include <doge/components/RigidBody.hpp>
+#include <doge/extensions/physics/RigidBody.hpp>
 #include <doge/extensions/physics/PhysicsBody.hpp>
 #include <doge/extensions/physics/PhysicsCollider.hpp>
 #include <doge/extensions/physics/PhysicsBodyInit.hpp>

@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
-#include <doge/components/RigidBody.hpp>
 #include <doge/components/PolygonShape.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
