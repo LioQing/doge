@@ -5,7 +5,7 @@
 namespace doge
 {
     std::map<std::string, std::reference_wrapper<gui::Component>> gui::elements;
-    std::list<std::reference_wrapper<gui::Component>> gui::idless_elements;
+    std::vector<std::reference_wrapper<gui::Component>> gui::idless_elements;
 
     void gui::Enable(Engine& engine)
     {

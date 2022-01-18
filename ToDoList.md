@@ -13,12 +13,11 @@
       - [ ] color picker
       - [ ] combo box
       - [ ] text box
-    - [ ] collection views
+    - [ ] containers
       - [ ] grid
-      - [ ] scrollable
       - [ ] list (specialization of scrollable)
-    - [ ] container
-      - [ ] window
+      - [ ] scrollable (elements are free to move)
+      - [ ] window (elements are free to move)
     - [ ] outputs
       - [ ] dialog box
       - [ ] text
@@ -32,5 +31,4 @@
   - [ ] remove sprite sheet member of texture and unify all io classes
   - [ ] texture atlas
   - [ ] nine slice
-
 

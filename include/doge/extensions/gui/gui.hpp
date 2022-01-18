@@ -5,7 +5,7 @@
 #include <doge/extensions/gui/GUIElement.hpp>
 #include <doge/core/Engine.hpp>
 #include <map>
-#include <list>
+#include <vector>
 #include <memory>
 #include <doge/utils/aliases.hpp>
 
@@ -38,7 +38,7 @@ namespace doge
     private:
 
         static std::map<std::string, std::reference_wrapper<Component>> elements;
-        static std::list<std::reference_wrapper<Component>> idless_elements;
+        static std::vector<std::reference_wrapper<Component>> idless_elements;
 
         static void Start(Engine& engine);
         static void Update(Engine& engine, DeltaTime dt);
