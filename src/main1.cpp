@@ -21,6 +21,10 @@ namespace ParticleSim
         // cam
         Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
         cam_comp = &cam.GetComponent<Camera>();
+
+        // smaller cam
+        Entity subcam = engine.AddCamera(Vec2f(12.8, 7.2), Rectf(0, 0, 0.25, 0.25));
+        subcam.AddComponent(Layer::Create(0, -1));
         
         // square for testing layer rendering
         Entity foreground = engine.AddEntity();

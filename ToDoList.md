@@ -1,10 +1,11 @@
 # To Do List
 
 - [x] enable disable for entities
-- [ ] render layer for drawable components
-- [ ] visibility component to support drawable to be only on drawn on certain camera
+- [x] render layer for drawable components
+- [x] visibility component to support drawable to be only on drawn on certain camera
 - [ ] extension: gui
   - [ ] main class gui
+  - [ ] gui camera
   - [ ] widgets
     - [ ] inputs
       - [ ] button
@@ -33,5 +34,4 @@
   - [ ] nine slice
 - [ ] rework physics extensions
   - [ ] make collider attach to rgbd instead of entity with rgbd
-
 

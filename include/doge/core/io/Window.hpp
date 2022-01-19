@@ -7,6 +7,7 @@
 #include <set>
 #include <variant>
 #include <array>
+#include <optional>
 #include <SFML/Graphics.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/aliases.hpp>
@@ -36,9 +37,10 @@ namespace doge
                 Convex, Circle, Rectangle, SpriteType, Polygon
             };
 
-            using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;
+            using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>; // eid, draw type, index
+            using ViewInfo = std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>; // view, layer, draw key
             
-            std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>> views_draws;
+            std::unordered_map<EntityID, ViewInfo> views_draws;
             std::map<DrawableKey, int> draws_layers;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 

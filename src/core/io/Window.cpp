@@ -148,7 +148,7 @@ namespace doge::io
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, std::make_pair(std::make_unique<sf::View>(), std::set<DrawableKey>())).first;
+                view_itr = views_draws.emplace(entity.id, ViewInfo(std::make_unique<sf::View>(), std::set<DrawableKey>())).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
@@ -349,11 +349,12 @@ namespace doge::io
         }
 
         // layers_draws
-        std::multimap<int, DrawableKey> layers_draws;
+        std::map<int, std::set<DrawableKey>> layers_draws;
         
-        std::transform(draws_layers.begin(), draws_layers.end(), std::inserter(layers_draws, layers_draws.end()), 
-        [](const std::pair<DrawableKey, int>& p)
-        { return std::make_pair(p.second, p.first); });
+        for (auto& [draw, layer] : draws_layers)
+        {
+            layers_draws[layer].emplace(draw);
+        }
 
         // draw
         window.clear(cast::ToSfColor(background_color));
@@ -364,10 +365,32 @@ namespace doge::io
             window.setView(*view);
 
             // draw
-            for (auto& [layer, layer_draw_key] : layers_draws)
+            if (engine.GetEntity(eid).HasComponent<Layer>())
             {
-                if (draw_keys.contains(layer_draw_key))
-                    window.draw(*drawables.at(layer_draw_key));
+                auto& layers = engine.GetEntity(eid).GetComponent<Layer>().layers;
+
+                for (auto& [layer, layer_draw_keys] : layers_draws)
+                {
+                    if (!layers.contains(layer))
+                        continue;
+
+                    for (auto& draw_key : layer_draw_keys)
+                    {
+                        if (draw_keys.contains(draw_key))
+                            window.draw(*drawables.at(draw_key));
+                    }
+                }
+            }
+            else
+            {
+                for (auto& [layer, layer_draw_keys] : layers_draws)
+                {
+                    for (auto& draw_key : layer_draw_keys)
+                    {
+                        if (draw_keys.contains(draw_key))
+                            window.draw(*drawables.at(draw_key));
+                    }
+                }
             }
         }
     }
