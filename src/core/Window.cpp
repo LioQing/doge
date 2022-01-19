@@ -71,15 +71,15 @@ namespace doge
 
     Vec2f Window::GetAutoResizedCameraSize(const Camera& cam) const
     {
-        return settings.size * cast::SizeFromRect(cam.port);
+        return settings.size * cam.port.GetSize();
     }
 
     Vec2f Window::MapPixelToCoords(const Vec2i& pixel, const Component<Camera>& camera) const
     {
         auto entity = camera.GetEntity();
         auto size = window_io.GetSize();
-        auto port_pos = cast::PosFromRect(camera.port) * size;
-        auto port_size = cast::SizeFromRect(camera.port) * size;
+        auto port_pos = camera.port.GetPosition() * size;
+        auto port_size = camera.port.GetSize() * size;
         auto cam_size = camera.size;
         if (cam_size == Vec2f::Zero())
             cam_size = size;
@@ -92,8 +92,8 @@ namespace doge
     {
         auto entity = camera.GetEntity();
         auto size = window_io.GetSize();
-        auto port_pos = cast::PosFromRect(camera.port) * size;
-        auto port_size = cast::SizeFromRect(camera.port) * size;
+        auto port_pos = camera.port.GetPosition() * size;
+        auto port_size = camera.port.GetSize() * size;
         auto cam_size = camera.size;
         if (cam_size == Vec2f::Zero())
             cam_size = size;

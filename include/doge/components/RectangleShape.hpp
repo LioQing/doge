@@ -14,6 +14,7 @@ namespace doge
         Color outline_color = Color::White();
         float outline_thickness = 0.f;
         std::string texture_id = "";
+        std::string atlas_rectangle_id = "";
         Recti texture_rectangle = Recti();
     };
 }

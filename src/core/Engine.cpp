@@ -5,7 +5,7 @@
 #include <vector>
 #include <doge/utils.hpp>
 #include <doge/components.hpp>
-#include <doge/core/io/Window.hpp>
+#include <doge/core.hpp>
 
 namespace doge
 {

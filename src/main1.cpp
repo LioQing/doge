@@ -18,6 +18,13 @@ namespace ParticleSim
 
     void Start(Engine& engine)
     {
+        // texture
+        auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
+        if (success)
+        {
+            itr->second.atlas_rectangles.emplace("base", Recti(0, 0, 32, 32));
+        }
+
         // cam
         Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
         cam_comp = &cam.GetComponent<Camera>();
@@ -33,7 +40,7 @@ namespace ParticleSim
         foreground.AddComponent(RectangleShape
         {
             .size = Vec2f(0.7, 0.7),
-            .origin = Vec2i(0.35, 0.35),
+            .origin = Vec2f(0.35, 0.35),
             .color = Color::Yellow(),
         });
 
@@ -42,7 +49,7 @@ namespace ParticleSim
         midground.AddComponent(RectangleShape
         {
             .size = Vec2f(0.5, 0.5),
-            .origin = Vec2i(0.25, 0.25),
+            .origin = Vec2f(0.25, 0.25),
             .color = Color::Cyan(),
         });
 
@@ -52,7 +59,7 @@ namespace ParticleSim
         background.AddComponent(RectangleShape
         {
             .size = Vec2f(0.9, 0.9),
-            .origin = Vec2i(0.45, 0.45),
+            .origin = Vec2f(0.45, 0.45),
             .color = Color::Magenta(),
         });
 
@@ -85,6 +92,7 @@ namespace ParticleSim
             {
                 .radius = .2f,
                 .origin = { .2f, .2f },
+                .texture_id = "icons",
                 .texture_rectangle = Recti(0, 0, 32, 32),
             });
 
@@ -138,13 +146,14 @@ namespace ParticleSim
             fsm.state_machines.at(1).on_entry += 
             [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
             {
+                auto& base_rect = engine.assets.textures.at("icons").atlas_rectangles.at("base");
                 if (state == 0)
                 {
-                    entity.GetComponent<CircleShape>().texture_id = "";
+                    entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
                 }
                 else if (state == 1)
                 {
-                    entity.GetComponent<CircleShape>().texture_id = "missing_texture";
+                    entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
                 }
             };
         }

@@ -329,7 +329,7 @@ namespace TestScene
         {
             auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::CompoundSprite>();
             doge::Rectf aabb = doge::global::GetAABB(comp.circle_shapes.at(0), comp.GetEntity());
-            doge::global::SetPosition(position, doge::cast::PosFromRect(aabb));
+            doge::global::SetPosition(position, aabb.GetPosition());
             doge::global::SetRotation(rot, 0);
             doge::global::SetScale(scale, doge::Vec2f::One());
             shape.size.Set(aabb.width, aabb.height);

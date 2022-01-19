@@ -60,8 +60,21 @@ namespace doge::io
             shape.setOutlineThickness(comp.outline_thickness);
             if (comp.texture_id != "")
             {
-                shape.setTexture(&engine.assets.textures.at(comp.texture_id).texture);
-                shape.setTextureRect(cast::ToSfRect(comp.texture_rectangle));
+                auto& texture = engine.assets.textures.at(comp.texture_id);
+                shape.setTexture(&texture.texture);
+
+                Recti rect = comp.texture_rectangle;
+                if (!comp.atlas_rectangle_id.empty())
+                {
+                    rect = texture.atlas_rectangles.at(comp.atlas_rectangle_id);
+                }
+                else if (rect.width == 0 && rect.height == 0)
+                {
+                    rect.width = texture.GetSize().x;
+                    rect.height = texture.GetSize().y;
+                }
+
+                shape.setTextureRect(cast::ToSfRect(rect));
             }
             else
             {
@@ -251,8 +264,22 @@ namespace doge::io
         auto SyncSprite = [&](sf::Sprite& sprite, const Sprite& sprite_comp, const Entity& entity)
         {
             SyncTransformable(sprite, sprite_comp, entity);
-            sprite.setTexture(engine.assets.textures.at(sprite_comp.texture_id).texture);
-            sprite.setTextureRect(cast::ToSfRect(sprite_comp.texture_rectangle));
+
+            auto& texture = engine.assets.textures.at(sprite_comp.texture_id);
+            sprite.setTexture(texture.texture);
+
+            Recti rect = sprite_comp.texture_rectangle;
+            if (!sprite_comp.atlas_rectangle_id.empty())
+            {
+                rect = texture.atlas_rectangles.at(sprite_comp.atlas_rectangle_id);
+            }
+            else if (rect.width == 0 && rect.height == 0)
+            {
+                rect.width = texture.GetSize().x;
+                rect.height = texture.GetSize().y;
+            }
+
+            sprite.setTextureRect(cast::ToSfRect(rect));
             sprite.setColor(cast::ToSfColor(sprite_comp.color));
         };
 

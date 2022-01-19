@@ -88,7 +88,7 @@ namespace doge
 
         auto end_x = (Vec2f(circle.radius, 0).Rotated(rotation) * scale).Magnitude();
         auto end_y = (Vec2f(0, circle.radius).Rotated(rotation) * scale).Magnitude();
-        return cast::RectFromVec2(
+        return Rectf(
             ((-circle.origin + Vec2f(circle.radius, circle.radius)) * scale).Rotated(rotation) - Vec2f(end_x, end_y) + GetPosition(entity),
             Vec2f(end_x, end_y) * 2.f
         );
