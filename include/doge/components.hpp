@@ -9,6 +9,7 @@
 #include "components/EntityInfo.hpp"
 #include "components/Camera.hpp"
 #include "components/Tag.hpp"
+#include "components/Layer.hpp"
 #include "components/CompoundSprite.hpp"
 #include "components/Sprite.hpp"
 #include "components/PolygonShape.hpp"

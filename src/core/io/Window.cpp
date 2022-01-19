@@ -71,6 +71,29 @@ namespace doge::io
 
         auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(const DrawableKey& key, Component<TComp>& comp)
         {
+            // draws_layers
+            auto layer_comp = comp.GetEntity().GetIfHasComponentElseDefault<Layer>();
+            if (layer_comp.layers.size() < 1)
+                throw std::invalid_argument("Layer component of Entity have no layer information");
+            int layer = *layer_comp.layers.rbegin();
+
+            auto layer_itr = draws_layers.find(key);
+            if (layer_itr == draws_layers.end())
+            {
+                auto [layer_itr_, success] = draws_layers.emplace(key, layer);
+                if (!success)
+                {
+                    throw std::invalid_argument("Failed to emplace layer info for entity");
+                }
+                layer_itr = std::move(layer_itr_);
+                comp.OnRemoval([&, val_key = key](){ draws_layers.erase(val_key); });
+            }
+            else
+            {
+                layer_itr->second = layer;
+            }
+
+            // drawables
             auto draw_itr = drawables.find(key);
             if (draw_itr != drawables.end())
                 return draw_itr;
@@ -78,7 +101,7 @@ namespace doge::io
             auto [draw_itr_, success] = drawables.emplace(key, static_cast<std::unique_ptr<sf::Drawable>>(std::make_unique<TSfShape>()));
             if (!success)
             {
-                throw std::invalid_argument(std::string("More than one shape is found in Entity ") + std::to_string(std::get<0>(key)));
+                throw std::invalid_argument("More than one shape is found in entity");
             }
             draw_itr = std::move(draw_itr_);
             comp.OnRemoval([&, val_key = key](){ drawables.erase(val_key); });
@@ -88,8 +111,7 @@ namespace doge::io
         auto InAnyViewHelper = [&]<typename TComp>(
             const TComp& comp, 
             const Entity& entity, 
-            const DrawableKey& key
-            )
+            const DrawableKey& key)
         {
             auto is_in_any_view = false;
             Rectf aabb = global::GetAABB(comp, entity);
@@ -326,6 +348,13 @@ namespace doge::io
             }
         }
 
+        // layers_draws
+        std::multimap<int, DrawableKey> layers_draws;
+        
+        std::transform(draws_layers.begin(), draws_layers.end(), std::inserter(layers_draws, layers_draws.end()), 
+        [](const std::pair<DrawableKey, int>& p)
+        { return std::make_pair(p.second, p.first); });
+
         // draw
         window.clear(cast::ToSfColor(background_color));
         for (auto& [eid, view_draw] : views_draws)
@@ -335,9 +364,10 @@ namespace doge::io
             window.setView(*view);
 
             // draw
-            for (auto draw_key : draw_keys)
+            for (auto& [layer, layer_draw_key] : layers_draws)
             {
-                window.draw(*drawables.at(draw_key));
+                if (draw_keys.contains(layer_draw_key))
+                    window.draw(*drawables.at(layer_draw_key));
             }
         }
     }

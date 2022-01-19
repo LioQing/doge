@@ -39,6 +39,7 @@ namespace doge
             using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>;
             
             std::unordered_map<EntityID, std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>> views_draws;
+            std::map<DrawableKey, int> draws_layers;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 
             doge::Event<sf::Event> sf_event;

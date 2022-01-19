@@ -21,6 +21,36 @@ namespace ParticleSim
         // cam
         Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
         cam_comp = &cam.GetComponent<Camera>();
+        
+        // square for testing layer rendering
+        Entity foreground = engine.AddEntity();
+        foreground.AddComponent(Layer::Create(1));
+        foreground.AddComponent(Position(-0.5, 0));
+        foreground.AddComponent(RectangleShape
+        {
+            .size = Vec2f(0.7, 0.7),
+            .origin = Vec2i(0.35, 0.35),
+            .color = Color::Yellow(),
+        });
+
+        Entity midground = engine.AddEntity();
+        midground.AddComponent(Position(0, 0));
+        midground.AddComponent(RectangleShape
+        {
+            .size = Vec2f(0.5, 0.5),
+            .origin = Vec2i(0.25, 0.25),
+            .color = Color::Cyan(),
+        });
+
+        Entity background = engine.AddEntity();
+        background.AddComponent(Layer::Create(-1));
+        background.AddComponent(Position(0.5, 0));
+        background.AddComponent(RectangleShape
+        {
+            .size = Vec2f(0.9, 0.9),
+            .origin = Vec2i(0.45, 0.45),
+            .color = Color::Magenta(),
+        });
 
         // wall
         Entity wall = engine.AddEntity();
