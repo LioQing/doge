@@ -18,6 +18,15 @@ namespace doge
         using Texture = NineSliceTexture;
         using SpriteFactory = NineSliceSpriteFactory;
 
+        enum BorderThickness
+        {
+            Unchange,
+            Stretch,
+            TileScale,
+            HorizontalScale,
+            VerticalScale,
+        };
+
         nine_slice(const nine_slice&) = delete;
 
         static std::string TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id);
@@ -55,13 +64,35 @@ namespace doge
             Assets& assets,
             Entity entity,
             const std::string& texture_id,
-            const Vec2f& size,
+            const Vec2f& size = Vec2f::Zero(),
             const Vec2i& center_texture_size = Vec2i::Zero(),
             const Rectf& border_thickness = Rectf(),
             const Vec2f& origin = Vec2f::Zero(),
             const Color& color = Color::White());
+        
+        static Component<CompoundSprite>& Add9SliceSprite(
+            Assets& assets,
+            Entity entity,
+            const std::string& texture_id,
+            const Vec2f& tile_size,
+            const Vec2u& tile_count = Vec2u::One(),
+            BorderThickness border_thickness = BorderThickness::Stretch,
+            const Vec2f& origin = Vec2f::Zero(),
+            const Color& color = Color::White());
 
     private:
+
+        static void Update9SliceSprite(
+            Assets& assets,
+            Entity entity,
+            std::vector<Sprite>& sprites,
+            const Texture& texture,
+            const Vec2f& center_texture_size,
+            const Vec2f& size,
+            const Rectf& border_thickness,
+            const Vec2f& origin,
+            const Color& color
+        );
 
         static std::unordered_map<std::string, NineSliceTexture> textures;
     };

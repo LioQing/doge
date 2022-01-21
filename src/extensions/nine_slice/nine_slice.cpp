@@ -227,31 +227,92 @@ namespace doge
         auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
         auto bord_thick = border_thickness == Rectf() ? 
             Rectf(
-                slice_tex.border_thickness.GetPosition() * rect_size / (slice_tex.texture_rectangle.GetSize() + center_texture_size), 
-                slice_tex.border_thickness.GetSize() * rect_size / (slice_tex.texture_rectangle.GetSize() + center_texture_size)
+                slice_tex.border_thickness.GetPosition() * rect_size / slice_tex.texture_rectangle.GetSize(), 
+                slice_tex.border_thickness.GetSize() * rect_size / slice_tex.texture_rectangle.GetSize()
             ) : 
             border_thickness;
 
+        Update9SliceSprite(assets, entity, sprites, slice_tex, center_texture_size, rect_size, bord_thick, origin, color);
+
+        return comp_sprite;
+    }
+
+    Component<CompoundSprite>& nine_slice::Add9SliceSprite(
+        Assets& assets,
+        Entity entity,
+        const std::string& texture_id,
+        const Vec2f& tile_size,
+        const Vec2u& tile_count,
+        BorderThickness border_thickness_option,
+        const Vec2f& origin,
+        const Color& color)
+    {
+        auto& comp_sprite = entity.AddComponent<CompoundSprite>();
+        auto& sprites = comp_sprite.sprites;
+        auto& slice_tex = textures.at(texture_id);
+
+        auto texture_center_size = assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
+        auto center_texture_size = texture_center_size * tile_count;
+
+        auto size = tile_size * tile_count;
+
+        auto border_thickness = slice_tex.border_thickness;
+        if (border_thickness_option == BorderThickness::Stretch)
+        {
+            border_thickness.SetPosition(border_thickness.GetPosition() * size / slice_tex.texture_rectangle.GetSize());
+            border_thickness.SetSize(border_thickness.GetSize() * size / slice_tex.texture_rectangle.GetSize());
+        }
+        else if (border_thickness_option == BorderThickness::TileScale)
+        {
+            border_thickness.SetPosition(border_thickness.GetPosition() * tile_size / slice_tex.texture_rectangle.GetSize());
+            border_thickness.SetSize(border_thickness.GetSize() * tile_size / slice_tex.texture_rectangle.GetSize());
+        }
+        else if (border_thickness_option == BorderThickness::HorizontalScale)
+        {
+            border_thickness.SetPosition(border_thickness.GetPosition() * size.x / slice_tex.texture_rectangle.GetSize().x);
+            border_thickness.SetSize(border_thickness.GetSize() * size.x / slice_tex.texture_rectangle.GetSize().x);
+        }
+        else if (border_thickness_option == BorderThickness::VerticalScale)
+        {
+            border_thickness.SetPosition(border_thickness.GetPosition() * size.y / slice_tex.texture_rectangle.GetSize().y);
+            border_thickness.SetSize(border_thickness.GetSize() * size.y / slice_tex.texture_rectangle.GetSize().y);
+        }
+
+        Update9SliceSprite(assets, entity, sprites, slice_tex, center_texture_size, size, border_thickness, origin, color);
+
+        return comp_sprite;
+    }
+
+    void nine_slice::Update9SliceSprite(
+        Assets& assets,
+        Entity entity,
+        std::vector<Sprite>& sprites,
+        const Texture& texture,
+        const Vec2f& center_texture_size,
+        const Vec2f& size,
+        const Rectf& border_thickness,
+        const Vec2f& origin,
+        const Color& color)
+    {
         auto tl0 = Vec2f::Zero();
-        auto tl1 = bord_thick.GetPosition();
-        auto tl2 = rect_size - bord_thick.GetSize();
-        auto tl3 = rect_size;
+        auto tl1 = border_thickness.GetPosition();
+        auto tl2 = size - border_thickness.GetSize();
+        auto tl3 = size;
 
         sprites.resize(Texture::Slice::Count);
 
-        sprites.at(Texture::Slice::Center)  .size = rect_size - bord_thick.GetPosition() - bord_thick.GetSize();
-
-        sprites.at(Texture::Slice::Top)     .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.top     * Vec2f::j();
-        sprites.at(Texture::Slice::Left)    .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.left    * Vec2f::i();
-        sprites.at(Texture::Slice::Bottom)  .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.height  * Vec2f::j();
-        sprites.at(Texture::Slice::Right)   .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.width   * Vec2f::i();
-
-        sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(bord_thick.left,    bord_thick.top);
-        sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(bord_thick.left,    bord_thick.height);
-        sprites.at(Texture::Slice::BottomRight) .size = Vec2f(bord_thick.width,   bord_thick.height);
-        sprites.at(Texture::Slice::TopRight)    .size = Vec2f(bord_thick.width,   bord_thick.top);
-
+        sprites.at(Texture::Slice::Center)  .size = size - border_thickness.GetPosition() - border_thickness.GetSize();
         sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
+
+        sprites.at(Texture::Slice::Top)     .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + border_thickness.top     * Vec2f::j();
+        sprites.at(Texture::Slice::Left)    .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + border_thickness.left    * Vec2f::i();
+        sprites.at(Texture::Slice::Bottom)  .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + border_thickness.height  * Vec2f::j();
+        sprites.at(Texture::Slice::Right)   .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + border_thickness.width   * Vec2f::i();
+
+        sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(border_thickness.left,    border_thickness.top);
+        sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(border_thickness.left,    border_thickness.height);
+        sprites.at(Texture::Slice::BottomRight) .size = Vec2f(border_thickness.width,   border_thickness.height);
+        sprites.at(Texture::Slice::TopRight)    .size = Vec2f(border_thickness.width,   border_thickness.top);
 
         sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::i());
         sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::j());
@@ -270,10 +331,8 @@ namespace doge
     
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            sprites.at(i).texture_id = slice_tex.textures.at(i);
+            sprites.at(i).texture_id = texture.textures.at(i);
             sprites.at(i).color = color;
         }
-
-        return comp_sprite;
     }
 }

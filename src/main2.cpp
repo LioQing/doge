@@ -45,15 +45,21 @@ namespace Test2
         nine_slice::Add9SliceSprite(
             engine.assets,
             crate_9sliced2,
-            nine_slice::SpriteFactory
-            {
-                .texture_id = "crate",
-                .size = Vec2f(200, 200),
-                .center_texture_size = Vec2i(46, 46),
-                .border_thickness = Rectf(40, 50, 50, 40),
-                .origin = Vec2f(100, 100)
-            }
+            "crate",
+            Vec2f(100, 100),
+            Vec2u(2, 2),
+            nine_slice::BorderThickness::TileScale,
+            Vec2f(100, 100)
         );
+
+        Entity ind = engine.AddEntity();
+        ind.AddComponent(Position(-150, 0));
+        ind.AddComponent(CircleShape
+        {
+            .radius = 5.f,
+            .origin = Vec2f(5.f, 5.f),
+            .color = Color::Green(),
+        });
     }
 
     void Update(Engine& engine, DeltaTime dt)

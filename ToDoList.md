@@ -32,7 +32,8 @@
   - [ ] assets
 - [ ] extension: nine_slice
   - [x] nine slice
-  - [ ] even simpler sprite creation process (add options)
+  - [x] even simpler sprite creation process (add options)
+  - [ ] potentially more creation options (also the logic is a bit messy for now)
 - [ ] rework physics extensions
   - [ ] make collider attach to rgbd instead of entity with rgbd
 
