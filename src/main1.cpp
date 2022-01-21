@@ -19,11 +19,16 @@ namespace ParticleSim
     void Start(Engine& engine)
     {
         // texture
-        auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
-        if (success)
-        {
-            itr->second.atlas_rectangles.emplace("base", Recti(0, 0, 32, 32));
-        }
+        // {
+        //     auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
+        //     if (success)
+        //     {
+        //         itr->second.atlas_rectangles = std::unordered_map<std::string, Recti>{{ "base", Recti(0, 0, 32, 32) }};
+        //     }
+        // }
+
+        engine.assets.LoadTexture("crate", "test2.png");
+        engine.assets.LoadTexture("crate_center", "test2.png", Recti(4, 5, 23, 23));
 
         // cam
         Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
@@ -42,6 +47,7 @@ namespace ParticleSim
             .size = Vec2f(0.7, 0.7),
             .origin = Vec2f(0.35, 0.35),
             .color = Color::Yellow(),
+            //.texture_id = "crate",
         });
 
         Entity midground = engine.AddEntity();
@@ -51,6 +57,7 @@ namespace ParticleSim
             .size = Vec2f(0.5, 0.5),
             .origin = Vec2f(0.25, 0.25),
             .color = Color::Cyan(),
+            //.texture_id = "crate",
         });
 
         Entity background = engine.AddEntity();
@@ -61,6 +68,7 @@ namespace ParticleSim
             .size = Vec2f(0.9, 0.9),
             .origin = Vec2f(0.45, 0.45),
             .color = Color::Magenta(),
+            //.texture_id = "crate",
         });
 
         // wall
@@ -92,7 +100,7 @@ namespace ParticleSim
             {
                 .radius = .2f,
                 .origin = { .2f, .2f },
-                .texture_id = "icons",
+                //.texture_id = "icons",
                 .texture_rectangle = Recti(0, 0, 32, 32),
             });
 
@@ -149,11 +157,13 @@ namespace ParticleSim
                 auto& base_rect = engine.assets.textures.at("icons").atlas_rectangles.at("base");
                 if (state == 0)
                 {
-                    entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
+                    entity.GetComponent<CircleShape>().texture_id = "";
+                    //entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
                 }
                 else if (state == 1)
                 {
-                    entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
+                    entity.GetComponent<CircleShape>().texture_id = "missing_texture";
+                    //entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
                 }
             };
         }

@@ -57,6 +57,10 @@ set(SRC_FILES
     # gui
     extensions/gui/gui.cpp
     extensions/gui/GUIElement.cpp
+
+    # nine_slice
+    extensions/nine_slice/nine_slice.cpp
+    extensions/nine_slice/NineSliceTexture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
@@ -75,7 +79,7 @@ target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
 target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
 
 add_executable(test
-    main1.cpp
+    main2.cpp
 )
 
 target_link_libraries(test ${PROJECT_NAME}-static)

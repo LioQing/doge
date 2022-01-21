@@ -21,7 +21,7 @@ namespace doge
 
     void Engine::CloseWindow()
     {
-        assets.Clear();
+        assets.textures.erase("missing_texture");
         window.CloseWindow();
     }
 

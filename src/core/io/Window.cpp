@@ -70,8 +70,7 @@ namespace doge::io
                 }
                 else if (rect.width == 0 && rect.height == 0)
                 {
-                    rect.width = texture.GetSize().x;
-                    rect.height = texture.GetSize().y;
+                    rect.SetSize(texture.GetSize());
                 }
 
                 shape.setTextureRect(cast::ToSfRect(rect));
@@ -266,18 +265,23 @@ namespace doge::io
             SyncTransformable(sprite, sprite_comp, entity);
 
             auto& texture = engine.assets.textures.at(sprite_comp.texture_id);
-            sprite.setTexture(texture.texture);
 
             Recti rect = sprite_comp.texture_rectangle;
             if (!sprite_comp.atlas_rectangle_id.empty())
             {
                 rect = texture.atlas_rectangles.at(sprite_comp.atlas_rectangle_id);
             }
-            else if (rect.width == 0 && rect.height == 0)
+            else
             {
-                rect.width = texture.GetSize().x;
-                rect.height = texture.GetSize().y;
+                rect = math::AutoSize(rect, texture.GetSize());
             }
+
+            auto scale = sprite_comp.size / rect.GetSize();
+            scale = math::AutoSize(scale, Vec2f::One());
+            sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
+            sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
+
+            sprite.setTexture(texture.texture);
 
             sprite.setTextureRect(cast::ToSfRect(rect));
             sprite.setColor(cast::ToSfColor(sprite_comp.color));

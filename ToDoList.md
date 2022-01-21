@@ -30,7 +30,7 @@
   - [ ] assets
 - [ ] advance sprite
   - [x] remove sprite sheet member of texture and unify all io classes into doge::io
-  - [ ] texture atlas
+  - [x] texture atlas
   - [ ] nine slice
 - [ ] rework physics extensions
   - [ ] make collider attach to rgbd instead of entity with rgbd

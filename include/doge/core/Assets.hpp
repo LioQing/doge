@@ -27,29 +27,27 @@ namespace doge
 
     struct Assets
     {
-        std::unordered_set<std::string> asset_paths = { "assets" };
+        static std::unordered_set<std::string> asset_paths;
 
-        std::unordered_set<std::string> texture_sub_paths = { "textures" };
+        static std::unordered_set<std::string> texture_sub_paths;
         std::unordered_map<std::string, TextureEx> textures; // require windows to be created
         
-        std::unordered_set<std::string> image_sub_paths = { "images" };
+        static std::unordered_set<std::string> image_sub_paths;
         std::unordered_map<std::string, io::Image> images;
         
-        std::unordered_set<std::string> cursor_sub_paths = { "cursors" };
+        static std::unordered_set<std::string> cursor_sub_paths;
         std::unordered_map<std::string, io::Cursor> cursors;
 
-        std::unordered_set<std::string> sound_sub_paths = { "sounds" };
+        static std::unordered_set<std::string> sound_sub_paths;
         std::unordered_map<std::string, io::SoundBuffer> sound_buffers;
         std::unordered_map<std::string, io::Sound> sounds;
 
-        std::unordered_set<std::string> music_sub_paths = { "musics " };
+        static std::unordered_set<std::string> music_sub_paths;
         std::unordered_map<std::string, io::Music> musics;
 
-        void Clear();
+        static std::string SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths);
 
-        std::string SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths) const;
-
-        std::string SearchForTexture(const std::string& filename) const;
+        static std::string SearchForTexture(const std::string& filename);
 
         std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
         LoadTexture(const std::string& id, const std::string& filename, const Recti& area = Recti());
@@ -60,7 +58,7 @@ namespace doge
         std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
         LoadTexture(const std::string& id, const io::Image& image, const Recti& area = Recti());
 
-        std::string SearchForImage(const std::string& filename) const;
+        static std::string SearchForImage(const std::string& filename);
 
         std::pair<std::unordered_map<std::string, io::Image>::iterator, bool>
         LoadImage(const std::string& id, const std::string& filename);
@@ -68,7 +66,7 @@ namespace doge
         std::pair<std::unordered_map<std::string, io::Image>::iterator, bool>
         LoadImage(const std::string& id, void* data, std::size_t size);
 
-        std::string SearchForCursor(const std::string& filename) const;
+        static std::string SearchForCursor(const std::string& filename);
 
         std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
         LoadCursor(const std::string& id, const std::string& filename, const Vec2u& hotspot);
@@ -82,7 +80,7 @@ namespace doge
         std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
         LoadCursor(const std::string& id, io::Cursor::Type type);
 
-        std::string SearchForSound(const std::string& filename) const;
+        static std::string SearchForSound(const std::string& filename);
 
         std::pair<std::unordered_map<std::string, io::SoundBuffer>::iterator, bool>
         LoadSoundBuffer(const std::string& id, const std::string& filename);
@@ -121,7 +119,7 @@ namespace doge
             std::uint32_t sample_rate
             );
 
-        std::string SearchForMusic(const std::string& filename) const;
+        static std::string SearchForMusic(const std::string& filename);
 
         std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>
         LoadMusic(const std::string& id, const std::string& filename);

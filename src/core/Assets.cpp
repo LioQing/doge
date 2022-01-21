@@ -6,15 +6,14 @@
 
 namespace doge
 {
-    void Assets::Clear()
-    {
-        textures.clear();
-        
-        sound_buffers.clear();
-        sounds.clear();
-    }
+    std::unordered_set<std::string> Assets::asset_paths = { "assets" };
+    std::unordered_set<std::string> Assets::texture_sub_paths = { "textures" };
+    std::unordered_set<std::string> Assets::image_sub_paths = { "images" };
+    std::unordered_set<std::string> Assets::cursor_sub_paths = { "cursors" };
+    std::unordered_set<std::string> Assets::sound_sub_paths = { "sounds" };
+    std::unordered_set<std::string> Assets::music_sub_paths = { "musics " };
 
-    std::string Assets::SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths) const
+    std::string Assets::SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths)
     {
         if (std::filesystem::exists(filename))
             return filename;
@@ -34,7 +33,7 @@ namespace doge
         return "";
     }
 
-    std::string Assets::SearchForTexture(const std::string& filename) const
+    std::string Assets::SearchForTexture(const std::string& filename)
     {
         return SearchForAsset(filename, texture_sub_paths);
     }
@@ -79,7 +78,7 @@ namespace doge
         return std::make_pair(textures.end(), false);
     }
 
-    std::string Assets::SearchForImage(const std::string& filename) const
+    std::string Assets::SearchForImage(const std::string& filename)
     {
         return SearchForAsset(filename, image_sub_paths);
     }
@@ -113,7 +112,7 @@ namespace doge
         return std::make_pair(images.end(), false);
     }
 
-    std::string Assets::SearchForCursor(const std::string& filename) const
+    std::string Assets::SearchForCursor(const std::string& filename)
     {
         return SearchForAsset(filename, cursor_sub_paths);
     }
@@ -177,7 +176,7 @@ namespace doge
         return std::make_pair(cursors.end(), false);
     }
 
-    std::string Assets::SearchForSound(const std::string& filename) const
+    std::string Assets::SearchForSound(const std::string& filename)
     {
         return SearchForAsset(filename, sound_sub_paths);
     }
@@ -286,7 +285,7 @@ namespace doge
         return sounds.emplace(id, io::Sound(itr->second));
     }
 
-    std::string Assets::SearchForMusic(const std::string& filename) const
+    std::string Assets::SearchForMusic(const std::string& filename)
     {
         return SearchForAsset(filename, music_sub_paths);
     }

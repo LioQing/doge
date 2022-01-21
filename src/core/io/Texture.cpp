@@ -30,6 +30,13 @@ namespace doge::io
         return texture.loadFromImage(image.image, cast::ToSfRect(area));
     }
 
+    void Texture::SetRenderOptions(RenderOptions options)
+    {
+        SetSmooth(options & RenderOptions::Smooth);
+        SetSRGB(options & RenderOptions::SRGB);
+        SetRepeated(options & RenderOptions::Repeated);
+    }
+
     void Texture::SetSmooth(bool smooth)
     {
         texture.setSmooth(smooth);
