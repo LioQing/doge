@@ -3,6 +3,8 @@
 - [x] enable disable for entities
 - [x] render layer for drawable components
 - [x] visibility component to support drawable to be only on drawn on certain camera
+- [x] remove sprite sheet member of texture and unify all io classes into doge::io
+- [x] texture atlas
 - [ ] extension: gui
   - [ ] main class gui
   - [ ] gui camera
@@ -28,10 +30,9 @@
     - [ ] padding
     - [ ] draggable
   - [ ] assets
-- [ ] advance sprite
-  - [x] remove sprite sheet member of texture and unify all io classes into doge::io
-  - [x] texture atlas
-  - [ ] nine slice
+- [ ] extension: nine_slice
+  - [x] nine slice
+  - [ ] even simpler sprite creation process (add options)
 - [ ] rework physics extensions
   - [ ] make collider attach to rgbd instead of entity with rgbd
 
