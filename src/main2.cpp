@@ -34,8 +34,25 @@ namespace Test2
             engine.assets,
             crate_9sliced,
             "crate",
-            Recti(0, 0, 64, 64),
+            Vec2f(200, 200),
+            Vec2i(46, 46),
+            Rectf(),
             Vec2f(100, 100)
+        );
+
+        Entity crate_9sliced2 = engine.AddEntity();
+        crate_9sliced2.AddComponent(Position(-500, 0));
+        nine_slice::Add9SliceSprite(
+            engine.assets,
+            crate_9sliced2,
+            nine_slice::SpriteFactory
+            {
+                .texture_id = "crate",
+                .size = Vec2f(200, 200),
+                .center_texture_size = Vec2i(46, 46),
+                .border_thickness = Rectf(40, 50, 50, 40),
+                .origin = Vec2f(100, 100)
+            }
         );
     }
 

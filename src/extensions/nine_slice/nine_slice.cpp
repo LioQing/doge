@@ -205,36 +205,53 @@ namespace doge
         return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
+    Component<CompoundSprite>& nine_slice::Add9SliceSprite(Assets& assets, Entity entity, const SpriteFactory& factory)
+    {
+        return Add9SliceSprite(assets, entity, factory.texture_id, factory.size, factory.center_texture_size, factory.border_thickness, factory.origin, factory.color);
+    }
+
     Component<CompoundSprite>& nine_slice::Add9SliceSprite(
         Assets& assets,
         Entity entity,
         const std::string& texture_id,
-        const Recti& texture_rectangle,
         const Vec2f& size,
+        const Vec2i& center_texture_size,
+        const Rectf& border_thickness,
         const Vec2f& origin,
         const Color& color)
     {
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
         auto& sprites = comp_sprite.sprites;
         auto& slice_tex = textures.at(texture_id);
+        
+        auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
+        auto bord_thick = border_thickness == Rectf() ? 
+            Rectf(
+                slice_tex.border_thickness.GetPosition() * rect_size / (slice_tex.texture_rectangle.GetSize() + center_texture_size), 
+                slice_tex.border_thickness.GetSize() * rect_size / (slice_tex.texture_rectangle.GetSize() + center_texture_size)
+            ) : 
+            border_thickness;
 
-        auto tl0 = Vec2i::Zero();
-        auto tl1 = slice_tex.border_thickness.GetPosition();
-        auto tl2 = size - slice_tex.border_thickness.GetSize();
-        auto tl3 = size;
+        auto tl0 = Vec2f::Zero();
+        auto tl1 = bord_thick.GetPosition();
+        auto tl2 = rect_size - bord_thick.GetSize();
+        auto tl3 = rect_size;
 
         sprites.resize(Texture::Slice::Count);
 
-        sprites.at(Texture::Slice::Center)  .size = size - slice_tex.border_thickness.GetPosition() - slice_tex.border_thickness.GetSize();
+        sprites.at(Texture::Slice::Center)  .size = rect_size - bord_thick.GetPosition() - bord_thick.GetSize();
 
-        sprites.at(Texture::Slice::Top)     .size = sprites.at(Texture::Slice::Center).size * Vec2f::i();
-        sprites.at(Texture::Slice::Left)    .size = sprites.at(Texture::Slice::Center).size * Vec2f::j();
-        sprites.at(Texture::Slice::Bottom)  .size = sprites.at(Texture::Slice::Center).size * Vec2f::i();
-        sprites.at(Texture::Slice::Right)   .size = sprites.at(Texture::Slice::Center).size * Vec2f::j();
+        sprites.at(Texture::Slice::Top)     .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.top     * Vec2f::j();
+        sprites.at(Texture::Slice::Left)    .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.left    * Vec2f::i();
+        sprites.at(Texture::Slice::Bottom)  .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.height  * Vec2f::j();
+        sprites.at(Texture::Slice::Right)   .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.width   * Vec2f::i();
 
-        sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize( 
-            texture_rectangle.GetSize() - slice_tex.border_thickness.GetPosition() - slice_tex.border_thickness.GetSize()
-        );
+        sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(bord_thick.left,    bord_thick.top);
+        sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(bord_thick.left,    bord_thick.height);
+        sprites.at(Texture::Slice::BottomRight) .size = Vec2f(bord_thick.width,   bord_thick.height);
+        sprites.at(Texture::Slice::TopRight)    .size = Vec2f(bord_thick.width,   bord_thick.top);
+
+        sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
 
         sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::i());
         sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::j());

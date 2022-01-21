@@ -6,6 +6,7 @@
 #include <doge/core/Component.hpp>
 #include <doge/extensions/nine_slice/NineSliceTexture.hpp>
 #include <doge/core/TextureEx.hpp>
+#include <doge/extensions/nine_slice/NineSliceSpriteFactory.hpp>
 
 namespace doge
 {
@@ -15,6 +16,7 @@ namespace doge
     struct nine_slice
     {
         using Texture = NineSliceTexture;
+        using SpriteFactory = NineSliceSpriteFactory;
 
         nine_slice(const nine_slice&) = delete;
 
@@ -47,12 +49,15 @@ namespace doge
         static void SetRepeated(Assets& assets, const std::string& id, bool repeated);
         static bool IsRepeated(const Assets& assets, const std::string& id);
 
+        static Component<CompoundSprite>& Add9SliceSprite(Assets& assets, Entity entity, const SpriteFactory& factory);
+
         static Component<CompoundSprite>& Add9SliceSprite(
             Assets& assets,
             Entity entity,
             const std::string& texture_id,
-            const Recti& texture_rectangle = Recti(),
-            const Vec2f& size = Vec2f::Zero(),
+            const Vec2f& size,
+            const Vec2i& center_texture_size = Vec2i::Zero(),
+            const Rectf& border_thickness = Rectf(),
             const Vec2f& origin = Vec2f::Zero(),
             const Color& color = Color::White());
 
