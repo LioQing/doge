@@ -21,6 +21,7 @@ namespace doge
         using Body = PhysicsBody;
         using Collider = PhysicsCollider;
         using BodyInit = PhysicsBodyInit;
+        using FixtureKey = std::tuple<EntityID, Collider::Type, std::size_t>; // eid, fixture type, index
 
         physics(const physics&) = delete;
         static void Enable(Engine& engine);
@@ -48,8 +49,8 @@ namespace doge
 
         static std::unique_ptr<b2World> world;
         static std::unordered_map<EntityID, b2Body*> bodies;
-        static std::unordered_map<EntityID, std::array<std::vector<b2Fixture*>, Collider::Type::Count>> compound_fixtures;
         static std::unordered_map<EntityID, BodyInit> body_inits;
+        static std::map<FixtureKey, b2Fixture*> fixtures;
         static Vec2f gravity;
 
         static void Start(Engine& engine);

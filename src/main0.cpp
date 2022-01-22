@@ -13,7 +13,7 @@ namespace TestScene
     {
         auto my_shape = e.AddEntity("Test", "test");
 
-        my_shape.AddComponent(doge::RigidBody
+        auto& rgbd = my_shape.AddComponent(doge::RigidBody
         {
             .type = doge::RigidBody::Type::Dynamic, 
             //.continuous = true,
@@ -21,6 +21,7 @@ namespace TestScene
 
         my_shape.AddComponent(doge::ConvexCollider
         {
+            .rigidbody_entity = my_shape,
             .points =
             {
                 { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
@@ -30,10 +31,24 @@ namespace TestScene
             .restitution = .5f,
         });
 
+        auto instant_dest = e.AddEntity();
+        instant_dest.AddComponent<doge::Scale>(0.01, 0.01);
+        instant_dest.AddComponent<doge::Position>();
+        instant_dest.AddComponent(doge::CircleCollider
+        {
+            .rigidbody_entity = my_shape,
+            .radius = 50.f,
+        });
+        instant_dest.AddComponent(doge::CircleShape
+        {
+            .radius = 50.f,
+            .origin = doge::Vec2f(50.f, 50.f),
+            .color = 0xFFFFFF01,
+        });
+        e.DestroyEntity(instant_dest);
+
         my_shape.AddComponent<doge::Position>();
         my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
-        // my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f);
-        // my_shape.AddComponent<doge::AngularVelocity>(20);
 
         doge::physics::BodyInit init;
         init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f * 0.01;
@@ -75,6 +90,7 @@ namespace TestScene
             (
                 doge::CircleCollider
                 {
+                    .rigidbody_entity = my_shape,
                     .radius = 10.f,
                     .origin = { 15, 0 },
                     .density = 1.f,
@@ -83,6 +99,7 @@ namespace TestScene
                 },
                 doge::RectangleCollider
                 {
+                    .rigidbody_entity = my_shape,
                     .size = { 30, 8 },
                     .origin = { 0, 0 },
                     .density = 1.f,
@@ -93,8 +110,6 @@ namespace TestScene
 
             my_shape.AddComponent<doge::Position>(-i * 0.5, 0);
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
-            // my_shape.AddComponent<doge::Velocity>(doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f);
-            // my_shape.AddComponent<doge::AngularVelocity>(20);
             my_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
             doge::physics::BodyInit init;
@@ -143,6 +158,7 @@ namespace TestScene
         my_sprite.AddComponent<doge::Rotation>();
         my_sprite.AddComponent(doge::RectangleCollider
         {
+            .rigidbody_entity = my_sprite,
             .size = { 100, 100 },
         });
         my_sprite.AddComponent<doge::Scale>(0.01, 0.01);
@@ -167,8 +183,9 @@ namespace TestScene
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
-        ground.AddComponent(doge::EdgeCollider
+        ground.AddComponent(doge::ConvexCollider
         {
+            .rigidbody_entity = ground,
             .points = // shape: /\.
             { 
                 doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
@@ -207,6 +224,7 @@ namespace TestScene
         my_custom_shape.AddComponent(doge::RigidBody(doge::RigidBody::Kinematic));
         my_custom_shape.AddComponent(doge::ConvexCollider
         {
+            .rigidbody_entity = my_custom_shape,
             .points = 
             {
                 doge::Vec2f(0, 0),
@@ -376,6 +394,8 @@ int main()
     test.finish = TestScene::Finish;
 
     e.AddScene("Test", test);
+
+    doge::physics::SetGravity(doge::Vec2f(0, 1.96f));
 
     doge::physics::Enable(e);
 

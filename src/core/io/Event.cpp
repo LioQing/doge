@@ -6,6 +6,9 @@ namespace doge::io
 {
     void Event::OnPollEvent(const sf::Event& event)
     {
+        if (event.type == sf::Event::MouseWheelMoved)
+            return;
+        
         this->event.Raise(cast::FromSfEvent(event));
     }
 }

@@ -16,16 +16,96 @@ namespace ParticleSim
     Entity shoot_line;
     Component<Camera>* cam_comp;
 
+    Entity AddParticle(Engine& engine, const Vec2f& position)
+    {
+        Entity particle = engine.AddEntity();
+
+        particle.AddComponent(Tag::Create("particle"));
+
+        particle.AddComponent(CircleShape
+        {
+            .radius = .2f,
+            .origin = { .2f, .2f },
+            //.texture_id = "icons",
+            .texture_rectangle = Recti(0, 0, 32, 32),
+        });
+
+        particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
+        particle.AddComponent(CircleCollider
+        {
+            .rigidbody_entity = particle,
+            .radius = .2f,
+            .friction = 0.4f,
+            .restitution = 0.8f,
+        });
+
+        particle.AddComponent<Position>(position);
+        particle.AddComponent<Rotation>();
+        
+        auto& fsm = particle.AddComponent(StateMachines
+        (
+            {
+                StateMachine // color: 0 - white (still), 1 - red (moving), 2 - blue (grabbed)
+                {
+                    .state = 0,
+                    .transition = 
+                    [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+                    {
+                        if (shoot_particle == entity.id)
+                            return 2;
+
+                        if (physics::HasBody(entity) && physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
+                            return 1;
+                        
+                        return 0;
+                    }
+                },
+                StateMachine // movement: 0 - grab, 1 - free
+                {
+                    .state = 0,
+                },
+            }
+        ));
+
+        fsm.state_machines.at(0).on_entry += 
+        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+        {
+            if (state == 0)
+                entity.GetComponent<CircleShape>().color = Color::White();
+            else if (state == 1)
+                entity.GetComponent<CircleShape>().color = Color::Red();
+            else if (state == 2)
+                entity.GetComponent<CircleShape>().color = Color::Blue();
+        };
+
+        fsm.state_machines.at(1).on_entry += 
+        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
+        {
+            auto& base_rect = engine.assets.textures.at("icons").atlas_rectangles.at("base");
+            if (state == 0)
+            {
+                entity.GetComponent<CircleShape>().texture_id = "";
+                //entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
+            }
+            else if (state == 1)
+            {
+                entity.GetComponent<CircleShape>().texture_id = "missing_texture";
+                //entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
+            }
+        };
+
+        return particle;
+    }
+
     void Start(Engine& engine)
     {
-        // texture
-        // {
-        //     auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
-        //     if (success)
-        //     {
-        //         itr->second.atlas_rectangles = std::unordered_map<std::string, Recti>{{ "base", Recti(0, 0, 32, 32) }};
-        //     }
-        // }
+        {
+            auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
+            if (success)
+            {
+                itr->second.atlas_rectangles = std::unordered_map<std::string, Recti>{{ "base", Recti(0, 0, 32, 32) }};
+            }
+        }
 
         engine.assets.LoadTexture("crate", "test2.png");
         engine.assets.LoadTexture("crate_center", "test2.png", Recti(4, 5, 23, 23));
@@ -77,6 +157,7 @@ namespace ParticleSim
         wall.AddComponent<RigidBody>(RigidBody::Type::Static);
         wall.AddComponent(EdgeCollider
         {
+            .rigidbody_entity = wall,
             .points = 
             {
                 Vec2f(-6.4, -3.6),
@@ -92,80 +173,7 @@ namespace ParticleSim
         // particles
         for (std::size_t i = 1; i <= 20; ++i)
         {
-            Entity particle = engine.AddEntity();
-
-            particle.AddComponent(Tag::Create("particle"));
-
-            particle.AddComponent(CircleShape
-            {
-                .radius = .2f,
-                .origin = { .2f, .2f },
-                //.texture_id = "icons",
-                .texture_rectangle = Recti(0, 0, 32, 32),
-            });
-
-            particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
-            particle.AddComponent(CircleCollider
-            {
-                .radius = .2f,
-                .friction = 0.4f,
-                .restitution = 0.8f,
-            });
-
-            particle.AddComponent<Position>(engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
-            particle.AddComponent<Rotation>();
-            
-            auto& fsm = particle.AddComponent(StateMachines
-            (
-                {
-                    StateMachine // color: 0 - white (still), 1 - red (moving), 2 - blue (grabbed)
-                    {
-                        .state = 0,
-                        .transition = 
-                        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-                        {
-                            if (shoot_particle == entity.id)
-                                return 2;
-
-                            if (physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
-                                return 1;
-                            
-                            return 0;
-                        }
-                    },
-                    StateMachine // movement: 0 - grab, 1 - free
-                    {
-                        .state = 0,
-                    },
-                }
-            ));
-
-            fsm.state_machines.at(0).on_entry += 
-            [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-            {
-                if (state == 0)
-                    entity.GetComponent<CircleShape>().color = Color::White();
-                else if (state == 1)
-                    entity.GetComponent<CircleShape>().color = Color::Red();
-                else if (state == 2)
-                    entity.GetComponent<CircleShape>().color = Color::Blue();
-            };
-
-            fsm.state_machines.at(1).on_entry += 
-            [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-            {
-                auto& base_rect = engine.assets.textures.at("icons").atlas_rectangles.at("base");
-                if (state == 0)
-                {
-                    entity.GetComponent<CircleShape>().texture_id = "";
-                    //entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
-                }
-                else if (state == 1)
-                {
-                    entity.GetComponent<CircleShape>().texture_id = "missing_texture";
-                    //entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
-                }
-            };
+            AddParticle(engine, engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
         }
 
         // shoot actions
@@ -186,12 +194,12 @@ namespace ParticleSim
         {
             if (event.button == event::MouseButton::Button::Left)
             {
+                shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                 for (auto entity : engine.Select<Tag>()
                     .Where([](const Entity& _, const Tag& tag)
                     { return *tag.tags.begin() == "particle"; })
                     .Entities())
                 {
-                    shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                     if (!physics::GetCollider(entity).TestPoint(shoot_mouse_position))
                         continue;
 
@@ -206,6 +214,8 @@ namespace ParticleSim
 
                     return;
                 }
+
+                AddParticle(engine, shoot_mouse_position);
             }
             else if (event.button == event::MouseButton::Button::Right)
             {
@@ -214,6 +224,21 @@ namespace ParticleSim
                     .EntitiesAndOnlyComponents<StateMachines>())
                 {
                     fsm::ManualTransition(fsm.state_machines.at(1), 1, entity, engine);
+                }
+            }
+            else if (event.button == event::MouseButton::Button::Middle)
+            {
+                shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
+                for (auto entity : engine.Select<Tag>()
+                    .Where([](const Entity& _, const Tag& tag)
+                    { return *tag.tags.begin() == "particle"; })
+                    .Entities())
+                {
+                    if (!physics::GetCollider(entity).TestPoint(shoot_mouse_position))
+                        continue;
+
+                    engine.DestroyEntity(entity);
+                    return;
                 }
             }
         };
@@ -266,6 +291,8 @@ namespace ParticleSim
                 line.vertices.at(1).position = engine.window.MapPixelToCoords(engine.window.window_io.GetMousePosition(), *cam_comp) - pos.position;
             }
         }
+
+        std::cout << 1000.f / dt << std::endl;
     }
 
     void FixedUpdate(Engine& engine, DeltaTime dt)

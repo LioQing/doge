@@ -9,7 +9,7 @@ namespace doge
     {
         enum Type
         {
-            Convex, Circle, Rectangle,
+            Convex, Circle, Rectangle, Edge,
             Count
         };
 
