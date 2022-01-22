@@ -156,7 +156,7 @@ namespace ParticleSim
         rr.AddComponent(Position(1, 0));
         rr.AddComponent(ConvexShape
         {
-            .points = math::CreateRoundedCornerRectangle(Vec2f(1, 1), 0.08),
+            .points = math::RoundedRectangle(Vec2f(1, 1), 0.08),
             .origin = Vec2f(0.5, 0.5),
         });
 

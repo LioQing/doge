@@ -40,7 +40,7 @@ namespace doge
         return true;
     }
 
-    std::vector<Vec2f> math::CreateRoundedCornerRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count)
+    std::vector<Vec2f> math::RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count)
     {
         using std::numbers::pi;
 
