@@ -103,6 +103,7 @@ namespace doge
         private:
             
             int style = sf::Style::Default;
+            std::uint32_t msaa_level = 0;
         };
     }
 }

@@ -24,5 +24,6 @@ namespace doge
         std::uint32_t fps = 60;
         Style style = Style::Default;
         bool v_sync = false;
+        std::uint32_t msaa_level = 0;
     };
 }

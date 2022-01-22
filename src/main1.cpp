@@ -151,6 +151,15 @@ namespace ParticleSim
             //.texture_id = "crate",
         });
 
+        // rounded rectangle
+        Entity rr = engine.AddEntity();
+        rr.AddComponent(Position(1, 0));
+        rr.AddComponent(ConvexShape
+        {
+            .points = math::CreateRoundedCornerRectangle(Vec2f(1, 1), 0.08),
+            .origin = Vec2f(0.5, 0.5),
+        });
+
         // wall
         Entity wall = engine.AddEntity();
 
@@ -317,6 +326,9 @@ int main()
 {
     Engine engine;
     engine.window.settings.fps = 120;
+    engine.window.settings.msaa_level = 16;
+    engine.window.settings.size = Vec2u(1280, 720);
+    engine.window.settings.title = "Particle Simulation";
 
     engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 
@@ -335,7 +347,7 @@ int main()
 
     engine.AddScene("particle_sim", glf);
 
-    engine.StartScene("particle_sim", Window::Settings{ .size = Vec2u(1280, 720), .title = "Particle Simulation" });
+    engine.StartScene("particle_sim");
 
     return 0;
 }

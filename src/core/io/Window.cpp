@@ -10,7 +10,12 @@ namespace doge::io
     void Window::CreateWindow(const WindowSettings& settings)
     {
         style = cast::ToSfStyle(settings.style);
-        window.create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style);
+        msaa_level = settings.msaa_level;
+
+        sf::ContextSettings context_settings;
+        context_settings.antialiasingLevel = msaa_level;
+
+        window.create(sf::VideoMode(settings.size.x, settings.size.y), settings.title, style, context_settings);
         
         if (settings.style == WindowSettings::Style::None)
         {
@@ -461,7 +466,7 @@ namespace doge::io
         if (!IsOpen())
             return;
 
-        if (settings.style != style)
+        if (settings.style != style || settings.msaa_level != msaa_level)
         {
             CreateWindow(settings);
             return;
