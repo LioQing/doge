@@ -6,7 +6,6 @@
 #include <doge/core/Component.hpp>
 #include <doge/extensions/nine_slice/NineSliceTexture.hpp>
 #include <doge/core/TextureEx.hpp>
-#include <doge/extensions/nine_slice/NineSliceSpriteFactory.hpp>
 
 namespace doge
 {
@@ -16,7 +15,6 @@ namespace doge
     struct nine_slice
     {
         using Texture = NineSliceTexture;
-        using SpriteFactory = NineSliceSpriteFactory;
 
         enum BorderThickness
         {
@@ -57,8 +55,6 @@ namespace doge
 
         static void SetRepeated(Assets& assets, const std::string& id, bool repeated);
         static bool IsRepeated(const Assets& assets, const std::string& id);
-
-        static Component<CompoundSprite>& Add9SliceSprite(Assets& assets, Entity entity, const SpriteFactory& factory);
 
         static Component<CompoundSprite>& Add9SliceSprite(
             Assets& assets,

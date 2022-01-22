@@ -205,11 +205,6 @@ namespace doge
         return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
-    Component<CompoundSprite>& nine_slice::Add9SliceSprite(Assets& assets, Entity entity, const SpriteFactory& factory)
-    {
-        return Add9SliceSprite(assets, entity, factory.texture_id, factory.size, factory.center_texture_size, factory.border_thickness, factory.origin, factory.color);
-    }
-
     Component<CompoundSprite>& nine_slice::Add9SliceSprite(
         Assets& assets,
         Entity entity,
