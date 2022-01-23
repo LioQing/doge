@@ -394,20 +394,20 @@ namespace doge::io
 
         // draw
         window.clear(cast::ToSfColor(background_color));
-        for (auto& [eid, view_draw] : views_draws)
+        for (auto& [cam_id, view_draw] : views_draws)
         {
             auto& [view, draw_keys] = view_draw;
 
             window.setView(*view);
 
             // draw
-            if (engine.GetEntity(eid).HasComponent<Layer>())
+            if (engine.GetEntity(cam_id).HasComponent<Layer>())
             {
-                auto& layers = engine.GetEntity(eid).GetComponent<Layer>().layers;
+                auto& cam_layers = engine.GetEntity(cam_id).GetComponent<Layer>().layers;
 
                 for (auto& [layer, layer_draw_keys] : layers_draws)
                 {
-                    if (!layers.contains(layer))
+                    if (!cam_layers.contains(layer))
                         continue;
 
                     for (auto& draw_key : layer_draw_keys)
@@ -419,13 +419,10 @@ namespace doge::io
             }
             else
             {
-                for (auto& [layer, layer_draw_keys] : layers_draws)
+                for (auto& draw_key : layers_draws.at(0))
                 {
-                    for (auto& draw_key : layer_draw_keys)
-                    {
-                        if (draw_keys.contains(draw_key))
-                            window.draw(*drawables.at(draw_key));
-                    }
+                    if (draw_keys.contains(draw_key))
+                        window.draw(*drawables.at(draw_key));
                 }
             }
         }

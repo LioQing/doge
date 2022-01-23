@@ -26,14 +26,14 @@ namespace doge
         return texture_id;
     }
 
-    void GUIElement::SetLayer(int layer)
+    void GUIElement::SetOwnerCamera(const std::string& owner_camera)
     {
-        this->layer = layer;
+        this->owner_camera = owner_camera;
     }
 
-    int GUIElement::GetLayer() const
+    const std::string& GUIElement::GetOwnerCamera() const
     {
-        return layer;
+        return owner_camera;
     }
 
     void GUIElement::SetSize(const Vec2f& size)

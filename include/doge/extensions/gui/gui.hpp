@@ -5,7 +5,7 @@
 #include <doge/extensions/gui/GUIElement.hpp>
 #include <doge/core/Engine.hpp>
 #include <unordered_map>
-#include <vector>
+#include <unordered_set>
 #include <memory>
 #include <doge/utils/aliases.hpp>
 
@@ -20,44 +20,38 @@ namespace doge
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
 
-        static Entity AddCamera(Engine& engine, const std::string& id, int camera_layer = 32);
+        static void AddCamera(Engine& engine, const std::string& id, int layer = 32, bool destroy_on_finish = true);
 
-        template <std::convertible_to<std::string>... T>
-        static Entity AddCamera(Engine& engine, const std::string& id, int camera_layer, T&&... scene_ids)
-        {
-            Entity cam = engine.AddEntity(scene_ids...);
-            cam.AddComponent<Camera>();
-            cam.AddComponent(Layer::Create(camera_layer));
-
-            camera_entities.emplace(id, cam);
-
-            return cam;
-        }
+        static void RemoveCamera(Engine& engine, const std::string& id);
 
         template <typename E>
         requires std::derived_from<std::remove_reference_t<E>, Element>
         static void AddElement(Engine& engine, E&& element)
         {
+            if (cameras.find(element.GetOwnerCamera()) == cameras.end())
+                throw std::invalid_argument("OwnerCamera property of GUIElement (gui::Element) is not found in gui::cameras");
+
             auto entity = engine.AddEntity();
-            auto& comp = entity.AddComponent(Component::Create(std::forward<E>(element)));
+            Element& element = *entity.AddComponent(Component::Create(std::forward<E>(element))).element;
 
             if (element.GetID() == "")
-                idless_elements.emplace_back(comp);
+                idless_elements.emplace(entity);
             else
-                elements.emplace(element.GetID(), comp);
+                elements.emplace(element.GetID(), entity);
+            
+            element.Initialize(engine);
         }
 
-        static void RemoveElement(const std::string& id);
-        static void ClearElements();
+        static void RemoveElement(Engine& engine, const std::string& id);
+        static void RemoveElements(Engine& engine, const std::string& camera_id);
 
     private:
 
-        static std::unordered_map<std::string, Entity> camera_entities;
-        static std::unordered_map<std::string, std::reference_wrapper<Component>> elements;
-        static std::vector<std::reference_wrapper<Component>> idless_elements;
+        static std::unordered_map<std::string, Entity> cameras;
+        static std::unordered_map<std::string, Entity> elements;
+        static std::set<Entity> idless_elements;
 
-        static void Start(Engine& engine);
         static void Update(Engine& engine, DeltaTime dt);
-        static void Finish(Engine& engine);
+        static void FixedUpdate(Engine& engine, DeltaTime dt);
     };
 }

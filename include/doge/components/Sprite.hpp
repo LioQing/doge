@@ -12,6 +12,7 @@ namespace doge
         std::string atlas_rectangle_id = "";
         Recti texture_rectangle = Recti();
         Vec2f size = Vec2f::Zero();
+        
         Vec2f origin = Vec2f::Zero();
         Color color = Color::White();
     };

@@ -4,16 +4,15 @@
 
 namespace doge
 {
-    std::unordered_map<std::string, Entity> gui::camera_entities;
-    std::unordered_map<std::string, std::reference_wrapper<gui::Component>> gui::elements;
-    std::vector<std::reference_wrapper<gui::Component>> gui::idless_elements;
+    std::unordered_map<std::string, Entity> gui::cameras;
+    std::unordered_map<std::string, Entity> gui::elements;
+    std::set<Entity> gui::idless_elements;
 
     void gui::Enable(Engine& engine)
     {
         GameLoopFunctions glf;
-        glf.start = Start;
         glf.update = Update;
-        glf.finish = Finish;
+        glf.fixed_update = FixedUpdate;
         
         engine.scenes.extensions.emplace("doge_gui", glf);
     }
@@ -23,38 +22,67 @@ namespace doge
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    Entity gui::AddCamera(Engine& engine, const std::string& id, int camera_layer)
+    void gui::AddCamera(Engine& engine, const std::string& id, int layer, bool destroy_on_finish)
     {
-        Entity cam = engine.AddCamera();
-        cam.AddComponent(Layer::Create(camera_layer));
+        auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
-        camera_entities.emplace(id, cam);
+        if (!success)
+            throw std::invalid_argument("Failed to add camera to gui");
 
-        return cam;
+        itr->second.AddComponent<Camera>();
+        itr->second.AddComponent(Layer::Create(layer));
     }
 
-    void gui::RemoveElement(const std::string& id)
+    void gui::RemoveCamera(Engine& engine, const std::string& id)
     {
+        RemoveElements(engine, id);
+        cameras.erase(id);
+    }
+
+    void gui::RemoveElement(Engine& engine, const std::string& id)
+    {
+        engine.DestroyEntity(elements.at(id));
         elements.erase(id);
     }
 
-    void gui::ClearElements()
+    void gui::RemoveElements(Engine& engine, const std::string& camera_id)
     {
-        
-    }
+        for (auto& [id, element] : elements)
+        {
+            if (element.GetComponent<Component>().element->GetOwnerCamera() == camera_id)
+                engine.DestroyEntity(element);
+        }
 
-    void gui::Start(Engine& engine)
-    {
-
+        for (auto& element : idless_elements)
+        {
+            if (element.GetComponent<Component>().element->GetOwnerCamera() == camera_id)
+                engine.DestroyEntity(element);
+        }
     }
 
     void gui::Update(Engine& engine, DeltaTime dt)
     {
+        for (auto& [id, element] : elements)
+        {
+            element.GetComponent<GUIComponent>().element->Update(engine, dt);
+        }
 
+        for (auto& element : idless_elements)
+        {
+            element.GetComponent<GUIComponent>().element->Update(engine, dt);
+        }
     }
 
-    void gui::Finish(Engine& engine)
+    void gui::FixedUpdate(Engine& engine, DeltaTime dt)
     {
+        for (auto& [id, element] : elements)
+        {
+            element.GetComponent<GUIComponent>().element->FixedUpdate(engine, dt);
+        }
 
+        for (auto& element : idless_elements)
+        {
+            element.GetComponent<GUIComponent>().element->FixedUpdate(engine, dt);
+        }
     }
 }

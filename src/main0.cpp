@@ -11,7 +11,7 @@ namespace TestScene
 {
     doge::Entity AddGreenRect(doge::Engine& e)
     {
-        auto my_shape = e.AddEntity("Test", "test");
+        auto my_shape = e.AddEntity(false);
 
         auto& rgbd = my_shape.AddComponent(doge::RigidBody
         {

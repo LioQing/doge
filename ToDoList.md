@@ -37,3 +37,7 @@
 - [x] rework physics extensions
   - [x] make collider attach to rgbd instead of entity with rgbd
 
+- [ ] rework camera
+  - [ ] add render_order
+  - [ ] make default camera layer to be 0
+
