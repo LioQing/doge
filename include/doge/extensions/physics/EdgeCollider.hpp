@@ -7,7 +7,7 @@ namespace doge
 {
     struct EdgeCollider
     {
-        EntityID rigidbody_entity;
+        EntityID rigid_body_entity;
 
         // collision only happen on left side of edge
         std::vector<Vec2f> points;

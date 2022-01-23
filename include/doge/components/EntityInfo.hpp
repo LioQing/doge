@@ -8,6 +8,6 @@ namespace doge
     struct EntityInfo
     {
         bool enabled = true;
-        std::vector<std::string> scene_ids; // no scene id represent all scene
+        bool destroy_on_finish = true;
     };
 }

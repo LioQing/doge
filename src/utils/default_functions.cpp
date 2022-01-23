@@ -7,11 +7,14 @@ namespace doge
 {
     namespace default_functions
     {
-        void Finish(Engine& e)
+        void Finish(Engine& engine)
         {
-            for (auto entity : e.Select<>().InAllOf(e.scenes.active_scene_id).Entities())
+            for (auto entity : engine.Select<EntityInfo>()
+                .Where([](Entity _, const EntityInfo& entity_info)
+                { return entity_info.destroy_on_finish; })
+                .Entities())
             {
-                e.DestroyEntity(entity);
+                engine.DestroyEntity(entity);
             }
         }
     }

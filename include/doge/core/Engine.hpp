@@ -49,18 +49,7 @@ namespace doge
 
         std::deque<EntityID> to_be_destroyed;
 
-        Entity AddEntity(bool all_scenes = false);
-
-        template <std::convertible_to<std::string>... T>
-        Entity AddEntity(T... scene_ids)
-        {
-            auto e = lic::AddEntity();
-            e.AddComponent<EntityInfo>(true, std::vector<std::string>({ scene_ids... }));
-        
-            auto node = PCNode::AddNode(e);
-
-            return Entity(e, node.get());
-        }
+        Entity AddEntity(bool destroy_on_finish = true);
 
         Entity GetEntity(EntityID eid) const;
 
@@ -89,10 +78,8 @@ namespace doge
         Range<TComps...> Select(bool include_disabled = false) const
         {
             if (include_disabled)
-                return Range<TComps...>(lic::Select<EntityInfo, TComps...>(), scenes.active_scene_id);
-            return Range<TComps...>(lic::Select<EntityInfo, TComps...>().Where(
-                [](lic::Entity entity, EntityInfo entity_info, TComps... c){ return entity_info.enabled; }), 
-                scenes.active_scene_id);
+                return Range<TComps...>(lic::Select<TComps...>());
+            return Range<TComps...>(lic::Select<TComps...>().Where([](lic::Entity entity, TComps... c){ return entity.GetComponent<EntityInfo>().enabled; }));
         }
 
         // assets

@@ -1,6 +1,7 @@
 #include <doge/extensions/fsm/fsm.hpp>
 
 #include <doge/core.hpp>
+#include <doge/utils/aliases.hpp>
 #include <doge/extensions/fsm/StateMachine.hpp>
 #include <doge/extensions/fsm/StateMachines.hpp>
 
@@ -34,7 +35,7 @@ namespace doge
     {
         for (auto [entity, fsm] : engine
             .Select<StateMachine>()
-            .Where([auto_update](const Entity& _, const StateMachine& fsm)
+            .Where([auto_update](Entity _, const StateMachine& fsm)
             { return fsm.auto_update == auto_update; })
             .EntitiesAndComponents())
         {

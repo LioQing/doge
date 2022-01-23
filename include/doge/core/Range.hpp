@@ -71,127 +71,68 @@ namespace doge
     };
 
     template <typename... TComps>
-    struct Range : public lic::Range<EntityInfo, TComps...>
+    struct Range : public lic::Range<TComps...>
     {
-        std::string active_scene_id = "";
-        
-        template <std::convertible_to<std::string>... TSceneID>
-        Range<TComps...> InAnyOf(TSceneID&&... scene_ids) const
-        {
-            return Range(lic::Range<EntityInfo, TComps...>::Where(
-                [&](lic::Entity entity, EntityInfo entity_info, TComps... _)
-                { 
-                    for (auto& scene_id : { scene_ids... })
-                        if (std::find(entity_info.scene_ids.begin(), entity_info.scene_ids.end(), scene_id) != entity_info.scene_ids.end())
-                            return true;
-                    return false;
-                }));
-        }
-
-        template <std::convertible_to<std::string>... TSceneID>
-        Range<TComps...> InAllOf(TSceneID&&... scene_ids) const
-        {
-            return Range(lic::Range<EntityInfo, TComps...>::Where(
-                [&](lic::Entity entity, EntityInfo entity_info, TComps... _)
-                { 
-                    for (auto& scene_id : { scene_ids... })
-                        if (std::find(entity_info.scene_ids.begin(), entity_info.scene_ids.end(), scene_id) == entity_info.scene_ids.end())
-                            return false;
-                    return true;
-                }));
-        }
-
-        template <std::convertible_to<std::string>... TSceneID>
-        Range<TComps...> InNoneOf(TSceneID&&... scene_ids) const
-        {
-            return Range(lic::Range<EntityInfo, TComps...>::Where(
-                [&](lic::Entity entity, EntityInfo entity_info, TComps... _)
-                {
-                    for (auto& scene_id : { scene_ids... })
-                        if (std::find(entity_info.scene_ids.begin(), entity_info.scene_ids.end(), scene_id) != entity_info.scene_ids.end())
-                            return false;
-                    return true;
-                }));
-        }
-
         template <typename... TSelectComps>
         Range<TComps..., TSelectComps...> Select() const
         {
-            return Range<TComps..., TSelectComps...>(lic::Range<EntityInfo, TComps...>::Select<TSelectComps...>());
+            return Range<TComps..., TSelectComps...>(lic::Range<TComps...>::Select<TSelectComps...>());
         }
 
         template <std::predicate<Entity, TComps...> TPred>
         Range<TComps...> Where(TPred predicate) const
         {
-            return Range(lic::Range<EntityInfo, TComps...>::Where([&](lic::Entity entity, EntityInfo _, TComps... c)
+            return Range(lic::Range<TComps...>::Where([&](lic::Entity entity, const TComps&... c)
             { return predicate(Entity(entity, PCNode::root.GetDescendent(entity).get()), c...); }));
         }
 
         EntityContainer Entities() const
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).Entities();
-            return EntityContainer(lic::Range<EntityInfo, TComps...>::entities);
+            return EntityContainer(lic::Range<TComps...>::entities);
         }
 
         ComponentContainer<false, TComps...> Components()
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).Components();
-            return ComponentContainer<false, TComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<false, TComps...>(lic::Range<TComps...>::entities);
         }
 
         const ComponentContainer<false, TComps...> Components() const
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).Components();
-            return ComponentContainer<false, TComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<false, TComps...>(lic::Range<TComps...>::entities);
         }
 
         template <typename... TOnlyComps>
         ComponentContainer<false, TOnlyComps...> OnlyComponents()
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).OnlyComponents<TOnlyComps...>();
-            return ComponentContainer<false, TOnlyComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<false, TOnlyComps...>(lic::Range<TComps...>::entities);
         }
 
         template <typename... TOnlyComps>
         const ComponentContainer<false, TOnlyComps...> OnlyComponents() const
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).OnlyComponents<TOnlyComps...>();
-            return ComponentContainer<false, TOnlyComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<false, TOnlyComps...>(lic::Range<TComps...>::entities);
         }
 
         ComponentContainer<true, TComps...> EntitiesAndComponents()
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).EntitiesAndComponents();
-            return ComponentContainer<true, TComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<true, TComps...>(lic::Range<TComps...>::entities);
         }
 
         const ComponentContainer<true, TComps...> EntitiesAndComponents() const
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).EntitiesAndComponents();
-            return ComponentContainer<true, TComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<true, TComps...>(lic::Range<TComps...>::entities);
         }
 
         template <typename... TOnlyComps>
         ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents()
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
-            return ComponentContainer<true, TOnlyComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<true, TOnlyComps...>(lic::Range<TComps...>::entities);
         }
 
         template <typename... TOnlyComps>
         const ComponentContainer<true, TOnlyComps...> EntitiesAndOnlyComponents() const
         {
-            if (!active_scene_id.empty())
-                return InAnyOf(active_scene_id).EntitiesAndOnlyComponents<TOnlyComps...>();
-            return ComponentContainer<true, TOnlyComps...>(lic::Range<EntityInfo, TComps...>::entities);
+            return ComponentContainer<true, TOnlyComps...>(lic::Range<TComps...>::entities);
         }
     };
 }

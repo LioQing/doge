@@ -6,6 +6,6 @@ namespace doge
 
     namespace default_functions
     {
-        void Finish(Engine& e);
+        void Finish(Engine& engine);
     }
 }

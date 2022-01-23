@@ -4,7 +4,7 @@ namespace doge
 {
     struct CircleCollider
     {
-        EntityID rigidbody_entity;
+        EntityID rigid_body_entity;
 
         float radius = 1.f;
         Vec2f origin = Vec2f::Zero();

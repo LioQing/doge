@@ -266,10 +266,10 @@ namespace doge
 
         auto UpdateConvex = [&]<typename TComp>(Entity& entity, Component<TComp>& coll_comp, ConvexCollider& coll, const FixtureKey& key)
         {
-            auto body_itr = bodies.find(coll.rigidbody_entity);
+            auto body_itr = bodies.find(coll.rigid_body_entity);
 
             if (body_itr == bodies.end())
-                throw std::invalid_argument("Invalid ConvexCollider::rigidbody_entity, can't find the attached rigidbody");
+                throw std::invalid_argument("Invalid ConvexCollider::rigid_body_entity, can't find the attached rigidbody");
 
             auto* body = body_itr->second;
 
@@ -278,7 +278,7 @@ namespace doge
             {
                 b2PolygonShape convex;
                 SyncConvex(convex, entity, coll);
-                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &convex), coll.rigidbody_entity, coll_comp);
+                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &convex), coll.rigid_body_entity, coll_comp);
             }
             
             if (coll.apply_changes)
@@ -316,10 +316,10 @@ namespace doge
 
         auto UpdateCircle = [&]<typename TComp>(Entity& entity, Component<TComp>& coll_comp, CircleCollider& coll, const FixtureKey& key)
         {
-            auto body_itr = bodies.find(coll.rigidbody_entity);
+            auto body_itr = bodies.find(coll.rigid_body_entity);
 
             if (body_itr == bodies.end())
-                throw std::invalid_argument("Invalid CircleCollider::rigidbody_entity, can't find the attached rigidbody");
+                throw std::invalid_argument("Invalid CircleCollider::rigid_body_entity, can't find the attached rigidbody");
 
             auto* body = body_itr->second;
 
@@ -328,7 +328,7 @@ namespace doge
             {
                 b2CircleShape circle;
                 SyncCircle(circle, entity, coll);
-                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &circle), coll.rigidbody_entity, coll_comp);
+                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &circle), coll.rigid_body_entity, coll_comp);
             }
             
             if (coll.apply_changes)
@@ -358,10 +358,10 @@ namespace doge
 
         auto UpdateRectangle = [&]<typename TComp>(Entity& entity, Component<TComp>& coll_comp, RectangleCollider& coll, const FixtureKey& key)
         {
-            auto body_itr = bodies.find(coll.rigidbody_entity);
+            auto body_itr = bodies.find(coll.rigid_body_entity);
 
             if (body_itr == bodies.end())
-                throw std::invalid_argument("Invalid RectangleCollider::rigidbody_entity, can't find the attached rigidbody");
+                throw std::invalid_argument("Invalid RectangleCollider::rigid_body_entity, can't find the attached rigidbody");
 
             auto* body = body_itr->second;
 
@@ -370,7 +370,7 @@ namespace doge
             {
                 b2PolygonShape rect;
                 SyncRectangle(rect, entity, coll);
-                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &rect), coll.rigidbody_entity, coll_comp);
+                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &rect), coll.rigid_body_entity, coll_comp);
             }
             
             if (coll.apply_changes)
@@ -402,10 +402,10 @@ namespace doge
 
         auto UpdateEdge = [&]<typename TComp>(Entity& entity, Component<TComp>& coll_comp, EdgeCollider& coll, const FixtureKey& key)
         {
-            auto body_itr = bodies.find(coll.rigidbody_entity);
+            auto body_itr = bodies.find(coll.rigid_body_entity);
 
             if (body_itr == bodies.end())
-                throw std::invalid_argument("Invalid EdgeCollider::rigidbody_entity, can't find the attached rigidbody");
+                throw std::invalid_argument("Invalid EdgeCollider::rigid_body_entity, can't find the attached rigidbody");
 
             auto* body = body_itr->second;
 
@@ -414,7 +414,7 @@ namespace doge
             {
                 b2ChainShape edge;
                 SyncEdge(edge, entity, coll);
-                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &edge), coll.rigidbody_entity, coll_comp);
+                fixture_itr = EmplaceFixture(key, AddFixture(body, coll, &edge), coll.rigid_body_entity, coll_comp);
             }
 
             if (coll.apply_changes)

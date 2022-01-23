@@ -165,14 +165,10 @@ namespace doge
         }
     }
 
-    Entity Engine::AddEntity(bool all_scenes)
+    Entity Engine::AddEntity(bool destroy_on_finish)
     {
         auto e = lic::AddEntity();
-
-        if (all_scenes)
-            e.AddComponent<EntityInfo>(true);
-        else
-            e.AddComponent<EntityInfo>(true, std::vector<std::string>({ scenes.active_scene_id }));
+        e.AddComponent<EntityInfo>(true, destroy_on_finish);
         
         auto node = PCNode::AddNode(e);
 

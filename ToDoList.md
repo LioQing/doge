@@ -34,6 +34,6 @@
   - [x] nine slice
   - [x] even simpler sprite creation process (add options)
   - [ ] potentially more creation options (also the logic is a bit messy for now)
-- [ ] rework physics extensions
-  - [ ] make collider attach to rgbd instead of entity with rgbd
+- [x] rework physics extensions
+  - [x] make collider attach to rgbd instead of entity with rgbd
 

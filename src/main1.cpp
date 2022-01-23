@@ -33,7 +33,7 @@ namespace ParticleSim
         particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
         particle.AddComponent(CircleCollider
         {
-            .rigidbody_entity = particle,
+            .rigid_body_entity = particle,
             .radius = .2f,
             .friction = 0.4f,
             .restitution = 0.8f,
@@ -159,6 +159,15 @@ namespace ParticleSim
             .points = math::RoundedRectangle(Vec2f(1, 1), 0.08),
             .origin = Vec2f(0.5, 0.5),
         });
+        rr.AddComponent(RigidBody
+        {
+            .type = RigidBody::Type::Static,
+        });
+        rr.AddComponent(RectangleCollider
+        {
+            .rigid_body_entity = rr,
+            .size = Vec2f(1, 1),
+        });
 
         // wall
         Entity wall = engine.AddEntity();
@@ -166,7 +175,7 @@ namespace ParticleSim
         wall.AddComponent<RigidBody>(RigidBody::Type::Static);
         wall.AddComponent(EdgeCollider
         {
-            .rigidbody_entity = wall,
+            .rigid_body_entity = wall,
             .points = 
             {
                 Vec2f(-6.4, -3.6),
@@ -339,6 +348,8 @@ int main()
     physics::SetGravity(Vec2f(0, 9.8));
 
     fsm::Enable(engine);
+
+    gui::Enable(engine);
 
     GameLoopFunctions glf;
     glf.start           = ParticleSim::Start;

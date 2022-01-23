@@ -7,7 +7,7 @@ namespace doge
 {
     struct ConvexCollider
     {
-        EntityID rigidbody_entity;
+        EntityID rigid_body_entity;
 
         // collision only happen on right side of edge
         std::vector<Vec2f> points;

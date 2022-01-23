@@ -4,7 +4,7 @@
 #include <doge/extensions/gui/GUIComponent.hpp>
 #include <doge/extensions/gui/GUIElement.hpp>
 #include <doge/core/Engine.hpp>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <memory>
 #include <doge/utils/aliases.hpp>
@@ -20,6 +20,20 @@ namespace doge
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
 
+        static Entity AddCamera(Engine& engine, const std::string& id, int camera_layer = 32);
+
+        template <std::convertible_to<std::string>... T>
+        static Entity AddCamera(Engine& engine, const std::string& id, int camera_layer, T&&... scene_ids)
+        {
+            Entity cam = engine.AddEntity(scene_ids...);
+            cam.AddComponent<Camera>();
+            cam.AddComponent(Layer::Create(camera_layer));
+
+            camera_entities.emplace(id, cam);
+
+            return cam;
+        }
+
         template <typename E>
         requires std::derived_from<std::remove_reference_t<E>, Element>
         static void AddElement(Engine& engine, E&& element)
@@ -34,10 +48,12 @@ namespace doge
         }
 
         static void RemoveElement(const std::string& id);
+        static void ClearElements();
 
     private:
 
-        static std::map<std::string, std::reference_wrapper<Component>> elements;
+        static std::unordered_map<std::string, Entity> camera_entities;
+        static std::unordered_map<std::string, std::reference_wrapper<Component>> elements;
         static std::vector<std::reference_wrapper<Component>> idless_elements;
 
         static void Start(Engine& engine);

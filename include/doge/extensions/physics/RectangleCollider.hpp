@@ -6,7 +6,7 @@ namespace doge
 {
     struct RectangleCollider
     {
-        EntityID rigidbody_entity;
+        EntityID rigid_body_entity;
 
         Vec2f size = Vec2f::One();
         Vec2f origin = Vec2f::Zero();

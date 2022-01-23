@@ -21,7 +21,7 @@ namespace TestScene
 
         my_shape.AddComponent(doge::ConvexCollider
         {
-            .rigidbody_entity = my_shape,
+            .rigid_body_entity = my_shape,
             .points =
             {
                 { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
@@ -36,7 +36,7 @@ namespace TestScene
         instant_dest.AddComponent<doge::Position>();
         instant_dest.AddComponent(doge::CircleCollider
         {
-            .rigidbody_entity = my_shape,
+            .rigid_body_entity = my_shape,
             .radius = 50.f,
         });
         instant_dest.AddComponent(doge::CircleShape
@@ -90,7 +90,7 @@ namespace TestScene
             (
                 doge::CircleCollider
                 {
-                    .rigidbody_entity = my_shape,
+                    .rigid_body_entity = my_shape,
                     .radius = 10.f,
                     .origin = { 15, 0 },
                     .density = 1.f,
@@ -99,7 +99,7 @@ namespace TestScene
                 },
                 doge::RectangleCollider
                 {
-                    .rigidbody_entity = my_shape,
+                    .rigid_body_entity = my_shape,
                     .size = { 30, 8 },
                     .origin = { 0, 0 },
                     .density = 1.f,
@@ -158,7 +158,7 @@ namespace TestScene
         my_sprite.AddComponent<doge::Rotation>();
         my_sprite.AddComponent(doge::RectangleCollider
         {
-            .rigidbody_entity = my_sprite,
+            .rigid_body_entity = my_sprite,
             .size = { 100, 100 },
         });
         my_sprite.AddComponent<doge::Scale>(0.01, 0.01);
@@ -185,7 +185,7 @@ namespace TestScene
         ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
         ground.AddComponent(doge::ConvexCollider
         {
-            .rigidbody_entity = ground,
+            .rigid_body_entity = ground,
             .points = // shape: /\.
             { 
                 doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
@@ -224,7 +224,7 @@ namespace TestScene
         my_custom_shape.AddComponent(doge::RigidBody(doge::RigidBody::Kinematic));
         my_custom_shape.AddComponent(doge::ConvexCollider
         {
-            .rigidbody_entity = my_custom_shape,
+            .rigid_body_entity = my_custom_shape,
             .points = 
             {
                 doge::Vec2f(0, 0),
