@@ -1,5 +1,7 @@
 #include <doge/extensions/gui/GUIElement.hpp>
 
+#include <doge/extensions/gui/gui.hpp>
+
 namespace doge
 {
     GUIElement::~GUIElement()
@@ -26,14 +28,19 @@ namespace doge
         return texture_id;
     }
 
-    void GUIElement::SetOwnerCamera(const std::string& owner_camera)
+    void GUIElement::SetCamera(const std::string& owner_camera)
     {
-        this->owner_camera = owner_camera;
+        this->camera = owner_camera;
     }
 
-    const std::string& GUIElement::GetOwnerCamera() const
+    const std::string& GUIElement::GetCamera() const
     {
-        return owner_camera;
+        return camera;
+    }
+
+    doge::Component<Camera>& GUIElement::GetCameraComponent() const
+    {
+        return gui::GetCamera(camera);
     }
 
     void GUIElement::SetSize(const Vec2f& size)
@@ -54,5 +61,25 @@ namespace doge
     const Vec2f& GUIElement::GetPosition() const
     {
         return position;
+    }
+
+    void GUIElement::SetIsScaleVec(ScaleVec is_scale_vec)
+    {
+        this->is_scale_vec = is_scale_vec;
+    }
+
+    GUIElement::ScaleVec GUIElement::IsScaleVec() const
+    {
+        return is_scale_vec;
+    }
+
+    bool GUIElement::IsScaleVec(ScaleVec scale_vec) const
+    {
+        return is_scale_vec & scale_vec;
+    }
+
+    Rectf GUIElement::GetRectangle() const
+    {
+        return Rectf(position - origin - size / 2.f, size);
     }
 }

@@ -128,7 +128,6 @@ namespace ParticleSim
             .size = Vec2f(0.7, 0.7),
             .origin = Vec2f(0.35, 0.35),
             .color = Color::Yellow(),
-            //.texture_id = "crate",
         });
 
         Entity midground = engine.AddEntity();
@@ -138,7 +137,6 @@ namespace ParticleSim
             .size = Vec2f(0.5, 0.5),
             .origin = Vec2f(0.25, 0.25),
             .color = Color::Cyan(),
-            //.texture_id = "crate",
         });
 
         Entity background = engine.AddEntity();
@@ -149,7 +147,6 @@ namespace ParticleSim
             .size = Vec2f(0.9, 0.9),
             .origin = Vec2f(0.45, 0.45),
             .color = Color::Magenta(),
-            //.texture_id = "crate",
         });
 
         // rounded rectangle
@@ -296,6 +293,22 @@ namespace ParticleSim
                 }
             }
         };
+
+        // gui elements
+        gui::AddCamera(engine, "gui_cam");
+        
+        Button button0;
+        button0.SetID("button0");
+        button0.SetCamera("gui_cam");
+        button0.SetSize(Vec2(200, 200));
+
+        button0.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
+        button0.on_released += [](){ std::cout << "Released" << std::endl; };
+        button0.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
+        button0.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
+        button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
+
+        gui::AddElement(engine, button0);
     }
 
     void Update(Engine& engine, DeltaTime dt)
@@ -311,7 +324,7 @@ namespace ParticleSim
             }
         }
 
-        std::cout << 1000.f / dt << std::endl;
+        //std::cout << 1000.f / dt << std::endl;
     }
 
     void FixedUpdate(Engine& engine, DeltaTime dt)
@@ -336,7 +349,7 @@ int main()
 {
     Engine engine;
     engine.window.settings.fps = 120;
-    engine.window.settings.msaa_level = 16;
+    engine.window.settings.msaa_level = 4;
     engine.window.settings.size = Vec2u(1280, 720);
     engine.window.settings.title = "Particle Simulation";
 

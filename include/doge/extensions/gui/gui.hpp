@@ -11,6 +11,8 @@
 
 namespace doge
 {
+    struct Camera;
+
     struct gui
     {
         using Element = GUIElement;
@@ -24,26 +26,32 @@ namespace doge
 
         static void RemoveCamera(Engine& engine, const std::string& id);
 
+        static doge::Component<Camera>& GetCamera(const std::string& id);
+
         template <typename E>
         requires std::derived_from<std::remove_reference_t<E>, Element>
         static void AddElement(Engine& engine, E&& element)
         {
-            if (cameras.find(element.GetOwnerCamera()) == cameras.end())
-                throw std::invalid_argument("OwnerCamera property of GUIElement (gui::Element) is not found in gui::cameras");
+            auto cam_itr = cameras.find(element.GetCamera());
+            if (cam_itr == cameras.end())
+                throw std::invalid_argument("Camera property of GUIElement (gui::Element) is not found in gui::cameras");
 
             auto entity = engine.AddEntity();
-            Element& element = *entity.AddComponent(Component::Create(std::forward<E>(element))).element;
+            entity.SetParent(cam_itr->second);
+            auto& comp = entity.AddComponent(Component::Create(std::forward<E>(element)));
 
             if (element.GetID() == "")
                 idless_elements.emplace(entity);
             else
                 elements.emplace(element.GetID(), entity);
             
-            element.Initialize(engine);
+            comp.element->Initialize(engine);
         }
 
         static void RemoveElement(Engine& engine, const std::string& id);
         static void RemoveElements(Engine& engine, const std::string& camera_id);
+
+        static doge::Component<GUIComponent>& GetElement(const std::string& id);
 
     private:
 

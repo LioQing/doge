@@ -39,6 +39,11 @@ namespace doge
         cameras.erase(id);
     }
 
+    doge::Component<Camera>& gui::GetCamera(const std::string& id)
+    {
+        return cameras.at(id).GetComponent<Camera>();
+    }
+
     void gui::RemoveElement(Engine& engine, const std::string& id)
     {
         engine.DestroyEntity(elements.at(id));
@@ -49,15 +54,20 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            if (element.GetComponent<Component>().element->GetOwnerCamera() == camera_id)
+            if (element.GetComponent<GUIComponent>().element->GetCamera() == camera_id)
                 engine.DestroyEntity(element);
         }
 
         for (auto& element : idless_elements)
         {
-            if (element.GetComponent<Component>().element->GetOwnerCamera() == camera_id)
+            if (element.GetComponent<GUIComponent>().element->GetCamera() == camera_id)
                 engine.DestroyEntity(element);
         }
+    }
+
+    doge::Component<gui::Component>& gui::GetElement(const std::string& id)
+    {
+        return elements.at(id).GetComponent<GUIComponent>();
     }
 
     void gui::Update(Engine& engine, DeltaTime dt)
