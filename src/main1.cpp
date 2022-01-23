@@ -111,12 +111,12 @@ namespace ParticleSim
         engine.assets.LoadTexture("crate_center", "test2.png", Recti(4, 5, 23, 23));
 
         // cam
-        Entity cam = engine.AddCamera(Vec2f(12.8, 7.2));
+        Entity cam = engine.AddCamera(Camera{ .size = Vec2f(12.8, 7.2), .render_order = 1 });
         cam_comp = &cam.GetComponent<Camera>();
         cam.AddComponent(Layer::Create(1, 0, -1));
 
         // smaller cam
-        Entity subcam = engine.AddCamera(Vec2f(12.8, 7.2), Rectf(0, 0, 0.25, 0.25));
+        Entity subcam = engine.AddCamera(Camera{ .size = Vec2f(12.8, 7.2), .port = Rectf(0, 0, 0.25, 0.25), .render_order = 0 });
         subcam.AddComponent(Layer::Create(0, -1));
         
         // square for testing layer rendering

@@ -38,10 +38,10 @@ namespace doge
             };
 
             using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>; // eid, draw type, index
-            using ViewInfo = std::pair<std::unique_ptr<sf::View>, std::set<DrawableKey>>; // view, draw key
+            using ViewInfo = std::tuple<std::unique_ptr<sf::View>, std::set<DrawableKey>, std::int32_t>; // view, draw key, render order
             
             std::unordered_map<EntityID, ViewInfo> views_draws;
-            std::map<DrawableKey, int> draws_layers;
+            std::map<DrawableKey, std::int32_t> draws_layers;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 
             doge::Event<sf::Event> sf_event;

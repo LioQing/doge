@@ -12,5 +12,7 @@ namespace doge
         
         // size of camera in window (in ratio to the window)
         Rectf port = Rectf(0, 0, 1, 1);
+
+        std::int32_t render_order = 0;
     };
 }

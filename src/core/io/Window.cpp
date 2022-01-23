@@ -135,7 +135,7 @@ namespace doge::io
 
             for (auto cam_entity : engine.Select<Camera>().Entities())
             {
-                auto& [view_ptr, draw_keys] = views_draws.at(cam_entity.id);
+                auto& [view_ptr, draw_keys, render_order] = views_draws.at(cam_entity.id);
                 
                 bool is_in_view = 
                     aabb.left + aabb.width > view_ptr->getCenter().x - view_ptr->getSize().x / 2.f &&
@@ -165,11 +165,11 @@ namespace doge::io
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, ViewInfo(std::make_unique<sf::View>(), std::set<DrawableKey>())).first;
+                view_itr = views_draws.emplace(entity.id, ViewInfo(std::make_unique<sf::View>(), std::set<DrawableKey>(), cam.render_order)).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
-            auto& view = view_itr->second.first;
+            auto& view = std::get<0>(view_itr->second);
             
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
             if (cam.size == Vec2f::Zero())
@@ -187,7 +187,7 @@ namespace doge::io
         // clearing views_draws
         for (auto& [entity, view_draw] : views_draws)
         {
-            view_draw.second.clear();
+            std::get<1>(view_draw).clear();
         }
 
         // convex shape
@@ -385,44 +385,55 @@ namespace doge::io
         }
 
         // layers_draws
-        std::map<int, std::set<DrawableKey>> layers_draws;
+        std::map<std::int32_t, std::set<const DrawableKey*>> layers_draws;
         
         for (auto& [draw, layer] : draws_layers)
         {
-            layers_draws[layer].emplace(draw);
+            layers_draws[layer].emplace(&draw);
+        }
+
+        // cam orders
+        std::map<std::int32_t, std::unordered_map<EntityID, std::reference_wrapper<ViewInfo>>> orders_views;
+
+        for (auto& [cam_id, view_info] : views_draws)
+        {
+            orders_views[std::get<2>(view_info)].emplace(cam_id, std::ref(view_info));
         }
 
         // draw
         window.clear(cast::ToSfColor(background_color));
-        for (auto& [cam_id, view_draw] : views_draws)
+        for (auto& [order, view_infos] : orders_views)
         {
-            auto& [view, draw_keys] = view_draw;
-
-            window.setView(*view);
-
-            // draw
-            if (engine.GetEntity(cam_id).HasComponent<Layer>())
+            for (auto& [cam_id, view_info] : view_infos)
             {
-                auto& cam_layers = engine.GetEntity(cam_id).GetComponent<Layer>().layers;
+                auto& [view, draw_keys, _] = view_info.get();
 
-                for (auto& [layer, layer_draw_keys] : layers_draws)
+                window.setView(*view);
+
+                // draw
+                if (engine.GetEntity(cam_id).HasComponent<Layer>())
                 {
-                    if (!cam_layers.contains(layer))
-                        continue;
+                    auto& cam_layers = engine.GetEntity(cam_id).GetComponent<Layer>().layers;
 
-                    for (auto& draw_key : layer_draw_keys)
+                    for (auto& [layer, layer_draw_keys] : layers_draws)
                     {
-                        if (draw_keys.contains(draw_key))
-                            window.draw(*drawables.at(draw_key));
+                        if (!cam_layers.contains(layer))
+                            continue;
+
+                        for (auto& draw_key : layer_draw_keys)
+                        {
+                            if (draw_keys.contains(*draw_key))
+                                window.draw(*drawables.at(*draw_key));
+                        }
                     }
                 }
-            }
-            else
-            {
-                for (auto& draw_key : layers_draws.at(0))
+                else
                 {
-                    if (draw_keys.contains(draw_key))
-                        window.draw(*drawables.at(draw_key));
+                    for (auto& draw_key : layers_draws.at(0))
+                    {
+                        if (draw_keys.contains(*draw_key))
+                            window.draw(*drawables.at(*draw_key));
+                    }
                 }
             }
         }
