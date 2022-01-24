@@ -133,6 +133,18 @@ namespace doge::io
             auto is_in_any_view = false;
             Rectf aabb = global::GetAABB(comp, entity);
 
+            if (aabb.width < 0.f)
+            {
+                aabb.width = std::abs(aabb.width);
+                aabb.left -= aabb.width;
+            }
+
+            if (aabb.height < 0.f)
+            {
+                aabb.height = std::abs(aabb.height);
+                aabb.top -= aabb.height;
+            }
+
             for (auto cam_entity : engine.Select<Camera>().Entities())
             {
                 auto& [view_ptr, draw_keys, render_order] = views_draws.at(cam_entity.id);

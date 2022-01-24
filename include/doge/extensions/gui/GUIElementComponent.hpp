@@ -6,15 +6,15 @@
 
 namespace doge
 {
-    struct GUIComponent
+    struct GUIElementComponent
     {
         std::shared_ptr<GUIElement> element;
 
         template <typename E>
         requires std::derived_from<std::remove_reference_t<E>, GUIElement>
-        static GUIComponent Create(E&& element)
+        static GUIElementComponent Create(E&& element)
         {
-            GUIComponent comp;
+            GUIElementComponent comp;
             comp.element = std::make_shared<std::remove_reference_t<E>>(std::forward<E>(element));
             return comp;
         }

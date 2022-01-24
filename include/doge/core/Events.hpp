@@ -8,6 +8,7 @@ namespace doge
 {
     struct Events
     {
+        Event<                          > on_window_opened;
         Event<                          > on_window_closed;
         Event<event::Size               > on_window_resized;
         Event<                          > on_window_focus_lost;

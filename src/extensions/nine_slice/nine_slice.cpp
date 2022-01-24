@@ -15,6 +15,12 @@ namespace doge
         return std::string("nine_slice_") + id + "_" + Texture::PostFixFromSlice(slice);
     }
 
+    std::string nine_slice::SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice)
+    {
+        auto prefix_size = std::string("nine_slice_").size();
+        return id.substr(prefix_size, id.find(NineSliceTexture::PostFixFromSlice(slice)) - prefix_size - 1);
+    }
+
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
     nine_slice::AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle)
     {
@@ -205,7 +211,7 @@ namespace doge
         return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
-    Component<CompoundSprite>& nine_slice::Add9SliceSprite(
+    Component<CompoundSprite>& nine_slice::Add9SliceSpriteBySize(
         Assets& assets,
         Entity entity,
         const std::string& texture_id,
@@ -216,23 +222,13 @@ namespace doge
         const Color& color)
     {
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
-        auto& sprites = comp_sprite.sprites;
-        auto& slice_tex = textures.at(texture_id);
-        
-        auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
-        auto bord_thick = border_thickness == Rectf() ? 
-            Rectf(
-                slice_tex.border_thickness.GetPosition() * rect_size / slice_tex.texture_rectangle.GetSize(), 
-                slice_tex.border_thickness.GetSize() * rect_size / slice_tex.texture_rectangle.GetSize()
-            ) : 
-            border_thickness;
 
-        Update9SliceSprite(assets, entity, sprites, slice_tex, center_texture_size, rect_size, bord_thick, origin, color);
+        Update9SliceSprite(comp_sprite, texture_id, center_texture_size, size, border_thickness, origin, color);
 
         return comp_sprite;
     }
 
-    Component<CompoundSprite>& nine_slice::Add9SliceSprite(
+    Component<CompoundSprite>& nine_slice::Add9SliceSpriteByTile(
         Assets& assets,
         Entity entity,
         const std::string& texture_id,
@@ -243,7 +239,6 @@ namespace doge
         const Color& color)
     {
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
-        auto& sprites = comp_sprite.sprites;
         auto& slice_tex = textures.at(texture_id);
 
         auto texture_center_size = assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
@@ -273,16 +268,80 @@ namespace doge
             border_thickness.SetSize(border_thickness.GetSize() * size.y / slice_tex.texture_rectangle.GetSize().y);
         }
 
-        Update9SliceSprite(assets, entity, sprites, slice_tex, center_texture_size, size, border_thickness, origin, color);
+        Update9SliceSprite(comp_sprite, texture_id, center_texture_size, size, border_thickness, origin, color);
 
         return comp_sprite;
     }
+    
+    void nine_slice::SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id)
+    {
+        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        {
+            comp_sprite.sprites.at(i).texture_id = textures.at(id).textures.at(i);
+        }
+    }
+
+    void nine_slice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness)
+    {
+        auto& slice_tex = textures.at(SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::Center).texture_id, Texture::Slice::Center));
+        
+        auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
+        auto bord_thick = border_thickness == Rectf() ? slice_tex.border_thickness.Cast<float>() : border_thickness;
+
+        comp_sprite.sprites.at(Texture::Slice::Center)  .size = rect_size - bord_thick.GetPosition() - bord_thick.GetSize();
+        
+        comp_sprite.sprites.at(Texture::Slice::Top)     .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.top     * Vec2f::j();
+        comp_sprite.sprites.at(Texture::Slice::Left)    .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.left    * Vec2f::i();
+        comp_sprite.sprites.at(Texture::Slice::Bottom)  .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::i() + bord_thick.height  * Vec2f::j();
+        comp_sprite.sprites.at(Texture::Slice::Right)   .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::j() + bord_thick.width   * Vec2f::i();
+
+        comp_sprite.sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(bord_thick.left,    bord_thick.top);
+        comp_sprite.sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(bord_thick.left,    bord_thick.height);
+        comp_sprite.sprites.at(Texture::Slice::BottomRight) .size = Vec2f(bord_thick.width,   bord_thick.height);
+        comp_sprite.sprites.at(Texture::Slice::TopRight)    .size = Vec2f(bord_thick.width,   bord_thick.top);
+
+        SetSpriteOrigin(comp_sprite, comp_sprite.sprites.at(Texture::Slice::TopLeft).origin);
+    }
+
+    void nine_slice::SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin)
+    {
+        auto tl0 = Vec2f::Zero();
+        auto tl1 = comp_sprite.sprites.at(Texture::Slice::TopLeft).size;
+        auto tl2 = tl1 + comp_sprite.sprites.at(Texture::Slice::Center).size;
+        auto tl3 = tl2 + comp_sprite.sprites.at(Texture::Slice::BottomRight).size;
+        
+        comp_sprite.sprites.at(Texture::Slice::Center)      .origin = origin - tl1;
+        comp_sprite.sprites.at(Texture::Slice::TopLeft)     .origin = origin - tl0;
+        comp_sprite.sprites.at(Texture::Slice::BottomLeft)  .origin = origin - Vec2f(0, tl2.y);
+        comp_sprite.sprites.at(Texture::Slice::BottomRight) .origin = origin - tl2;
+        comp_sprite.sprites.at(Texture::Slice::TopRight)    .origin = origin - Vec2f(tl2.x, 0);
+        comp_sprite.sprites.at(Texture::Slice::Top)         .origin = origin - Vec2f(tl1.x, 0);
+        comp_sprite.sprites.at(Texture::Slice::Left)        .origin = origin - Vec2f(0, tl1.y);
+        comp_sprite.sprites.at(Texture::Slice::Bottom)      .origin = origin - Vec2f(tl1.x, tl2.y);
+        comp_sprite.sprites.at(Texture::Slice::Right)       .origin = origin - Vec2f(tl2.x, tl1.y);
+    }
+
+    void nine_slice::SetSpriteColor(CompoundSprite& comp_sprite, const Color& color)
+    {
+        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        {
+            comp_sprite.sprites.at(i).color = color;
+        }
+    }
+
+    void nine_slice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size)
+    {
+        comp_sprite.sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
+
+        comp_sprite.sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(center_texture_size * Vec2f::i());
+        comp_sprite.sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(center_texture_size * Vec2f::j());
+        comp_sprite.sprites.at(Texture::Slice::Bottom)  .texture_rectangle.SetSize(center_texture_size * Vec2f::i());
+        comp_sprite.sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2f::j());
+    }
 
     void nine_slice::Update9SliceSprite(
-        Assets& assets,
-        Entity entity,
-        std::vector<Sprite>& sprites,
-        const Texture& texture,
+        CompoundSprite& comp_sprite,
+        const std::string& texture_id,
         const Vec2f& center_texture_size,
         const Vec2f& size,
         const Rectf& border_thickness,
@@ -294,40 +353,16 @@ namespace doge
         auto tl2 = size - border_thickness.GetSize();
         auto tl3 = size;
 
-        sprites.resize(Texture::Slice::Count);
+        comp_sprite.sprites.resize(Texture::Slice::Count);
 
-        sprites.at(Texture::Slice::Center)  .size = size - border_thickness.GetPosition() - border_thickness.GetSize();
-        sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
-
-        sprites.at(Texture::Slice::Top)     .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + border_thickness.top     * Vec2f::j();
-        sprites.at(Texture::Slice::Left)    .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + border_thickness.left    * Vec2f::i();
-        sprites.at(Texture::Slice::Bottom)  .size = sprites.at(Texture::Slice::Center).size * Vec2f::i() + border_thickness.height  * Vec2f::j();
-        sprites.at(Texture::Slice::Right)   .size = sprites.at(Texture::Slice::Center).size * Vec2f::j() + border_thickness.width   * Vec2f::i();
-
-        sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(border_thickness.left,    border_thickness.top);
-        sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(border_thickness.left,    border_thickness.height);
-        sprites.at(Texture::Slice::BottomRight) .size = Vec2f(border_thickness.width,   border_thickness.height);
-        sprites.at(Texture::Slice::TopRight)    .size = Vec2f(border_thickness.width,   border_thickness.top);
-
-        sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::i());
-        sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::j());
-        sprites.at(Texture::Slice::Bottom)  .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::i());
-        sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(sprites.at(Texture::Slice::Center).texture_rectangle.GetSize() * Vec2f::j());
-
-        sprites.at(Texture::Slice::Center)      .origin = origin - tl1;
-        sprites.at(Texture::Slice::TopLeft)     .origin = origin - tl0;
-        sprites.at(Texture::Slice::BottomLeft)  .origin = origin - Vec2f(0, tl2.y);
-        sprites.at(Texture::Slice::BottomRight) .origin = origin - tl2;
-        sprites.at(Texture::Slice::TopRight)    .origin = origin - Vec2f(tl2.x, 0);
-        sprites.at(Texture::Slice::Top)         .origin = origin - Vec2f(tl1.x, 0);
-        sprites.at(Texture::Slice::Left)        .origin = origin - Vec2f(0, tl1.y);
-        sprites.at(Texture::Slice::Bottom)      .origin = origin - Vec2f(tl1.x, tl2.y);
-        sprites.at(Texture::Slice::Right)       .origin = origin - Vec2f(tl2.x, tl1.y);
-    
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            sprites.at(i).texture_id = texture.textures.at(i);
-            sprites.at(i).color = color;
+            comp_sprite.sprites.at(i).texture_id = textures.at(texture_id).textures.at(i);
+            comp_sprite.sprites.at(i).color = color;
         }
+
+        SetSpriteSizeAndBorder(comp_sprite, size, border_thickness);
+        SetSpriteOrigin(comp_sprite, origin);
+        SetSpriteCenterTextureSize(comp_sprite, center_texture_size);
     }
 }

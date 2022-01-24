@@ -28,6 +28,7 @@ namespace doge
         nine_slice(const nine_slice&) = delete;
 
         static std::string TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id);
+        static std::string SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice);
 
         std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
         static AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle);
@@ -56,7 +57,7 @@ namespace doge
         static void SetRepeated(Assets& assets, const std::string& id, bool repeated);
         static bool IsRepeated(const Assets& assets, const std::string& id);
 
-        static Component<CompoundSprite>& Add9SliceSprite(
+        static Component<CompoundSprite>& Add9SliceSpriteBySize(
             Assets& assets,
             Entity entity,
             const std::string& texture_id,
@@ -64,9 +65,10 @@ namespace doge
             const Vec2i& center_texture_size = Vec2i::Zero(),
             const Rectf& border_thickness = Rectf(),
             const Vec2f& origin = Vec2f::Zero(),
-            const Color& color = Color::White());
+            const Color& color = Color::White()
+        );
         
-        static Component<CompoundSprite>& Add9SliceSprite(
+        static Component<CompoundSprite>& Add9SliceSpriteByTile(
             Assets& assets,
             Entity entity,
             const std::string& texture_id,
@@ -74,15 +76,20 @@ namespace doge
             const Vec2u& tile_count = Vec2u::One(),
             BorderThickness border_thickness = BorderThickness::Stretch,
             const Vec2f& origin = Vec2f::Zero(),
-            const Color& color = Color::White());
+            const Color& color = Color::White()
+        );
+
+        static void SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id);
+        static void SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness);
+        static void SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin);
+        static void SetSpriteColor(CompoundSprite& comp_sprite, const Color& color);
+        static void SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size);
 
     private:
 
         static void Update9SliceSprite(
-            Assets& assets,
-            Entity entity,
-            std::vector<Sprite>& sprites,
-            const Texture& texture,
+            CompoundSprite& comp_sprite,
+            const std::string& texture_id,
             const Vec2f& center_texture_size,
             const Vec2f& size,
             const Rectf& border_thickness,

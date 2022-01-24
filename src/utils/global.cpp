@@ -120,7 +120,7 @@ namespace doge
     Rectf global::GetAABB(const Sprite& sprite, const Entity& entity)
     {
         auto tl = ((Vec2f::Zero() - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
-        auto br = ((Vec2f(sprite.texture_rectangle.width, sprite.texture_rectangle.height) - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
+        auto br = ((sprite.size - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
 
         return GetAABB(
             tl, br,

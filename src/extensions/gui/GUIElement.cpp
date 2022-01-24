@@ -1,6 +1,7 @@
 #include <doge/extensions/gui/GUIElement.hpp>
 
 #include <doge/extensions/gui/gui.hpp>
+#include <doge/core/Entity.hpp>
 
 namespace doge
 {
@@ -8,9 +9,9 @@ namespace doge
     {
     };
 
-    void GUIElement::SetID(const std::string& id)
+    Entity GUIElement::GetEntity() const
     {
-        this->id = id;
+        return gui::GetElementEntity(GetID());
     }
 
     const std::string& GUIElement::GetID() const
@@ -18,34 +19,26 @@ namespace doge
         return id;
     }
 
-    void GUIElement::SetTextureID(const std::string& texture_id)
+    void GUIElement::SetCameraID(const std::string& camera)
     {
-        this->texture_id = texture_id;
+        this->camera = camera;
+        OnCameraUpdated();
     }
 
-    const std::string& GUIElement::GetTextureID() const
-    {
-        return texture_id;
-    }
-
-    void GUIElement::SetCamera(const std::string& owner_camera)
-    {
-        this->camera = owner_camera;
-    }
-
-    const std::string& GUIElement::GetCamera() const
+    const std::string& GUIElement::GetCameraID() const
     {
         return camera;
     }
 
     doge::Component<Camera>& GUIElement::GetCameraComponent() const
     {
-        return gui::GetCamera(camera);
+        return gui::GetCameraComponent(camera);
     }
 
     void GUIElement::SetSize(const Vec2f& size)
     {
         this->size = size;
+        OnSizeUpdated();
     }
 
     const Vec2f& GUIElement::GetSize() const
@@ -56,6 +49,7 @@ namespace doge
     void GUIElement::SetPosition(const Vec2f& position)
     {
         this->position = position;
+        OnPositionUpdated();
     }
 
     const Vec2f& GUIElement::GetPosition() const
@@ -63,9 +57,21 @@ namespace doge
         return position;
     }
 
+    void GUIElement::SetOrigin(const Vec2f& origin)
+    {
+        this->origin = origin;
+        OnOriginUpdated();
+    }
+
+    const Vec2f& GUIElement::GetOrigin() const
+    {
+        return origin;
+    }
+
     void GUIElement::SetIsScaleVec(ScaleVec is_scale_vec)
     {
         this->is_scale_vec = is_scale_vec;
+        OnIsScaleVecUpdated();
     }
 
     GUIElement::ScaleVec GUIElement::IsScaleVec() const

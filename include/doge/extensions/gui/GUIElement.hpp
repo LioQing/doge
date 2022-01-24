@@ -9,6 +9,7 @@
 namespace doge
 {
     struct Engine;
+    struct Entity;
     
     template <typename TComp>
     struct Component;
@@ -33,14 +34,12 @@ namespace doge
         virtual void Update(Engine&, DeltaTime) {};
         virtual void FixedUpdate(Engine&, DeltaTime) {};
 
-        void SetID(const std::string& id);
+        Entity GetEntity() const;
+
         const std::string& GetID() const;
 
-        void SetTextureID(const std::string& texture_id);
-        const std::string& GetTextureID() const;
-
-        void SetCamera(const std::string& owner_camera);
-        const std::string& GetCamera() const;
+        void SetCameraID(const std::string& owner_camera);
+        const std::string& GetCameraID() const;
         doge::Component<Camera>& GetCameraComponent() const;
 
         void SetSize(const Vec2f& size);
@@ -49,6 +48,9 @@ namespace doge
         void SetPosition(const Vec2f& position);
         const Vec2f& GetPosition() const;
 
+        void SetOrigin(const Vec2f& origin);
+        const Vec2f& GetOrigin() const;
+
         // size & position scale with screen size, origin scale with size
         void SetIsScaleVec(ScaleVec is_scale_vec);
         ScaleVec IsScaleVec() const;
@@ -56,14 +58,23 @@ namespace doge
 
         Rectf GetRectangle() const;
 
+    protected:
+
+        virtual void OnCameraUpdated() {};
+        virtual void OnSizeUpdated() {};
+        virtual void OnPositionUpdated() {};
+        virtual void OnOriginUpdated() {};
+        virtual void OnIsScaleVecUpdated() {};
+        
     private:
 
         std::string id;
-        std::string texture_id;
         std::string camera;
         Vec2f size;
         Vec2f position;
         Vec2f origin;
         ScaleVec is_scale_vec = ScaleVec::None;
+
+        friend struct gui;
     };
 }

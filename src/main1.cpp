@@ -298,9 +298,27 @@ namespace ParticleSim
         gui::AddCamera(engine, "gui_cam");
         
         Button button0;
-        button0.SetID("button0");
-        button0.SetCamera("gui_cam");
-        button0.SetSize(Vec2(200, 200));
+        button0.SetCameraID("gui_cam");
+        button0.SetSize(Vec2f(100, 28));
+        button0.SetPosition(Vec2f(-300, 0));
+        button0.on_state_transition = [](Button& button)
+        {
+            if (button.IsDown())
+            {
+                button.SetColor(0xAAAAAA88);
+                button.SetSize(Vec2f(95, 26));
+            }
+            else if (button.IsMouseOver())
+            {
+                button.SetColor(0xEEEEEE88);
+                button.SetSize(Vec2f(102, 29));
+            }
+            else
+            {
+                button.SetColor(0xCFCFCF88);
+                button.SetSize(Vec2f(100, 28));
+            }
+        };
 
         button0.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
         button0.on_released += [](){ std::cout << "Released" << std::endl; };
@@ -308,7 +326,7 @@ namespace ParticleSim
         button0.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
         button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
 
-        gui::AddElement(engine, button0);
+        gui::AddElement(engine, "button0", button0);
     }
 
     void Update(Engine& engine, DeltaTime dt)
