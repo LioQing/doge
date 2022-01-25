@@ -15,13 +15,13 @@ namespace doge
     {
     }
 
-    Color Color::Red()          { return Color(0xFF, 0, 0); }
-    Color Color::Green()        { return Color(0, 0xFF, 0); }
-    Color Color::Blue()         { return Color(0, 0, 0xFF); }
-    Color Color::Yellow()       { return Color(0xFF, 0xFF, 0); }
-    Color Color::Magenta()      { return Color(0xFF, 0, 0xFF); }
-    Color Color::Cyan()         { return Color(0, 0xFF, 0xFF); }
-    Color Color::White()        { return Color(0xFF, 0xFF, 0xFF); }
-    Color Color::Black()        { return Color(0, 0, 0); }
-    Color Color::Transparent()  { return Color(0, 0, 0, 0); }
+    const Color Color::Red          = 0xFF0000FF;
+    const Color Color::Green        = 0x00FF00FF;
+    const Color Color::Blue         = 0x0000FFFF;
+    const Color Color::Yellow       = 0xFFFF00FF;
+    const Color Color::Magenta      = 0xFF00FFFF;
+    const Color Color::Cyan         = 0x00FFFFFF;
+    const Color Color::White        = 0xFFFFFFFF;
+    const Color Color::Black        = 0x000000FF;
+    const Color Color::Transparent  = 0x00000000;
 }

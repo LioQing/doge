@@ -262,4 +262,28 @@ namespace doge
             default: throw std::invalid_argument("Invalid controller axis");
         }
     }
+
+    Text::Style cast::FromSfTextStyle(std::uint32_t style)
+    {
+        Text::Style dstyle = Text::Style::Regular;
+
+        if (style & sf::Text::Bold)             style |= Text::Style::Bold;
+        if (style & sf::Text::Italic)           style |= Text::Style::Italic;
+        if (style & sf::Text::Underlined)       style |= Text::Style::Underlined;
+        if (style & sf::Text::StrikeThrough)    style |= Text::Style::StrikeThrough;
+
+        return dstyle;
+    }
+
+    std::uint32_t cast::ToSfTextStyle(Text::Style style)
+    {
+        std::uint32_t sftext = sf::Text::Regular;
+
+        if (style & Text::Style::Bold)             sftext |= sf::Text::Bold;
+        if (style & Text::Style::Italic)           sftext |= sf::Text::Italic;
+        if (style & Text::Style::Underlined)       sftext |= sf::Text::Underlined;
+        if (style & Text::Style::StrikeThrough)    sftext |= sf::Text::StrikeThrough;
+
+        return sftext;
+    }
 }

@@ -18,6 +18,11 @@ namespace doge
 
         if (assets.LoadTexture("missing_texture", "missing_texture.png").second)
             assets.textures.at("missing_texture").SetRepeated(true);
+        else
+            std::cerr << "Failed to load defaut texture missing_texture.png" << std::endl;
+
+        if (!assets.LoadFont("arial", "arial.ttf").second)
+            std::cerr << "Failed to load default font arial.ttf" << std::endl;
     }
 
     void Engine::CloseWindow()

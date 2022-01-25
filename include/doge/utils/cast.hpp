@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <box2d/box2d.h>
 #include <doge/components/PolygonShape.hpp>
+#include <doge/components/Text.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Vec3.hpp>
@@ -81,5 +82,8 @@ namespace doge
 
         static std::uint8_t FromSfControllerAxis(sf::Joystick::Axis axis);
         static sf::Joystick::Axis ToSfControllerAxis(std::uint8_t axis);
+
+        static Text::Style FromSfTextStyle(std::uint32_t style);
+        static std::uint32_t ToSfTextStyle(Text::Style style);
     };
 }

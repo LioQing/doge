@@ -45,6 +45,8 @@ set(SRC_FILES
     core/io/Sound.cpp
     core/io/Music.cpp
     core/io/Cursor.cpp
+    core/io/Font.cpp
+    utils/custom_sf/Text.cpp
 
     # physics
     extensions/physics/physics.cpp

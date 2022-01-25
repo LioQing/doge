@@ -11,6 +11,6 @@ namespace doge
         Scale(const Vec2f& scale);
         Scale(float x, float y);
 
-        Vec2f scale = Vec2f::One();
+        Vec2f scale = Vec2f::One;
     };
 }

@@ -117,21 +117,23 @@ namespace TestScene
             init.angular_velocity = 20.f;
             doge::physics::SetBodyInit(my_shape, init);
 
-            auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
-            (
+            // auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
+            // (
+            my_shape.AddComponent(
                 doge::CircleShape
                 {
                     .radius = 10.f,
                     .origin = doge::Vec2f(25.f, 10.f),
                     .color = doge::Color(0x0000FF88),
-                },
+                });
+            my_shape.AddComponent(
                 doge::RectangleShape
                 {
                     .size = { 30, 8 },
                     .origin = { 15, 4 },
                     .color = doge::Color(0x0000FF88),
-                }
-            ));
+                });
+            //));
 
             auto aabb = e.AddEntity();
             aabb.SetParent(my_shape);
@@ -139,7 +141,7 @@ namespace TestScene
             aabb.AddComponent(doge::RectangleShape
             {
                 .color = doge::Color::Transparent(),
-                .outline_color = doge::Color::White(),
+                .outline_color = doge::Color::White,
                 .outline_thickness = 0.01f,
             });
             aabb.AddComponent<doge::Position>();
@@ -296,8 +298,8 @@ namespace TestScene
             .type = doge::PolygonShape::Lines, 
             .vertices = 
             { 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White()), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
             } 
         });
     }
@@ -329,9 +331,17 @@ namespace TestScene
                 e.DestroyEntity(entity);
         }
 
-        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider>().EntitiesAndComponents())
+        // for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider>().EntitiesAndComponents())
+        // {
+        //     auto aabb = doge::global::GetAABB(shape.circle_shapes.at(0), entity);
+
+        //     if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
+        //         e.DestroyEntity(entity);
+        // }
+
+        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CircleShape, doge::CompoundCollider>().EntitiesAndComponents())
         {
-            auto aabb = doge::global::GetAABB(shape.circle_shapes.at(0), entity);
+            auto aabb = doge::global::GetAABB(shape, entity);
 
             if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
                 e.DestroyEntity(entity);
@@ -345,11 +355,11 @@ namespace TestScene
 
         for (auto [tag, position, shape, rot, scale] : e.Select<doge::Tag, doge::Position, doge::RectangleShape, doge::Rotation, doge::Scale>().Components())
         {
-            auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::CompoundSprite>();
-            doge::Rectf aabb = doge::global::GetAABB(comp.circle_shapes.at(0), comp.GetEntity());
+            auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::CircleShape>();
+            doge::Rectf aabb = doge::global::GetAABB(comp, comp.GetEntity());
             doge::global::SetPosition(position, aabb.GetPosition());
             doge::global::SetRotation(rot, 0);
-            doge::global::SetScale(scale, doge::Vec2f::One());
+            doge::global::SetScale(scale, doge::Vec2f::One);
             shape.size.Set(aabb.width, aabb.height);
         }
 

@@ -13,3 +13,4 @@
 #include "io/Sound.hpp"
 #include "io/Music.hpp"
 #include "io/Cursor.hpp"
+#include "io/Font.hpp"

@@ -68,22 +68,6 @@ namespace doge
         return origin;
     }
 
-    void GUIElement::SetIsScaleVec(ScaleVec is_scale_vec)
-    {
-        this->is_scale_vec = is_scale_vec;
-        OnIsScaleVecUpdated();
-    }
-
-    GUIElement::ScaleVec GUIElement::IsScaleVec() const
-    {
-        return is_scale_vec;
-    }
-
-    bool GUIElement::IsScaleVec(ScaleVec scale_vec) const
-    {
-        return is_scale_vec & scale_vec;
-    }
-
     Rectf GUIElement::GetRectangle() const
     {
         return Rectf(position - origin - size / 2.f, size);

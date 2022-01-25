@@ -29,7 +29,7 @@ namespace doge
         {
             sf::RenderWindow window;
             sf::Clock clock;
-            doge::Color background_color = doge::Color::Black();
+            doge::Color background_color = doge::Color::Black;
             Image icon;
 
             enum DrawableType

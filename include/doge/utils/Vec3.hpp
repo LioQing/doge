@@ -166,12 +166,30 @@ namespace doge
             return v3.Cross(v2 - *this).SqrMagnitude() == 0;
         }
 
-        static constexpr Vec3 One() 	{ return Vec3(1.0, 1.0, 1.0); }
-        static constexpr Vec3 Zero() { return Vec3(0.0, 0.0, 0.0); }
-        static constexpr Vec3 i() 	{ return Vec3(1.0, 0.0, 0.0); }
-        static constexpr Vec3 j() 	{ return Vec3(0.0, 1.0, 0.0); }
-        static constexpr Vec3 k() 	{ return Vec3(0.0, 0.0, 1.0); }
+        static const Vec3 One;
+        static const Vec3 Zero;
+        static const Vec3 Forward;
+        static const Vec3 Back;
+        static const Vec3 Up;
+        static const Vec3 Down;
+        static const Vec3 Right;
+        static const Vec3 Left;
+        static const Vec3 i;
+        static const Vec3 j;
+        static const Vec3 k;
     };
+
+    template <typename T> const Vec3<T> Vec3<T>::One        = Vec3<T>(1, 1, 1);
+    template <typename T> const Vec3<T> Vec3<T>::Zero       = Vec3<T>(0, 0, 0);
+    template <typename T> const Vec3<T> Vec3<T>::Forward    = Vec3<T>(0, 0, 1);
+    template <typename T> const Vec3<T> Vec3<T>::Back       = Vec3<T>(0, 0, -1);
+    template <typename T> const Vec3<T> Vec3<T>::Up         = Vec3<T>(0, 1, 0);
+    template <typename T> const Vec3<T> Vec3<T>::Down       = Vec3<T>(0, -1, 0);
+    template <typename T> const Vec3<T> Vec3<T>::Right      = Vec3<T>(1, 0, 0);
+    template <typename T> const Vec3<T> Vec3<T>::Left       = Vec3<T>(-1, 0, 0);
+    template <typename T> const Vec3<T> Vec3<T>::i          = Vec3<T>(1, 0, 0);
+    template <typename T> const Vec3<T> Vec3<T>::j          = Vec3<T>(0, 1, 0);
+    template <typename T> const Vec3<T> Vec3<T>::k          = Vec3<T>(0, 0, 1);
 
     template <typename T, typename U>
     auto operator+(const Vec3<T>& v1, const Vec3<U>& v2)

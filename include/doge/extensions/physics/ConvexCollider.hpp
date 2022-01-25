@@ -12,7 +12,7 @@ namespace doge
         // collision only happen on right side of edge
         std::vector<Vec2f> points;
 
-        Vec2f origin = Vec2f::Zero();
+        Vec2f origin = Vec2f::Zero;
         
         float density = 1.f;
         float friction = 0.2f;

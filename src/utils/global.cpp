@@ -101,7 +101,7 @@ namespace doge
 
     Rectf global::GetAABB(const RectangleShape& rectangle, const Entity& entity)
     {
-        auto tl = ((Vec2f::Zero() - rectangle.origin) * GetScale(entity)).Rotated(GetRotation(entity));
+        auto tl = ((Vec2f::Zero - rectangle.origin) * GetScale(entity)).Rotated(GetRotation(entity));
         auto br = ((rectangle.size - rectangle.origin) * GetScale(entity)).Rotated(GetRotation(entity));
 
         return GetAABB(
@@ -119,7 +119,7 @@ namespace doge
 
     Rectf global::GetAABB(const Sprite& sprite, const Entity& entity)
     {
-        auto tl = ((Vec2f::Zero() - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
+        auto tl = ((Vec2f::Zero - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
         auto br = ((sprite.size - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
 
         return GetAABB(

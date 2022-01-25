@@ -81,7 +81,7 @@ namespace doge
         auto port_pos = camera.port.GetPosition() * size;
         auto port_size = camera.port.GetSize() * size;
         auto cam_size = camera.size;
-        if (cam_size == Vec2f::Zero())
+        if (cam_size == Vec2f::Zero)
             cam_size = size;
 
         return ((pixel - port_pos - port_size / 2.f) * cam_size / port_size
@@ -95,7 +95,7 @@ namespace doge
         auto port_pos = camera.port.GetPosition() * size;
         auto port_size = camera.port.GetSize() * size;
         auto cam_size = camera.size;
-        if (cam_size == Vec2f::Zero())
+        if (cam_size == Vec2f::Zero)
             cam_size = size;
 
         return (coords - global::GetPosition(entity)).Rotated(-global::GetRotation(entity))

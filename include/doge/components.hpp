@@ -13,3 +13,4 @@
 #include "components/CompoundSprite.hpp"
 #include "components/Sprite.hpp"
 #include "components/PolygonShape.hpp"
+#include "components/Text.hpp"

@@ -71,11 +71,11 @@ namespace ParticleSim
         [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
         {
             if (state == 0)
-                entity.GetComponent<CircleShape>().color = Color::White();
+                entity.GetComponent<CircleShape>().color = Color::White;
             else if (state == 1)
-                entity.GetComponent<CircleShape>().color = Color::Red();
+                entity.GetComponent<CircleShape>().color = Color::Red;
             else if (state == 2)
-                entity.GetComponent<CircleShape>().color = Color::Blue();
+                entity.GetComponent<CircleShape>().color = Color::Blue;
         };
 
         fsm.state_machines.at(1).on_entry += 
@@ -127,7 +127,7 @@ namespace ParticleSim
         {
             .size = Vec2f(0.7, 0.7),
             .origin = Vec2f(0.35, 0.35),
-            .color = Color::Yellow(),
+            .color = Color::Yellow,
         });
 
         Entity midground = engine.AddEntity();
@@ -136,7 +136,7 @@ namespace ParticleSim
         {
             .size = Vec2f(0.5, 0.5),
             .origin = Vec2f(0.25, 0.25),
-            .color = Color::Cyan(),
+            .color = Color::Cyan,
         });
 
         Entity background = engine.AddEntity();
@@ -146,7 +146,7 @@ namespace ParticleSim
         {
             .size = Vec2f(0.9, 0.9),
             .origin = Vec2f(0.45, 0.45),
-            .color = Color::Magenta(),
+            .color = Color::Magenta,
         });
 
         // rounded rectangle
@@ -201,8 +201,8 @@ namespace ParticleSim
             .type = PolygonShape::Lines, 
             .vertices = 
             { 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent()), 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent()), 
+                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent), 
+                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent), 
             } 
         });
 
@@ -221,7 +221,7 @@ namespace ParticleSim
 
                     shoot_line.GetComponent<Position>().position = shoot_mouse_position;
                     for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                        vertex.color = Color::White();
+                        vertex.color = Color::White;
                     
                     shoot_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
                     shoot_particle = entity.id;
@@ -272,7 +272,7 @@ namespace ParticleSim
                 physics::GetBody(shoot_particle).ApplyImpulse(impulse, shoot_mouse_position);
 
                 for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                    vertex.color = Color::Transparent();
+                    vertex.color = Color::Transparent;
 
                 // engine.GetEntity(shoot_particle).GetComponent<EntityInfo>().enabled = false;
 
@@ -299,23 +299,22 @@ namespace ParticleSim
         
         Button button0;
         button0.SetCameraID("gui_cam");
-        button0.SetSize(Vec2f(100, 28));
         button0.SetPosition(Vec2f(-300, 0));
         button0.on_state_transition = [](Button& button)
         {
             if (button.IsDown())
             {
-                button.SetColor(0xAAAAAA88);
-                button.SetSize(Vec2f(95, 26));
+                button.SetColor(0xAAAAAAFF);
+                button.SetSize(Vec2f(98, 27));
             }
             else if (button.IsMouseOver())
             {
-                button.SetColor(0xEEEEEE88);
-                button.SetSize(Vec2f(102, 29));
+                button.SetColor(0xEEEEEEFF);
+                button.SetSize(Vec2f(101, 29));
             }
             else
             {
-                button.SetColor(0xCFCFCF88);
+                button.SetColor(0xCFCFCFFF);
                 button.SetSize(Vec2f(100, 28));
             }
         };

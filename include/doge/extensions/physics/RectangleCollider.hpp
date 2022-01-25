@@ -8,8 +8,8 @@ namespace doge
     {
         EntityID rigid_body_entity;
 
-        Vec2f size = Vec2f::One();
-        Vec2f origin = Vec2f::Zero();
+        Vec2f size = Vec2f::One;
+        Vec2f origin = Vec2f::Zero;
         
         float density = 1.f;
         float friction = 0.2f;

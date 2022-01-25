@@ -13,3 +13,5 @@
 #include "utils/DrawableVertices.hpp"
 #include "utils/lev.hpp"
 #include "utils/Time.hpp"
+#include "utils/utf8.hpp"
+#include "utils/custom_sf.hpp"

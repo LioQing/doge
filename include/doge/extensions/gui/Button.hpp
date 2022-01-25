@@ -66,8 +66,8 @@ namespace doge
         bool is_9_slice = true;
         std::string atlas_rectangle_id = "";
         Recti texture_rectangle = Recti();
-        Vec2i center_texture_size = Vec2i::Zero();
+        Vec2i center_texture_size = Vec2i::Zero;
         Rectf border_thickness = Rectf();
-        Color color = Color::White();
+        Color color = Color::White;
     };
 }

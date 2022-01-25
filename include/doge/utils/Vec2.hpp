@@ -202,15 +202,24 @@ namespace doge
             return (val > 0) ? 1 : -1;
         }
 
-        static constexpr Vec2 One()  { return Vec2(1.0, 1.0); }
-        static constexpr Vec2 Zero() { return Vec2(0.0, 0.0); }
-        static constexpr Vec2 Up()   { return Vec2(0.0, 1.0); }
-        static constexpr Vec2 Down() { return Vec2(0.0, -1.0); }
-        static constexpr Vec2 Left() { return Vec2(-1.0, 0.0); }
-        static constexpr Vec2 Right(){ return Vec2(1.0, 0.0); }
-        static constexpr Vec2 i()    { return Vec2(1.0, 0.0); }
-        static constexpr Vec2 j()    { return Vec2(0.0, 1.0); }
+        static const Vec2 One;
+        static const Vec2 Zero;
+        static const Vec2 Up;
+        static const Vec2 Down;
+        static const Vec2 Right;
+        static const Vec2 Left;
+        static const Vec2 i;
+        static const Vec2 j;
     };
+
+    template <typename T> const Vec2<T> Vec2<T>::One   = Vec2<T>(1, 1);
+    template <typename T> const Vec2<T> Vec2<T>::Zero  = Vec2<T>(0, 0);
+    template <typename T> const Vec2<T> Vec2<T>::Up    = Vec2<T>(0, 1);
+    template <typename T> const Vec2<T> Vec2<T>::Down  = Vec2<T>(0, -1);
+    template <typename T> const Vec2<T> Vec2<T>::Right = Vec2<T>(1, 0);
+    template <typename T> const Vec2<T> Vec2<T>::Left  = Vec2<T>(-1, 0);
+    template <typename T> const Vec2<T> Vec2<T>::i     = Vec2<T>(1, 0);
+    template <typename T> const Vec2<T> Vec2<T>::j     = Vec2<T>(0, 1);
 
     template <typename T, typename U>
     auto operator+(const Vec2<T>& v1, const Vec2<U>& v2)

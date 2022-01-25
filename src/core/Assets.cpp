@@ -7,6 +7,7 @@
 namespace doge
 {
     std::unordered_set<std::string> Assets::asset_paths = { "assets" };
+    std::unordered_set<std::string> Assets::font_sub_paths = { "fonts" };
     std::unordered_set<std::string> Assets::texture_sub_paths = { "textures" };
     std::unordered_set<std::string> Assets::image_sub_paths = { "images" };
     std::unordered_set<std::string> Assets::cursor_sub_paths = { "cursors" };
@@ -31,6 +32,40 @@ namespace doge
         }
 
         return "";
+    }
+
+    std::string Assets::SearchForFont(const std::string& filename)
+    {
+        return SearchForAsset(filename, font_sub_paths);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Font>::iterator, bool>
+    Assets::LoadFont(const std::string& id, const std::string& filename)
+    {
+        io::Font font;
+        auto path = SearchForFont(filename);
+
+        if (path == "")
+        {
+            std::cerr << "Cannot find path: " << filename << std::endl;
+            return std::make_pair(fonts.end(), false);
+        }
+
+        if (font.FromFile(path))
+            return fonts.emplace(id, font);
+        
+        return std::make_pair(fonts.end(), false);
+    }
+
+    std::pair<std::unordered_map<std::string, io::Font>::iterator, bool>
+    Assets::LoadFont(const std::string& id, void* data, std::size_t size)
+    {
+        io::Font font;
+
+        if (font.FromMemory(data, size))
+            return fonts.emplace(id, font);
+
+        return std::make_pair(fonts.end(), false);
     }
 
     std::string Assets::SearchForTexture(const std::string& filename)

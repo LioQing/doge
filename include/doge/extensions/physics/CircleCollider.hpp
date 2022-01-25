@@ -7,7 +7,7 @@ namespace doge
         EntityID rigid_body_entity;
 
         float radius = 1.f;
-        Vec2f origin = Vec2f::Zero();
+        Vec2f origin = Vec2f::Zero;
         
         float density = 1.f;
         float friction = 0.2f;

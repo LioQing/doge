@@ -11,9 +11,9 @@ namespace doge
     {
         std::vector<Vec2f> points;
         
-        Vec2f origin = Vec2f::Zero();
-        Color color = Color::White();
-        Color outline_color = Color::White();
+        Vec2f origin = Vec2f::Zero;
+        Color color = Color::White;
+        Color outline_color = Color::White;
         float outline_thickness = 0.f;
 
         std::string texture_id = "";

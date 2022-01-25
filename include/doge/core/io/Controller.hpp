@@ -10,7 +10,7 @@ namespace doge::io
     {
         struct Info
         {
-            std::string name;
+            const std::string& name;
             std::uint32_t vendor_id;
             std::uint32_t product_id;
         };

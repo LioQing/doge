@@ -61,11 +61,11 @@ namespace doge
             Assets& assets,
             Entity entity,
             const std::string& texture_id,
-            const Vec2f& size = Vec2f::Zero(),
-            const Vec2i& center_texture_size = Vec2i::Zero(),
+            const Vec2f& size = Vec2f::Zero,
+            const Vec2i& center_texture_size = Vec2i::Zero,
             const Rectf& border_thickness = Rectf(),
-            const Vec2f& origin = Vec2f::Zero(),
-            const Color& color = Color::White()
+            const Vec2f& origin = Vec2f::Zero,
+            const Color& color = Color::White
         );
         
         static Component<CompoundSprite>& Add9SliceSpriteByTile(
@@ -73,10 +73,10 @@ namespace doge
             Entity entity,
             const std::string& texture_id,
             const Vec2f& tile_size,
-            const Vec2u& tile_count = Vec2u::One(),
+            const Vec2u& tile_count = Vec2u::One,
             BorderThickness border_thickness = BorderThickness::Stretch,
-            const Vec2f& origin = Vec2f::Zero(),
-            const Color& color = Color::White()
+            const Vec2f& origin = Vec2f::Zero,
+            const Color& color = Color::White
         );
 
         static void SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id);

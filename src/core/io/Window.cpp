@@ -26,7 +26,7 @@ namespace doge::io
         SetFrameRate(settings.fps);
         SetVSyncEnabled(settings.v_sync);
 
-        if (icon.GetSize() != Vec2u::Zero())
+        if (icon.GetSize() != Vec2u::Zero)
         {
             SetIcon(icon);
         }
@@ -184,7 +184,7 @@ namespace doge::io
             auto& view = std::get<0>(view_itr->second);
             
             view->setCenter(cast::ToSfVec2(global::GetPosition(entity)));
-            if (cam.size == Vec2f::Zero())
+            if (cam.size == Vec2f::Zero)
             {
                 view->setSize(cast::ToSfVec2(engine.window.GetAutoResizedCameraSize(cam) * global::GetScale(entity)));
             }
@@ -294,7 +294,7 @@ namespace doge::io
             }
 
             auto scale = sprite_comp.size / rect.GetSize();
-            scale = math::AutoSize(scale, Vec2f::One());
+            scale = math::AutoSize(scale, Vec2f::One);
             sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
             sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
 

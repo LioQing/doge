@@ -5,6 +5,11 @@
 - [x] visibility component to support drawable to be only on drawn on certain camera
 - [x] remove sprite sheet member of texture and unify all io classes into doge::io
 - [x] texture atlas
+- [ ] core
+  - [ ] add text component
+  - [ ] add custom sf text class
+  - [ ] make text works in window.Render() function
+  
 - [ ] extension: gui
   - [ ] main class gui
   - [ ] gui camera
@@ -36,7 +41,6 @@
   - [ ] potentially more creation options (also the logic is a bit messy for now)
 - [x] rework physics extensions
   - [x] make collider attach to rgbd instead of entity with rgbd
-
 - [x] rework camera
   - [x] make default camera layer to be 0
   - [x] add render_order

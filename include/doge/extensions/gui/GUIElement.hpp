@@ -18,16 +18,6 @@ namespace doge
 
     struct GUIElement
     {
-        enum ScaleVec
-        {
-            None = 0,
-            Size = 1 << 0,
-            Position = 1 << 1,
-            Origin = 1 << 2,
-
-            All = Size | Position | Origin,
-        };
-
         virtual ~GUIElement() = 0;
 
         virtual void Initialize(Engine&) {};
@@ -51,11 +41,6 @@ namespace doge
         void SetOrigin(const Vec2f& origin);
         const Vec2f& GetOrigin() const;
 
-        // size & position scale with screen size, origin scale with size
-        void SetIsScaleVec(ScaleVec is_scale_vec);
-        ScaleVec IsScaleVec() const;
-        bool IsScaleVec(ScaleVec scale_vec) const;
-
         Rectf GetRectangle() const;
 
     protected:
@@ -64,7 +49,6 @@ namespace doge
         virtual void OnSizeUpdated() {};
         virtual void OnPositionUpdated() {};
         virtual void OnOriginUpdated() {};
-        virtual void OnIsScaleVecUpdated() {};
         
     private:
 
@@ -73,7 +57,6 @@ namespace doge
         Vec2f size;
         Vec2f position;
         Vec2f origin;
-        ScaleVec is_scale_vec = ScaleVec::None;
 
         friend struct gui;
     };

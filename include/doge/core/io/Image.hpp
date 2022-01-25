@@ -14,7 +14,7 @@ namespace doge::io
 
         Vec2u GetSize() const;
 
-        void Create(const Vec2u& size, const Color& color = Color::Black());
+        void Create(const Vec2u& size, const Color& color = Color::Black);
         bool FromFile(const std::string& filename);
         bool FromMemory(void* data, std::size_t size);
         void DownloadFromTexture(const Texture& texture);

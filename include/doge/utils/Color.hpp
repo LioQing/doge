@@ -15,14 +15,14 @@ namespace doge
         Color(uint32_t value);
         Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFFu);
 
-        static Color Red();
-        static Color Green();
-        static Color Blue();
-        static Color Yellow();
-        static Color Magenta();
-        static Color Cyan();
-        static Color White();
-        static Color Black();
-        static Color Transparent();
+        static const Color Red;
+        static const Color Green;
+        static const Color Blue;
+        static const Color Yellow;
+        static const Color Magenta;
+        static const Color Cyan;
+        static const Color White;
+        static const Color Black;
+        static const Color Transparent;
     };
 }

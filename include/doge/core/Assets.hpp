@@ -23,11 +23,15 @@ namespace doge
         struct SoundBuffer;
         struct Sound;
         struct Music;
+        struct Font;
     }
 
     struct Assets
     {
         static std::unordered_set<std::string> asset_paths;
+
+        static std::unordered_set<std::string> font_sub_paths;
+        std::unordered_map<std::string, io::Font> fonts;
 
         static std::unordered_set<std::string> texture_sub_paths;
         std::unordered_map<std::string, TextureEx> textures; // require windows to be created
@@ -46,6 +50,14 @@ namespace doge
         std::unordered_map<std::string, io::Music> musics;
 
         static std::string SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths);
+
+        static std::string SearchForFont(const std::string& filename);
+
+        std::pair<std::unordered_map<std::string, io::Font>::iterator, bool>
+        LoadFont(const std::string& id, const std::string& filename);
+
+        std::pair<std::unordered_map<std::string, io::Font>::iterator, bool>
+        LoadFont(const std::string& id, void* data, std::size_t size);
 
         static std::string SearchForTexture(const std::string& filename);
 
