@@ -333,7 +333,7 @@ namespace doge::io
         }
 
         // polygon shape
-        auto SyncPolygon = [&](DrawableVertices& vertices, const PolygonShape& polygon_comp, const Entity& entity)
+        auto SyncPolygon = [&](custom_sf::DrawableVertices& vertices, const PolygonShape& polygon_comp, const Entity& entity)
         {
             auto size = polygon_comp.vertices.size();
 
@@ -367,11 +367,11 @@ namespace doge::io
         auto UpdatePolygon = [&]<typename TComp>(Component<TComp>& comp, const PolygonShape& polygon_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::Polygon, index);
-            auto draw_itr = EmplaceDrawables.template operator()<DrawableVertices>(key, comp);
+            auto draw_itr = EmplaceDrawables.template operator()<custom_sf::DrawableVertices>(key, comp);
 
             if (InAnyViewHelper(polygon_comp, entity, key))
             {
-                SyncPolygon(static_cast<DrawableVertices&>(*draw_itr->second), polygon_comp, entity);
+                SyncPolygon(static_cast<custom_sf::DrawableVertices&>(*draw_itr->second), polygon_comp, entity);
             }
         };
 

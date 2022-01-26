@@ -334,8 +334,19 @@ namespace ParticleSim
         text.AddComponent(Scale(0.01, 0.01));
         text.AddComponent(Text
         {
-            .font_id = "yahei",
-            .string = U"Hola el mundo",
+            .font_id = "arial",
+            .string = U"Hola el\nmundo\nAV",
+            .character_appearances = std::map<std::size_t, Text::Appearance>
+            {
+                std::pair<std::size_t, Text::Appearance>(0, Text::Appearance{ .style = Text::Style::Italic }),
+                std::pair<std::size_t, Text::Appearance>(2, Text::Appearance{ .style = Text::Style::Italic }),
+                std::pair<std::size_t, Text::Appearance>(8, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Red }),
+                std::pair<std::size_t, Text::Appearance>(9, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Yellow }),
+                std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Green }),
+                std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Cyan }),
+                std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Blue }),
+                std::pair<std::size_t, Text::Appearance>(14, Text::Appearance{ }),
+            },
         });
     }
 
@@ -385,8 +396,6 @@ int main()
 
     engine.assets.LoadCursor("normal", io::Cursor::Type::Arrow);
     engine.assets.LoadCursor("grab", io::Cursor::Type::Hand);
-
-    engine.assets.LoadFont("yahei", "msyh.ttc");
 
     physics::Enable(engine); 
     physics::SetGravity(Vec2f(0, 9.8));

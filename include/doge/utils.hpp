@@ -10,7 +10,6 @@
 #include "utils/aliases.hpp"
 #include "utils/default_functions.hpp"
 #include "utils/math.hpp"
-#include "utils/DrawableVertices.hpp"
 #include "utils/lev.hpp"
 #include "utils/Time.hpp"
 #include "utils/custom_sf.hpp"

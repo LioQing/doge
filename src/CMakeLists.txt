@@ -47,6 +47,7 @@ set(SRC_FILES
     core/io/Cursor.cpp
     core/io/Font.cpp
     utils/custom_sf/Text.cpp
+    utils/custom_sf/DrawableVertices.cpp
 
     # physics
     extensions/physics/physics.cpp
