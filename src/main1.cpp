@@ -3,7 +3,6 @@
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
-#include <doge/extensions/fsm.hpp>
 #include <doge/extensions/gui.hpp>
 
 using namespace doge;
@@ -41,58 +40,6 @@ namespace ParticleSim
 
         particle.AddComponent<Position>(position);
         particle.AddComponent<Rotation>();
-        
-        auto& fsm = particle.AddComponent(StateMachines
-        (
-            {
-                StateMachine // color: 0 - white (still), 1 - red (moving), 2 - blue (grabbed)
-                {
-                    .state = 0,
-                    .transition = 
-                    [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-                    {
-                        if (shoot_particle == entity.id)
-                            return 2;
-
-                        if (physics::HasBody(entity) && physics::GetBody(entity).GetVelocity().Magnitude() > .01f)
-                            return 1;
-                        
-                        return 0;
-                    }
-                },
-                StateMachine // movement: 0 - grab, 1 - free
-                {
-                    .state = 0,
-                },
-            }
-        ));
-
-        fsm.state_machines.at(0).on_entry += 
-        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-        {
-            if (state == 0)
-                entity.GetComponent<CircleShape>().color = Color::White;
-            else if (state == 1)
-                entity.GetComponent<CircleShape>().color = Color::Red;
-            else if (state == 2)
-                entity.GetComponent<CircleShape>().color = Color::Blue;
-        };
-
-        fsm.state_machines.at(1).on_entry += 
-        [&](fsm::State state, Entity entity, Engine& engine, DeltaTime dt)
-        {
-            auto& base_rect = engine.assets.textures.at("icons").atlas_rectangles.at("base");
-            if (state == 0)
-            {
-                entity.GetComponent<CircleShape>().texture_id = "";
-                //entity.GetComponent<CircleShape>().texture_rectangle -= base_rect.GetSize() * Vec2f(1, 0);
-            }
-            else if (state == 1)
-            {
-                entity.GetComponent<CircleShape>().texture_id = "missing_texture";
-                //entity.GetComponent<CircleShape>().texture_rectangle += base_rect.GetSize() * Vec2f(1, 0);
-            }
-        };
 
         return particle;
     }
@@ -235,15 +182,6 @@ namespace ParticleSim
             }
             else if (event.button == event::MouseButton::Button::Right)
             {
-                for (auto [entity, fsm] : engine
-                    .Select<CircleShape, StateMachines>()
-                    .EntitiesAndOnlyComponents<StateMachines>())
-                {
-                    fsm::ManualTransition(fsm.state_machines.at(1), 1, entity, engine);
-                }
-            }
-            else if (event.button == event::MouseButton::Button::Middle)
-            {
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                 for (auto entity : engine.Select<Tag>()
                     .Where([](const Entity& _, const Tag& tag)
@@ -282,15 +220,6 @@ namespace ParticleSim
                 engine.assets.sounds.at("shoot").Play();
 
                 engine.window.window_io.SetMouseCursor(engine.assets.cursors.at("normal"));
-            }
-            else if (event.button == event::MouseButton::Button::Right)
-            {
-                for (auto [entity, fsm] : engine
-                    .Select<CircleShape, StateMachines>()
-                    .EntitiesAndOnlyComponents<StateMachines>())
-                {
-                    fsm::ManualTransition(fsm.state_machines.at(1), 0, entity, engine);
-                }
             }
         };
 
@@ -399,8 +328,6 @@ int main()
 
     physics::Enable(engine); 
     physics::SetGravity(Vec2f(0, 9.8));
-
-    fsm::Enable(engine);
 
     gui::Enable(engine);
 

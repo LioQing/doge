@@ -5,10 +5,10 @@
 - [x] visibility component to support drawable to be only on drawn on certain camera
 - [x] remove sprite sheet member of texture and unify all io classes into doge::io
 - [x] texture atlas
-- [ ] core
-  - [ ] add text component
-  - [ ] add custom sf text class
-  - [ ] make text works in window.Render() function
+- [x] core text
+  - [x] add text component
+  - [x] add custom sf text class
+  - [x] make text works in window.Render() function
   
 - [ ] extension: gui
   - [ ] main class gui

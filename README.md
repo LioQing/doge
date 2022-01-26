@@ -16,4 +16,6 @@ This library uses [SFML](https://www.sfml-dev.org/) for cross-platform IO functi
 
 physics: provide rigid body physics simulation (with [Box2D](https://box2d.org/))
 
-fsm: provide simple [finite-state machine](https://en.wikipedia.org/wiki/Finite-state_machine) functionalities
+nine_slice: provide interface for 9-slice sprites using CompoundSprite
+
+gui: provide a graphical user interface system that is more object oriented

@@ -425,10 +425,22 @@ namespace doge::io
                 UpdateRectangle(compound_comp, compound_comp.rectangle_shapes.at(i), entity, i);
             }
 
+            // polygon sub shape
+            for (std::size_t i = 0; i < compound_comp.polygon_shapes.size(); ++i)
+            {
+                UpdatePolygon(compound_comp, compound_comp.polygon_shapes.at(i), entity, i);
+            }
+
             // sub sprites
             for (std::size_t i = 0; i < compound_comp.sprites.size(); ++i)
             {
                 UpdateSprite(compound_comp, compound_comp.sprites.at(i), entity, i);
+            }
+
+            // text sub sprites
+            for (std::size_t i = 0; i < compound_comp.texts.size(); ++i)
+            {
+                UpdateText(compound_comp, compound_comp.texts.at(i), entity, i);
             }
         }
 
