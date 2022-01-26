@@ -86,7 +86,7 @@ namespace doge::io
             }
         };
 
-        auto EmplaceDrawables = [&]<typename TSfShape, typename TComp>(const DrawableKey& key, Component<TComp>& comp)
+        auto EmplaceDrawables = [&]<typename TDrawable, typename TComp, typename... Args>(const DrawableKey& key, Component<TComp>& comp, Args&&... args)
         {
             // draws_layers
             auto layer_comp = comp.GetEntity().GetIfHasComponentElseDefault<Layer>();
@@ -115,7 +115,7 @@ namespace doge::io
             if (draw_itr != drawables.end())
                 return draw_itr;
             
-            auto [draw_itr_, success] = drawables.emplace(key, static_cast<std::unique_ptr<sf::Drawable>>(std::make_unique<TSfShape>()));
+            auto [draw_itr_, success] = drawables.emplace(key, static_cast<std::unique_ptr<sf::Drawable>>(std::make_unique<TDrawable>(std::forward<Args>(args)...)));
             if (!success)
             {
                 throw std::invalid_argument("More than one shape is found in entity");
@@ -125,13 +125,12 @@ namespace doge::io
             return draw_itr;
         };
 
-        auto InAnyViewHelper = [&]<typename TComp>(
-            const TComp& comp, 
-            const Entity& entity, 
+        auto InAnyViewHelperHelper = [&](
+            const Rectf& aabb_, 
             const DrawableKey& key)
         {
             auto is_in_any_view = false;
-            Rectf aabb = global::GetAABB(comp, entity);
+            Rectf aabb = aabb_;
 
             if (aabb.width < 0.f)
             {
@@ -169,6 +168,19 @@ namespace doge::io
             }
 
             return is_in_any_view;
+        };
+
+        auto TextInAnyViewHelper = [&](const custom_sf::Text& text, const DrawableKey& key)
+        {
+            return InAnyViewHelperHelper(text.GetAABB(), key);
+        };
+
+        auto InAnyViewHelper = [&]<typename TComp>(
+            const TComp& comp, 
+            const Entity& entity, 
+            const DrawableKey& key)
+        {
+            return InAnyViewHelperHelper(global::GetAABB(comp, entity), key);
         };
 
         // view
@@ -366,6 +378,30 @@ namespace doge::io
         for (auto [entity, polygon_comp] : engine.Select<PolygonShape>().EntitiesAndComponents())
         {
             UpdatePolygon(polygon_comp, polygon_comp, entity, 0);
+        }
+
+        // text
+        auto SyncText = [&](custom_sf::Text& text, const doge::Text& text_comp, const Entity& entity)
+        {
+            SyncTransformable(text, text_comp, entity);
+            text.Update(engine.assets, text_comp);
+        };
+
+        auto UpdateText = [&]<typename TComp>(Component<TComp>& comp, const doge::Text& text_comp, const Entity& entity, std::size_t index)
+        {
+            auto key = DrawableKey(entity, DrawableType::Text, index);
+            auto draw_itr = EmplaceDrawables.template operator()<custom_sf::Text>(key, comp, engine.assets, text_comp);
+
+            custom_sf::Text& text = static_cast<custom_sf::Text&>(*draw_itr->second);
+            if (TextInAnyViewHelper(text, key))
+            {
+                SyncText(text, text_comp, entity);
+            }
+        };
+
+        for (auto [entity, text_comp] : engine.Select<doge::Text>().EntitiesAndComponents())
+        {
+            UpdateText(text_comp, text_comp, entity, 0);
         }
 
         // compound shape

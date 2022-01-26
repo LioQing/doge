@@ -34,7 +34,7 @@ namespace doge
 
             enum DrawableType
             {
-                Convex, Circle, Rectangle, SpriteType, Polygon
+                Convex, Circle, Rectangle, SpriteType, Polygon, Text
             };
 
             using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>; // eid, draw type, index

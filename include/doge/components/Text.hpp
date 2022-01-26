@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <doge/utils/Color.hpp>
+#include <doge/utils/Vec2.hpp>
 
 namespace doge
 {
@@ -23,10 +24,14 @@ namespace doge
             Color fill_color = Color::White;
             float outline_thickness = 0.f;
             Color outline_color = Color::Black;
+            float letter_spacing_factor = 1.f;
         };
 
         std::string font_id = "";
         std::u32string string = U"";
-        std::map<std::size_t, Appearance> character_appearance;
+        std::uint32_t font_size = 18;
+        float line_spacing_factor = 1.f;
+        Vec2f origin = Vec2f::Zero;
+        std::map<std::size_t, Appearance> character_appearances = { std::pair<std::size_t, Appearance>(0, Appearance()) };
     };
 }

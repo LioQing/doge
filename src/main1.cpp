@@ -326,6 +326,17 @@ namespace ParticleSim
         button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
 
         gui::AddElement(engine, "button0", button0);
+
+        // text
+        Entity text = engine.AddEntity();
+        text.AddComponent(Layer::Create(1));
+        text.AddComponent(Position(0, -2));
+        text.AddComponent(Scale(0.01, 0.01));
+        text.AddComponent(Text
+        {
+            .font_id = "yahei",
+            .string = U"Hola el mundo",
+        });
     }
 
     void Update(Engine& engine, DeltaTime dt)
@@ -374,6 +385,8 @@ int main()
 
     engine.assets.LoadCursor("normal", io::Cursor::Type::Arrow);
     engine.assets.LoadCursor("grab", io::Cursor::Type::Hand);
+
+    engine.assets.LoadFont("yahei", "msyh.ttc");
 
     physics::Enable(engine); 
     physics::SetGravity(Vec2f(0, 9.8));

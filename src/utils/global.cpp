@@ -135,18 +135,18 @@ namespace doge
         return GetAABB(sprite, sprite.GetEntity());
     }
 
-    Rectf global::GetAABB(const PolygonShape& custom, const Entity& entity)
+    Rectf global::GetAABB(const PolygonShape& polygon, const Entity& entity)
     {
         std::vector<Vec2f> points;
-        std::transform(custom.vertices.begin(), custom.vertices.end(), std::back_inserter(points),
-        [&](const PolygonShape::Vertex& v){ return ((v.position - custom.origin) * GetScale(entity)).Rotated(GetRotation(entity)); });
+        std::transform(polygon.vertices.begin(), polygon.vertices.end(), std::back_inserter(points),
+        [&](const PolygonShape::Vertex& v){ return ((v.position - polygon.origin) * GetScale(entity)).Rotated(GetRotation(entity)); });
 
         return GetAABB(points, GetPosition(entity));
     }
 
-    Rectf global::GetAABB(const Component<PolygonShape>& custom)
+    Rectf global::GetAABB(const Component<PolygonShape>& polygon)
     {
-        return GetAABB(custom, custom.GetEntity());
+        return GetAABB(polygon, polygon.GetEntity());
     }
 
     Rectf global::GetAABB(const Vec2f& tl, const Vec2f& br, const Vec2f& bl, const Vec2f& tr, const Vec2f& position)
