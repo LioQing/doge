@@ -9,6 +9,7 @@
   - [x] add text component
   - [x] add custom sf text class
   - [x] make text works in window.Render() function
+  - [x] align option for text
   
 - [ ] extension: gui
   - [ ] main class gui

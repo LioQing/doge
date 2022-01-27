@@ -21,30 +21,56 @@ namespace doge::custom_sf
             const io::Font& font = assets.fonts.at(text_comp.font_id);
 
             std::size_t line = 0;
-            std::size_t line_start_index = 0;
-            for (std::size_t i = 0; i < index; ++i)
+            std::size_t i;
+            for (i = 0; i < index; ++i)
             {
                 if (text_comp.string.at(i) == '\n')
                 {
                     ++line;
-                    line_start_index = i + 1;
                     offset.x = 0.f;
                 }
                 else
                 {
-                    offset.x += (font.GetGlyph(
-                        text_comp.string.at(i), 
-                        text_comp.font_size, 
-                        appear.style & doge::Text::Style::Bold, 
-                        appear.outline_thickness).advance
-                        + font.GetKerning(text_comp.string.at(i), text_comp.string.at(i + 1), text_comp.font_size))
+                    offset.x += font.GetLetterSpacing(
+                        text_comp.string.at(i),
+                        text_comp.string.at(i + 1),
+                        text_comp.font_size,
+                        appear.style & doge::Text::Style::Bold,
+                        appear.outline_thickness)
                         * appear.letter_spacing_factor;
                 }
             }
-
+            
             offset.y = line * font.GetLineSpacing(text_comp.font_size) * text_comp.line_spacing_factor;
 
-            return offset;
+            if (text_comp.align == doge::Text::Align::Left)
+                return offset;
+            
+            float line_width = offset.x;
+            for (; i + 1 < text_comp.string.size() && text_comp.string.at(i) != '\n'; ++i)
+            {
+                line_width += font.GetLetterSpacing(
+                    text_comp.string.at(i),
+                    text_comp.string.at(i + 1),
+                    text_comp.font_size,
+                    appear.style & doge::Text::Style::Bold,
+                    appear.outline_thickness)
+                    * appear.letter_spacing_factor;
+            }
+            
+            if (i + 1 == text_comp.string.size())
+            {
+                line_width += font.GetGlyph(
+                    text_comp.string.at(i),
+                    text_comp.font_size,
+                    appear.style & doge::Text::Style::Bold,
+                    appear.outline_thickness).advance;
+            }
+
+            if (text_comp.align == doge::Text::Align::Right)
+                return offset - Vec2f(line_width, 0);
+            
+            return offset - Vec2f(line_width / 2.f, 0);
         };
 
         auto UpdateText = [&](sf::Text& text, std::size_t start, std::size_t end, const doge::Text::Appearance& appear)
@@ -70,17 +96,34 @@ namespace doge::custom_sf
             text.setOutlineThickness(appear.outline_thickness);
         };
 
-        for (auto itr = text_comp.character_appearances.begin(); itr != text_comp.character_appearances.end();)
+        std::map<std::size_t, const doge::Text::Appearance&> sep_texts;
+        for (auto& [i, appear] : text_comp.character_appearances)
         {
-            auto& [start, appear] = *itr;
-            auto end = text_comp.string.size();
-            if (++itr != text_comp.character_appearances.end())
-                end = itr->first;
-            
-            auto& text = texts[start];
-
-            UpdateText(text, start, end, appear);
+            sep_texts.emplace(i, appear);
         }
+
+        auto prev_itr = sep_texts.begin();
+        for (std::size_t i = 1; i < text_comp.string.size(); ++i)
+        {
+            auto itr = sep_texts.find(i);
+            if (itr != sep_texts.end())
+            {
+                auto& [start, appear] = *prev_itr;
+                auto& end = itr->first;
+                
+                auto& text = texts[start];
+
+                UpdateText(text, start, end, appear);
+
+                prev_itr = itr;
+            }
+
+            if (text_comp.string.at(i) == '\n')
+            {
+                sep_texts.emplace(i + 1, prev_itr->second);
+            }
+        }
+        UpdateText(texts[prev_itr->first], prev_itr->first, text_comp.string.size(), prev_itr->second);
     }
 
     Rectf Text::GetAABB() const

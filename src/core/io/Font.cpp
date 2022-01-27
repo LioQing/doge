@@ -44,4 +44,10 @@ namespace doge::io
     {
         return font.getUnderlineThickness(character_size);
     }
+
+    float Font::GetLetterSpacing(std::uint32_t first_code_point, std::uint32_t second_code_point, std::uint32_t character_size, bool bold, float outline_thickness) const
+    {
+        return GetGlyph(first_code_point, character_size, bold, outline_thickness).advance
+            + GetKerning(first_code_point, second_code_point, character_size);
+    }
 }

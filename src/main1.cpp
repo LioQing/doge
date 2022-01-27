@@ -257,26 +257,72 @@ namespace ParticleSim
         gui::AddElement(engine, "button0", button0);
 
         // text
-        Entity text = engine.AddEntity();
-        text.AddComponent(Layer::Create(1));
-        text.AddComponent(Position(0, -2));
-        text.AddComponent(Scale(0.01, 0.01));
-        text.AddComponent(Text
         {
-            .font_id = "arial",
-            .string = U"Hola el\nmundo\nAV",
-            .character_appearances = std::map<std::size_t, Text::Appearance>
+            Entity text = engine.AddEntity();
+            text.AddComponent(Layer::Create(1));
+            text.AddComponent(Position(0, -1.6));
+            text.AddComponent(Scale(0.01, 0.01));
+            text.AddComponent(Text
             {
-                std::pair<std::size_t, Text::Appearance>(0, Text::Appearance{ .style = Text::Style::Italic }),
-                std::pair<std::size_t, Text::Appearance>(2, Text::Appearance{ .style = Text::Style::Italic }),
-                std::pair<std::size_t, Text::Appearance>(8, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Red }),
-                std::pair<std::size_t, Text::Appearance>(9, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Yellow }),
-                std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Green }),
-                std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Cyan }),
-                std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ .style = Text::Style::Bold, .fill_color = Color::Blue }),
-                std::pair<std::size_t, Text::Appearance>(14, Text::Appearance{ }),
-            },
-        });
+                .font_id = "arial",
+                .string = U"mundob\nmundo\nAVAVAVAV",
+                .align = Text::Align::Left,
+                .character_appearances = std::map<std::size_t, Text::Appearance>
+                {
+                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
+                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
+                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
+                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
+                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
+                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
+                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                },
+            });
+        }
+        {
+            Entity text = engine.AddEntity();
+            text.AddComponent(Layer::Create(1));
+            text.AddComponent(Position(0, -2.2));
+            text.AddComponent(Scale(0.01, 0.01));
+            text.AddComponent(Text
+            {
+                .font_id = "arial",
+                .string = U"mundob\nmundo\nAVAVAVAV",
+                .align = Text::Align::Center,
+                .character_appearances = std::map<std::size_t, Text::Appearance>
+                {
+                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
+                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
+                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
+                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
+                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
+                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
+                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                },
+            });
+        }
+        {
+            Entity text = engine.AddEntity();
+            text.AddComponent(Layer::Create(1));
+            text.AddComponent(Position(0, -2.8));
+            text.AddComponent(Scale(0.01, 0.01));
+            text.AddComponent(Text
+            {
+                .font_id = "arial",
+                .string = U"mundob\nmundo\nAVAVAVAV",
+                .align = Text::Align::Right,
+                .character_appearances = std::map<std::size_t, Text::Appearance>
+                {
+                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
+                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
+                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
+                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
+                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
+                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
+                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                },
+            });
+        }
     }
 
     void Update(Engine& engine, DeltaTime dt)

@@ -25,5 +25,6 @@ namespace doge::io
         float GetLineSpacing(std::uint32_t character_size) const;
         float GetUnderlinePosition(std::uint32_t character_size) const;
         float GetUnderlineThickness(std::uint32_t character_size) const;
+        float GetLetterSpacing(std::uint32_t first_code_point, std::uint32_t second_code_point, std::uint32_t character_size, bool bold, float outline_thickness = 0.f) const;
     };
 }

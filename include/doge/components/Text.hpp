@@ -18,6 +18,13 @@ namespace doge
             StrikeThrough = 1 << 3,
         };
 
+        enum Align
+        {
+            Left,
+            Center,
+            Right,
+        };
+
         struct Appearance
         {
             Style style = Style::Regular;
@@ -31,6 +38,7 @@ namespace doge
         std::u32string string = U"";
         std::uint32_t font_size = 18;
         float line_spacing_factor = 1.f;
+        Align align = Align::Left;
         Vec2f origin = Vec2f::Zero;
         std::map<std::size_t, Appearance> character_appearances = { std::pair<std::size_t, Appearance>(0, Appearance()) };
     };
