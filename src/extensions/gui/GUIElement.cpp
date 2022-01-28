@@ -1,6 +1,6 @@
 #include <doge/extensions/gui/GUIElement.hpp>
 
-#include <doge/extensions/gui/gui.hpp>
+#include <doge/extensions/gui/GUI.hpp>
 #include <doge/core/Entity.hpp>
 
 namespace doge
@@ -9,9 +9,14 @@ namespace doge
     {
     };
 
+    GUI& GUIElement::GetGUI() const
+    {
+        return *gui;
+    }
+
     Entity GUIElement::GetEntity() const
     {
-        return gui::GetElementEntity(GetID());
+        return GetGUI().GetElementEntity(GetID());
     }
 
     const std::string& GUIElement::GetID() const
@@ -26,7 +31,7 @@ namespace doge
 
     doge::Component<Camera>& GUIElement::GetCameraComponent() const
     {
-        return gui::GetCameraComponent(camera);
+        return GetGUI().GetCameraComponent(camera);
     }
 
     void GUIElement::SetSize(const Vec2f& size)

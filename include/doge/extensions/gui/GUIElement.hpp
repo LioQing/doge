@@ -10,6 +10,7 @@ namespace doge
 {
     struct Engine;
     struct Entity;
+    struct GUI;
     
     template <typename TComp>
     struct Component;
@@ -24,6 +25,7 @@ namespace doge
         virtual void Update(DeltaTime) {};
         virtual void FixedUpdate(DeltaTime) {};
 
+        GUI& GetGUI() const;
         Entity GetEntity() const;
 
         const std::string& GetID() const;
@@ -56,6 +58,8 @@ namespace doge
         Vec2f position;
         Vec2f origin;
 
-        friend struct gui;
+        GUI* gui = nullptr;
+
+        friend struct GUI;
     };
 }

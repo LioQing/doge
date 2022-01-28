@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gui/gui.hpp"
+#include "gui/GUI.hpp"
 #include "gui/GUIElement.hpp"
 #include "gui/GUIElementComponent.hpp"
 

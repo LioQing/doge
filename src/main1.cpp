@@ -3,12 +3,13 @@
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
-#include <doge/extensions/gui.hpp>
+#include <doge/extensions/GUI.hpp>
 
 using namespace doge;
 
 namespace ParticleSim
 {
+    std::unique_ptr<GUI> gui = nullptr;
     int shoot_particle = -1;
     Vec2f shoot_particle_position;
     Vec2f shoot_mouse_position;
@@ -46,6 +47,8 @@ namespace ParticleSim
 
     void Start(Engine& engine)
     {
+        gui = std::make_unique<GUI>(engine);
+
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
             if (success)
@@ -224,9 +227,9 @@ namespace ParticleSim
         };
 
         // gui elements
-        gui::AddCamera("gui_cam");
+        gui->AddCamera("gui_cam");
         
-        Button& button0 = gui::AddElement<Button>("button0", "gui_cam");
+        Button& button0 = gui->AddElement<Button>("button0", "gui_cam");
         button0.SetPosition(Vec2f(-300, 0));
         button0.SetTextFont("arial");
         button0.SetText(U"Testing");
@@ -341,6 +344,11 @@ namespace ParticleSim
             body.SetVelocity(diff);
         }
     }
+
+    void Finish(Engine& engine)
+    {
+        gui.release();
+    }
 }
 
 int main()
@@ -359,12 +367,11 @@ int main()
     physics::Enable(engine); 
     physics::SetGravity(Vec2f(0, 9.8));
 
-    gui::Enable(engine);
-
     GameLoopFunctions glf;
     glf.start           = ParticleSim::Start;
     glf.update          = ParticleSim::Update;
     glf.fixed_update    = ParticleSim::FixedUpdate;
+    glf.finish          = ParticleSim::Finish;
 
     engine.AddScene("particle_sim", glf);
 

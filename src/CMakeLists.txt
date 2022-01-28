@@ -55,7 +55,7 @@ set(SRC_FILES
     extensions/physics/PhysicsCollider.cpp
 
     # gui
-    extensions/gui/gui.cpp
+    extensions/gui/GUI.cpp
     extensions/gui/GUIElement.cpp
     extensions/gui/Button.cpp
 

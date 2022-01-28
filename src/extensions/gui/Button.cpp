@@ -1,6 +1,6 @@
 #include <doge/extensions/gui/Button.hpp>
 
-#include <doge/extensions/gui/gui.hpp>
+#include <doge/extensions/gui/GUI.hpp>
 #include <doge/extensions/nine_slice.hpp>
 #include <doge/core/Engine.hpp>
 #include <doge/utils/math.hpp>
@@ -10,12 +10,12 @@ namespace doge
 {
     void Button::Initialize()
     {
-        gui::GetEngine().events.on_mouse_button_pressed +=
+        GetGUI().GetEngine().events.on_mouse_button_pressed +=
         [&](const event::MouseButton& event)
         {
             if (
                 event.button == event::MouseButton::Button::Left && 
-                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_pressed();
@@ -24,12 +24,12 @@ namespace doge
             }
         };
 
-        gui::GetEngine().events.on_mouse_button_released +=
+        GetGUI().GetEngine().events.on_mouse_button_released +=
         [&](const event::MouseButton& event)
         {
             if (
                 event.button == event::MouseButton::Button::Left && 
-                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_released();
@@ -41,12 +41,12 @@ namespace doge
             on_state_transition(*this);
         };
 
-        gui::GetEngine().events.on_mouse_moved +=
+        GetGUI().GetEngine().events.on_mouse_moved +=
         [&](const event::MouseMove& event)
         {
             if (
                 !states.test(State::MouseOver) &&
-                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_mouse_entered();
@@ -55,7 +55,7 @@ namespace doge
             }
             else if (
                 states.test(State::MouseOver) &&
-                !math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                !math::TestPoint(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_mouse_left();
@@ -64,16 +64,16 @@ namespace doge
             }
         };
 
-        auto entity = gui::GetElementEntity(GetID());
-        entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID())));
+        auto entity = GetGUI().GetElementEntity(GetID());
+        entity.AddComponent(Layer::Create(GetGUI().GetCameraLayer(GetCameraID())));
         entity.AddComponent<doge::Position>(GetPosition());
         
         InitializeSpriteComponent(entity);
 
-        text_entity = gui::GetEngine().AddEntity();
+        text_entity = GetGUI().GetEngine().AddEntity();
         text_entity.SetParent(entity);
         text_entity.AddComponent(Tag::Create(GetID() + "_text"));
-        text_entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID()) + 1));
+        text_entity.AddComponent(Layer::Create(GetGUI().GetCameraLayer(GetCameraID()) + 1));
         text_entity.AddComponent(Text
         {
             .font_id = "",
@@ -92,9 +92,9 @@ namespace doge
         this->texture_id = texture_id;
 
         if (Is9Slice())
-            nine_slice::SetSpriteTextureID(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
+            nine_slice::SetSpriteTextureID(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
         else
-            gui::GetElementEntity(GetID()).GetComponent<Sprite>().texture_id = GetTextureID();
+            GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().texture_id = GetTextureID();
     }
 
     const std::string& Button::GetTextureID() const
@@ -106,7 +106,7 @@ namespace doge
     {
         this->is_9_slice = is_9_slice;
 
-        InitializeSpriteComponent(gui::GetElementEntity(GetID()));
+        InitializeSpriteComponent(GetGUI().GetElementEntity(GetID()));
     }
 
     bool Button::Is9Slice() const
@@ -118,8 +118,8 @@ namespace doge
     {
         this->atlas_rectangle_id = id;
 
-        if (gui::HasElement(GetID()) && !Is9Slice())
-            gui::GetElementEntity(GetID()).GetComponent<Sprite>().atlas_rectangle_id = GetAtlasRectangleID();
+        if (GetGUI().HasElement(GetID()) && !Is9Slice())
+            GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().atlas_rectangle_id = GetAtlasRectangleID();
     }
 
     const std::string& Button::GetAtlasRectangleID() const
@@ -131,8 +131,8 @@ namespace doge
     {
         this->texture_rectangle = texture_rectangle;
 
-        if (gui::HasElement(GetID()) && !Is9Slice())
-            gui::GetElementEntity(GetID()).GetComponent<Sprite>().texture_rectangle = GetTextureRectangle();
+        if (GetGUI().HasElement(GetID()) && !Is9Slice())
+            GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().texture_rectangle = GetTextureRectangle();
     }
 
     const Recti& Button::GetTextureRectangle() const
@@ -144,8 +144,8 @@ namespace doge
     {
         this->center_texture_size = center_texture_size;
 
-        if (gui::HasElement(GetID()) && Is9Slice())
-            nine_slice::SetSpriteCenterTextureSize(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetCenterTextureSize());
+        if (GetGUI().HasElement(GetID()) && Is9Slice())
+            nine_slice::SetSpriteCenterTextureSize(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetCenterTextureSize());
     }
 
     const Vec2i& Button::GetCenterTextureSize() const
@@ -157,8 +157,8 @@ namespace doge
     {
         this->border_thickness = border_thickness;
 
-        if (gui::HasElement(GetID()) && Is9Slice())
-            nine_slice::SetSpriteSizeAndBorder(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
+        if (GetGUI().HasElement(GetID()) && Is9Slice())
+            nine_slice::SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
     }
 
     const Rectf& Button::GetBorderThickness() const
@@ -171,9 +171,9 @@ namespace doge
         this->color = color;
 
         if (Is9Slice())
-            nine_slice::SetSpriteColor(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
+            nine_slice::SetSpriteColor(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
         else
-            gui::GetElementEntity(GetID()).GetComponent<Sprite>().color = GetColor();
+            GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().color = GetColor();
     }
 
     const Color& Button::GetColor() const
@@ -244,7 +244,7 @@ namespace doge
             return;
         }
 
-        auto height = gui::GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
+        auto height = GetGUI().GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
         auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
 
         text.origin = Vec2f(0, line * height / 2.f);
@@ -268,12 +268,12 @@ namespace doge
 
     void Button::OnSizeUpdated()
     {
-        if (gui::HasElement(GetID()))
+        if (GetGUI().HasElement(GetID()))
         {
             if (Is9Slice())
-                nine_slice::SetSpriteSizeAndBorder(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
+                nine_slice::SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
             else
-                gui::GetElementEntity(GetID()).GetComponent<Sprite>().size = GetSize();
+                GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().size = GetSize();
             
             SetOrigin(GetOrigin());
         }
@@ -281,20 +281,20 @@ namespace doge
 
     void Button::OnPositionUpdated()
     {
-        if (gui::HasElement(GetID()))
+        if (GetGUI().HasElement(GetID()))
         {
-            gui::GetElementEntity(GetID()).GetComponent<doge::Position>().position = GetPosition();
+            GetGUI().GetElementEntity(GetID()).GetComponent<doge::Position>().position = GetPosition();
         }
     }
 
     void Button::OnOriginUpdated()
     {
-        if (gui::HasElement(GetID()))
+        if (GetGUI().HasElement(GetID()))
         {
             if (Is9Slice())
-                nine_slice::SetSpriteOrigin(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
+                nine_slice::SetSpriteOrigin(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
             else
-                gui::GetElementEntity(GetID()).GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
+                GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
         }
     }
 
@@ -303,8 +303,8 @@ namespace doge
         if (Is9Slice())
         {
             nine_slice::Add9SliceSpriteBySize(
-                gui::GetEngine().assets,
-                gui::GetEngine().GetEntity(entity_id),
+                GetGUI().GetEngine().assets,
+                GetGUI().GetEngine().GetEntity(entity_id),
                 GetTextureID(),
                 GetSize(),
                 GetCenterTextureSize(),
@@ -315,7 +315,7 @@ namespace doge
         }
         else
         {
-            gui::GetEngine().GetEntity(entity_id).AddComponent(Sprite
+            GetGUI().GetEngine().GetEntity(entity_id).AddComponent(Sprite
             {
                 .texture_id = GetTextureID(),
                 .atlas_rectangle_id = GetAtlasRectangleID(),
