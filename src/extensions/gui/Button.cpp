@@ -4,17 +4,18 @@
 #include <doge/extensions/nine_slice.hpp>
 #include <doge/core/Engine.hpp>
 #include <doge/utils/math.hpp>
+#include <algorithm>
 
 namespace doge
 {
-    void Button::Initialize(Engine& engine)
+    void Button::Initialize()
     {
-        engine.events.on_mouse_button_pressed +=
+        gui::GetEngine().events.on_mouse_button_pressed +=
         [&](const event::MouseButton& event)
         {
             if (
                 event.button == event::MouseButton::Button::Left && 
-                math::TestPoint(engine.window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_pressed();
@@ -23,12 +24,12 @@ namespace doge
             }
         };
 
-        engine.events.on_mouse_button_released +=
+        gui::GetEngine().events.on_mouse_button_released +=
         [&](const event::MouseButton& event)
         {
             if (
                 event.button == event::MouseButton::Button::Left && 
-                math::TestPoint(engine.window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_released();
@@ -40,12 +41,12 @@ namespace doge
             on_state_transition(*this);
         };
 
-        engine.events.on_mouse_moved +=
+        gui::GetEngine().events.on_mouse_moved +=
         [&](const event::MouseMove& event)
         {
             if (
                 !states.test(State::MouseOver) &&
-                math::TestPoint(engine.window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_mouse_entered();
@@ -54,7 +55,7 @@ namespace doge
             }
             else if (
                 states.test(State::MouseOver) &&
-                !math::TestPoint(engine.window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
+                !math::TestPoint(gui::GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()), GetRectangle())
             )
             {
                 on_mouse_left();
@@ -67,9 +68,9 @@ namespace doge
         entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID())));
         entity.AddComponent<doge::Position>(GetPosition());
         
-        InitializeSpriteComponent(engine, entity);
+        InitializeSpriteComponent(entity);
 
-        text_entity = engine.AddEntity();
+        text_entity = gui::GetEngine().AddEntity();
         text_entity.SetParent(entity);
         text_entity.AddComponent(Tag::Create(GetID() + "_text"));
         text_entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID()) + 1));
@@ -101,11 +102,11 @@ namespace doge
         return texture_id;
     }
 
-    void Button::SetIs9Slice(Engine& engine, bool is_9_slice)
+    void Button::SetIs9Slice(bool is_9_slice)
     {
         this->is_9_slice = is_9_slice;
 
-        InitializeSpriteComponent(engine, gui::GetElementEntity(GetID()));
+        InitializeSpriteComponent(gui::GetElementEntity(GetID()));
     }
 
     bool Button::Is9Slice() const
@@ -183,6 +184,7 @@ namespace doge
     void Button::SetText(const std::u32string& text)
     {
         text_entity.GetComponent<Text>().string = text;
+        UpdateTextOrigin();
     }
 
     const std::u32string& Button::GetText() const
@@ -193,6 +195,7 @@ namespace doge
     void Button::SetTextFont(const std::string& font_id)
     {
         text_entity.GetComponent<Text>().font_id = font_id;
+        UpdateTextOrigin();
     }
 
     const std::string& Button::GetTextFontID() const
@@ -200,9 +203,21 @@ namespace doge
         return text_entity.GetComponent<Text>().font_id;
     }
 
+    void Button::SetTextFontSize(std::uint32_t font_size)
+    {
+        text_entity.GetComponent<Text>().font_size = font_size;
+        UpdateTextOrigin();
+    }
+
+    std::uint32_t Button::GetTextFontSize() const
+    {
+        return text_entity.GetComponent<Text>().font_size;
+    }
+
     void Button::SetTextAppearance(const Text::Appearance& appear)
     {
         text_entity.GetComponent<Text>().character_appearances.at(0) = appear;
+        UpdateTextOrigin();
     }
 
     const Text::Appearance& Button::GetTextAppearance() const
@@ -218,6 +233,21 @@ namespace doge
     bool Button::IsMouseOver() const
     {
         return states.test(State::MouseOver);
+    }
+
+    void Button::UpdateTextOrigin()
+    {
+        auto& text = text_entity.GetComponent<Text>();
+        if (text.font_id == "")
+        {
+            text.origin = Vec2f::Zero;
+            return;
+        }
+
+        auto height = gui::GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
+        auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
+
+        text.origin = Vec2f(0, line * height / 2.f);
     }
 
     void Button::DefaultOnStateTransition(Button& button)
@@ -268,13 +298,13 @@ namespace doge
         }
     }
 
-    void Button::InitializeSpriteComponent(Engine& engine, EntityID entity_id)
+    void Button::InitializeSpriteComponent(EntityID entity_id)
     {
         if (Is9Slice())
         {
             nine_slice::Add9SliceSpriteBySize(
-                engine.assets,
-                engine.GetEntity(entity_id),
+                gui::GetEngine().assets,
+                gui::GetEngine().GetEntity(entity_id),
                 GetTextureID(),
                 GetSize(),
                 GetCenterTextureSize(),
@@ -285,7 +315,7 @@ namespace doge
         }
         else
         {
-            engine.GetEntity(entity_id).AddComponent(Sprite
+            gui::GetEngine().GetEntity(entity_id).AddComponent(Sprite
             {
                 .texture_id = GetTextureID(),
                 .atlas_rectangle_id = GetAtlasRectangleID(),

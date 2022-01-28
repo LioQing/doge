@@ -8,9 +8,12 @@ namespace doge
     std::unordered_map<std::string, Entity> gui::cameras;
     std::unordered_map<std::string, Entity> gui::elements;
     std::set<Entity> gui::idless_elements;
+    Engine* gui::engine;
 
     void gui::Enable(Engine& engine)
     {
+        gui::engine = &engine;
+
         GameLoopFunctions glf;
         glf.start = Start;
         glf.update = Update;
@@ -29,16 +32,16 @@ namespace doge
         );
     }
 
-    void gui::Disable(Engine& engine)
+    void gui::Disable()
     {
-        engine.events.on_window_opened.RemoveListener("doge_gui_on_window_opened");
+        engine->events.on_window_opened.RemoveListener("doge_gui_on_window_opened");
 
-        engine.scenes.extensions.erase("doge_gui");
+        engine->scenes.extensions.erase("doge_gui");
     }
 
-    void gui::AddCamera(Engine& engine, const std::string& id, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    void gui::AddCamera(const std::string& id, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
     {
-        auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
+        auto [itr, success] = cameras.emplace(id, engine->AddEntity(destroy_on_finish));
 
         if (!success)
             throw std::invalid_argument("Failed to add camera to gui");
@@ -52,9 +55,9 @@ namespace doge
         itr->second.AddComponent<Layer>(layers);
     }
 
-    void gui::RemoveCamera(Engine& engine, const std::string& id)
+    void gui::RemoveCamera(const std::string& id)
     {
-        RemoveElements(engine, id);
+        RemoveElements(id);
         cameras.erase(id);
     }
 
@@ -83,24 +86,24 @@ namespace doge
         return cameras.find(id) != cameras.end();
     }
 
-    void gui::RemoveElement(Engine& engine, const std::string& id)
+    void gui::RemoveElement(const std::string& id)
     {
-        engine.DestroyEntity(elements.at(id));
+        engine->DestroyEntity(elements.at(id));
         elements.erase(id);
     }
 
-    void gui::RemoveElements(Engine& engine, const std::string& camera_id)
+    void gui::RemoveElements(const std::string& camera_id)
     {
         for (auto& [id, element] : elements)
         {
             if (element.GetComponent<GUIElementComponent>().element->GetCameraID() == camera_id)
-                engine.DestroyEntity(element);
+                engine->DestroyEntity(element);
         }
 
         for (auto& element : idless_elements)
         {
             if (element.GetComponent<GUIElementComponent>().element->GetCameraID() == camera_id)
-                engine.DestroyEntity(element);
+                engine->DestroyEntity(element);
         }
     }
 
@@ -124,6 +127,11 @@ namespace doge
         return elements.find(id) != elements.end();
     }
 
+    Engine& gui::GetEngine()
+    {
+        return *engine;
+    }
+
     void gui::Start(Engine& engine)
     {
 
@@ -133,12 +141,12 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<GUIElementComponent>().element->Update(engine, dt);
+            element.GetComponent<GUIElementComponent>().element->Update(dt);
         }
 
         for (auto& element : idless_elements)
         {
-            element.GetComponent<GUIElementComponent>().element->Update(engine, dt);
+            element.GetComponent<GUIElementComponent>().element->Update(dt);
         }
     }
 
@@ -146,12 +154,12 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<GUIElementComponent>().element->FixedUpdate(engine, dt);
+            element.GetComponent<GUIElementComponent>().element->FixedUpdate(dt);
         }
 
         for (auto& element : idless_elements)
         {
-            element.GetComponent<GUIElementComponent>().element->FixedUpdate(engine, dt);
+            element.GetComponent<GUIElementComponent>().element->FixedUpdate(dt);
         }
     }
 

@@ -18,7 +18,7 @@ namespace doge
         Event<> on_mouse_left;
         Event<> on_clicked;
 
-        void Initialize(Engine& engine) override;
+        void Initialize() override;
 
         template <std::invocable<Button&> T>
         void SetOnStateTransition(T transition)
@@ -30,7 +30,7 @@ namespace doge
         void SetTextureID(const std::string& texture_id);
         const std::string& GetTextureID() const;
 
-        void SetIs9Slice(Engine& engine, bool is_9_slice);
+        void SetIs9Slice(bool is_9_slice);
         bool Is9Slice() const;
 
         void SetAtlasRectangleID(const std::string& id);
@@ -54,11 +54,16 @@ namespace doge
         void SetTextFont(const std::string& font_id);
         const std::string& GetTextFontID() const;
 
+        void SetTextFontSize(std::uint32_t font_size);
+        std::uint32_t GetTextFontSize() const;
+
         void SetTextAppearance(const Text::Appearance& appear);
         const Text::Appearance& GetTextAppearance() const;
 
         bool IsDown() const;
         bool IsMouseOver() const;
+        
+        void UpdateTextOrigin();
 
         static void DefaultOnStateTransition(Button& button);
 
@@ -70,7 +75,7 @@ namespace doge
 
     private:
 
-        void InitializeSpriteComponent(Engine& engine, EntityID entity_id);
+        void InitializeSpriteComponent(EntityID entity_id);
 
         enum State
         {

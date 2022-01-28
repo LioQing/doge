@@ -20,9 +20,9 @@ namespace doge
     {
         virtual ~GUIElement() = 0;
 
-        virtual void Initialize(Engine&) {};
-        virtual void Update(Engine&, DeltaTime) {};
-        virtual void FixedUpdate(Engine&, DeltaTime) {};
+        virtual void Initialize() {};
+        virtual void Update(DeltaTime) {};
+        virtual void FixedUpdate(DeltaTime) {};
 
         Entity GetEntity() const;
 

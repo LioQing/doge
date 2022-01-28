@@ -224,10 +224,12 @@ namespace ParticleSim
         };
 
         // gui elements
-        gui::AddCamera(engine, "gui_cam");
+        gui::AddCamera("gui_cam");
         
-        Button& button0 = gui::AddElement<Button>(engine, "button0", "gui_cam");
+        Button& button0 = gui::AddElement<Button>("button0", "gui_cam");
         button0.SetPosition(Vec2f(-300, 0));
+        button0.SetTextFont("arial");
+        button0.SetText(U"Testing");
         auto appear = button0.GetTextAppearance();
         appear.fill_color = Color::Red;
         button0.SetTextAppearance(appear);
