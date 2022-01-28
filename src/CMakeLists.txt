@@ -60,7 +60,7 @@ set(SRC_FILES
     extensions/gui/Button.cpp
 
     # nine_slice
-    extensions/nine_slice/nine_slice.cpp
+    extensions/nine_slice/NineSlice.cpp
     extensions/nine_slice/NineSliceTexture.cpp
 )
 
@@ -80,7 +80,7 @@ target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
 target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
 
 add_executable(test
-    main1.cpp
+    main2.cpp
 )
 
 target_link_libraries(test ${PROJECT_NAME}-static)

@@ -3,6 +3,7 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/extensions/gui/GUIElementComponent.hpp>
 #include <doge/extensions/gui/GUIElement.hpp>
+#include <doge/extensions/nine_slice.hpp>
 #include <doge/core/Engine.hpp>
 #include <unordered_map>
 #include <unordered_set>
@@ -69,10 +70,12 @@ namespace doge
         bool HasElement(const std::string& id);
 
         Engine& GetEngine();
+        NineSlice& GetNineSlice();
 
     private:
 
         Engine& engine;
+        NineSlice nine_slice;
 
         std::unordered_map<std::string, Entity> cameras;
         std::unordered_map<std::string, Entity> elements;

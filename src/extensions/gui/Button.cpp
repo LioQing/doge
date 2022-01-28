@@ -92,7 +92,7 @@ namespace doge
         this->texture_id = texture_id;
 
         if (Is9Slice())
-            nine_slice::SetSpriteTextureID(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
+            GetGUI().GetNineSlice().SetSpriteTextureID(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
         else
             GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().texture_id = GetTextureID();
     }
@@ -145,7 +145,7 @@ namespace doge
         this->center_texture_size = center_texture_size;
 
         if (GetGUI().HasElement(GetID()) && Is9Slice())
-            nine_slice::SetSpriteCenterTextureSize(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetCenterTextureSize());
+            GetGUI().GetNineSlice().SetSpriteCenterTextureSize(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetCenterTextureSize());
     }
 
     const Vec2i& Button::GetCenterTextureSize() const
@@ -158,7 +158,7 @@ namespace doge
         this->border_thickness = border_thickness;
 
         if (GetGUI().HasElement(GetID()) && Is9Slice())
-            nine_slice::SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
+            GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
     }
 
     const Rectf& Button::GetBorderThickness() const
@@ -171,7 +171,7 @@ namespace doge
         this->color = color;
 
         if (Is9Slice())
-            nine_slice::SetSpriteColor(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
+            GetGUI().GetNineSlice().SetSpriteColor(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
         else
             GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().color = GetColor();
     }
@@ -271,7 +271,7 @@ namespace doge
         if (GetGUI().HasElement(GetID()))
         {
             if (Is9Slice())
-                nine_slice::SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
+                GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
             else
                 GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().size = GetSize();
             
@@ -292,7 +292,7 @@ namespace doge
         if (GetGUI().HasElement(GetID()))
         {
             if (Is9Slice())
-                nine_slice::SetSpriteOrigin(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
+                GetGUI().GetNineSlice().SetSpriteOrigin(GetGUI().GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
             else
                 GetGUI().GetElementEntity(GetID()).GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
         }
@@ -302,8 +302,7 @@ namespace doge
     {
         if (Is9Slice())
         {
-            nine_slice::Add9SliceSpriteBySize(
-                GetGUI().GetEngine().assets,
+            GetGUI().GetNineSlice().Add9SliceSpriteBySize(
                 GetGUI().GetEngine().GetEntity(entity_id),
                 GetTextureID(),
                 GetSize(),

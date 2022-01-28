@@ -5,7 +5,7 @@
 
 namespace doge
 {
-    GUI::GUI(Engine& engine) : engine(engine)
+    GUI::GUI(Engine& engine) : engine(engine), nine_slice(engine)
     {
         GameLoopFunctions glf;
         glf.start = [&](Engine& engine){ Start(engine); };
@@ -16,13 +16,13 @@ namespace doge
         engine.scenes.extensions.emplace("doge_gui", glf);
 
         engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
-        nine_slice::LoadTexture(engine.assets, "doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
+        nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
     }
 
     GUI::~GUI()
     {
         engine.assets.EraseTexture("doge_gui_button");
-        nine_slice::EraseTexture(engine.assets, "doge_gui_button");
+        nine_slice.EraseTexture("doge_gui_button");
 
         engine.scenes.extensions.erase("doge_gui");
     }
@@ -118,6 +118,11 @@ namespace doge
     Engine& GUI::GetEngine()
     {
         return engine;
+    }
+
+    NineSlice& GUI::GetNineSlice()
+    {
+        return nine_slice;
     }
 
     void GUI::Start(Engine& engine)

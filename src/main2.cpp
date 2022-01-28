@@ -6,13 +6,17 @@ using namespace doge;
 
 namespace Test2
 {
+    std::unique_ptr<NineSlice> ns = nullptr;
+
     void Start(Engine& engine)
     {
+        ns = std::make_unique<NineSlice>(engine);
+
         engine.assets.LoadTexture("crate", "test2.png").first->second.SetRenderOptions(TextureEx::RenderOptions::Repeated);
         engine.assets.LoadTexture("crate_center", "test2.png", Recti(4, 5, 23, 23)).first->second.SetRenderOptions(TextureEx::RenderOptions::Repeated);
 
-        nine_slice::LoadTexture(engine.assets, "crate", "test2.png", Recti(4, 5, 5, 4));
-        nine_slice::SetRepeated(engine.assets, "crate", true);
+        ns->LoadTexture("crate", "test2.png", Recti(4, 5, 5, 4));
+        ns->SetRepeated("crate", true);
 
         Entity cam = engine.AddCamera();
 
@@ -30,8 +34,7 @@ namespace Test2
 
         Entity crate_9sliced = engine.AddEntity();
         crate_9sliced.AddComponent(Position(-150, 0));
-        nine_slice::Add9SliceSprite(
-            engine.assets,
+        ns->Add9SliceSpriteBySize(
             crate_9sliced,
             "crate",
             Vec2f(200, 200),
@@ -42,13 +45,12 @@ namespace Test2
 
         Entity crate_9sliced2 = engine.AddEntity();
         crate_9sliced2.AddComponent(Position(-500, 0));
-        nine_slice::Add9SliceSprite(
-            engine.assets,
+        ns->Add9SliceSpriteByTile(
             crate_9sliced2,
             "crate",
             Vec2f(100, 100),
             Vec2u(2, 2),
-            nine_slice::BorderThickness::TileScale,
+            NineSlice::BorderThickness::TileScale,
             Vec2f(100, 100)
         );
 
@@ -58,7 +60,7 @@ namespace Test2
         {
             .radius = 5.f,
             .origin = Vec2f(5.f, 5.f),
-            .color = Color::Green(),
+            .color = Color::Green,
         });
     }
 

@@ -1,6 +1,7 @@
-#include <doge/extensions/nine_slice/nine_slice.hpp>
+#include <doge/extensions/nine_slice/NineSlice.hpp>
 
 #include <doge/extensions/nine_slice/NineSliceTexture.hpp>
+#include <doge/core/Engine.hpp>
 #include <doge/core/Assets.hpp>
 #include <doge/core/io/Texture.hpp>
 #include <doge/core/TextureEx.hpp>
@@ -8,26 +9,28 @@
 
 namespace doge
 {
-    std::unordered_map<std::string, NineSliceTexture> nine_slice::textures;
+    NineSlice::NineSlice(Engine& engine) : engine(engine) 
+    {
+    }
 
-    std::string nine_slice::TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id)
+    std::string NineSlice::TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id)
     {
         return std::string("nine_slice_") + id + "_" + Texture::PostFixFromSlice(slice);
     }
 
-    std::string nine_slice::SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice)
+    std::string NineSlice::SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice)
     {
         auto prefix_size = std::string("nine_slice_").size();
         return id.substr(prefix_size, id.find(NineSliceTexture::PostFixFromSlice(slice)) - prefix_size - 1);
     }
 
-    std::string nine_slice::SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite)
+    std::string NineSlice::SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite)
     {
         return SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::Center).texture_id, Texture::Slice::Center);
     }
 
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
-    nine_slice::AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle)
+    NineSlice::AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle)
     {
         auto result = textures.emplace(id, Texture{ .texture_rectangle = texture_rectangle, .border_thickness = border_thickness});
         if (!result.second)
@@ -41,21 +44,21 @@ namespace doge
         return result;
     }
 
-    void nine_slice::EraseTexture(Assets& assets, const std::string& id)
+    void NineSlice::EraseTexture(const std::string& id)
     {
         for (auto& texture_id : textures.at(id).textures)
-            assets.EraseTexture(texture_id);
+            engine.assets.EraseTexture(texture_id);
 
         textures.erase(id);
     }
 
-    const std::unordered_map<std::string, NineSliceTexture>& nine_slice::GetTextures()
+    const std::unordered_map<std::string, NineSliceTexture>& NineSlice::GetTextures() const
     {
         return textures;
     }
 
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
-    nine_slice::LoadTexture(Assets& assets, const std::string& id, const std::string& filename, const Recti& border_thickness, const Recti& area)
+    NineSlice::LoadTexture(const std::string& id, const std::string& filename, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
         if (!result.second)
@@ -82,21 +85,21 @@ namespace doge
         auto tl2 = rect.GetSize() - border_thickness.GetSize();
         auto tl3 = rect.GetSize();
 
-        assets.LoadTexture(std::string("nine_slice_") + id + "_center",         filename, Recti(tl1, tl2 - tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       filename, Recti(tl0, tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top",            filename, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      filename, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_right",          filename, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   filename, Recti(tl2, tl3 - tl2));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         filename, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    filename, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_left",           filename, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_center",         filename, Recti(tl1, tl2 - tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       filename, Recti(tl0, tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top",            filename, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      filename, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_right",          filename, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   filename, Recti(tl2, tl3 - tl2));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         filename, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    filename, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_left",           filename, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
 
         return result;
     }
 
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
-    nine_slice::LoadTexture(Assets& assets, const std::string& id, void* data, std::size_t size, const Recti& border_thickness, const Recti& area)
+    NineSlice::LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
         if (!result.second)
@@ -115,21 +118,21 @@ namespace doge
         auto tl2 = rect.GetSize() - border_thickness.GetSize();
         auto tl3 = rect.GetSize();
 
-        assets.LoadTexture(std::string("nine_slice_") + id + "_center",         data, size, Recti(tl1, tl2 - tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       data, size, Recti(tl0, tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top",            data, size, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      data, size, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_right",          data, size, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   data, size, Recti(tl2, tl3 - tl2));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         data, size, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    data, size, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_left",           data, size, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_center",         data, size, Recti(tl1, tl2 - tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       data, size, Recti(tl0, tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top",            data, size, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      data, size, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_right",          data, size, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   data, size, Recti(tl2, tl3 - tl2));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         data, size, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    data, size, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_left",           data, size, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
 
         return result;
     }
 
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
-    nine_slice::LoadTexture(Assets& assets, const std::string& id, const io::Image& image, const Recti& border_thickness, const Recti& area)
+    NineSlice::LoadTexture(const std::string& id, const io::Image& image, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
         if (!result.second)
@@ -148,83 +151,82 @@ namespace doge
         auto tl2 = rect.GetSize() - border_thickness.GetSize();
         auto tl3 = rect.GetSize();
 
-        assets.LoadTexture(std::string("nine_slice_") + id + "_center",         image, Recti(tl1, tl2 - tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       image, Recti(tl0, tl1));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top",            image, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      image, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_right",          image, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   image, Recti(tl2, tl3 - tl2));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         image, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    image, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
-        assets.LoadTexture(std::string("nine_slice_") + id + "_left",           image, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_center",         image, Recti(tl1, tl2 - tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_left",       image, Recti(tl0, tl1));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top",            image, Recti(tl1.x, 0, tl2.x - tl1.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_top_right",      image, Recti(tl2.x, 0, tl3.x - tl2.x, tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_right",          image, Recti(tl2.x, tl1.y, tl3.x - tl2.x, tl2.y - tl1.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_right",   image, Recti(tl2, tl3 - tl2));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom",         image, Recti(tl1.x, tl2.y, tl2.x - tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_bottom_left",    image, Recti(0, tl2.y, tl1.x, tl3.y - tl2.y));
+        engine.assets.LoadTexture(std::string("nine_slice_") + id + "_left",           image, Recti(0, tl1.y, tl1.x, tl2.y - tl1.y));
 
         return result;
     }
 
-    void nine_slice::SetRenderOptions(Assets& assets, const std::string& id, TextureEx::RenderOptions options)
+    void NineSlice::SetRenderOptions(const std::string& id, TextureEx::RenderOptions options)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetRenderOptions(options);
         }
     }
 
-    void nine_slice::SetSmooth(Assets& assets, const std::string& id, bool smooth)
+    void NineSlice::SetSmooth(const std::string& id, bool smooth)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetSmooth(smooth);
         }
     }
 
-    bool nine_slice::IsSmooth(const Assets& assets, const std::string& id)
+    bool NineSlice::IsSmooth(const std::string& id) const
     {
-        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
     }
 
-    void nine_slice::SetSRGB(Assets& assets, const std::string& id, bool srgb)
+    void NineSlice::SetSRGB(const std::string& id, bool srgb)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetSRGB(srgb);
         }
     }
 
-    bool nine_slice::IsSRGB(const Assets& assets, const std::string& id)
+    bool NineSlice::IsSRGB(const std::string& id) const
     {
-        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
     }
 
-    void nine_slice::SetRepeated(Assets& assets, const std::string& id, bool repeated)
+    void NineSlice::SetRepeated(const std::string& id, bool repeated)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetRepeated(repeated);
         }
     }
 
-    bool nine_slice::IsRepeated(const Assets& assets, const std::string& id)
+    bool NineSlice::IsRepeated(const std::string& id) const
     {
-        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
-    Component<CompoundSprite>& nine_slice::Add9SliceSpriteBySize(
-        Assets& assets,
+    Component<CompoundSprite>& NineSlice::Add9SliceSpriteBySize(
         Entity entity,
         const std::string& texture_id,
         const Vec2f& size,
         const Vec2i& center_texture_size,
         const Rectf& border_thickness,
         const Vec2f& origin,
-        const Color& color)
+        const Color& color) const
     {
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
 
@@ -233,20 +235,19 @@ namespace doge
         return comp_sprite;
     }
 
-    Component<CompoundSprite>& nine_slice::Add9SliceSpriteByTile(
-        Assets& assets,
+    Component<CompoundSprite>& NineSlice::Add9SliceSpriteByTile(
         Entity entity,
         const std::string& texture_id,
         const Vec2f& tile_size,
         const Vec2u& tile_count,
         BorderThickness border_thickness_option,
         const Vec2f& origin,
-        const Color& color)
+        const Color& color) const
     {
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
         auto& slice_tex = textures.at(texture_id);
 
-        auto texture_center_size = assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
+        auto texture_center_size = engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
         auto center_texture_size = texture_center_size * tile_count;
 
         auto size = tile_size * tile_count;
@@ -278,7 +279,7 @@ namespace doge
         return comp_sprite;
     }
     
-    void nine_slice::SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id)
+    void NineSlice::SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id) const
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
@@ -286,7 +287,7 @@ namespace doge
         }
     }
 
-    void nine_slice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness)
+    void NineSlice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness) const
     {
         auto& slice_tex = textures.at(SliceTextureIDFromCompoundSprite(comp_sprite));
         
@@ -308,7 +309,7 @@ namespace doge
         SetSpriteOrigin(comp_sprite, comp_sprite.sprites.at(Texture::Slice::TopLeft).origin);
     }
 
-    void nine_slice::SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin)
+    void NineSlice::SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin) const
     {
         auto tl0 = Vec2f::Zero;
         auto tl1 = comp_sprite.sprites.at(Texture::Slice::TopLeft).size;
@@ -326,7 +327,7 @@ namespace doge
         comp_sprite.sprites.at(Texture::Slice::Right)       .origin = origin - Vec2f(tl2.x, tl1.y);
     }
 
-    void nine_slice::SetSpriteColor(CompoundSprite& comp_sprite, const Color& color)
+    void NineSlice::SetSpriteColor(CompoundSprite& comp_sprite, const Color& color) const
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
@@ -334,7 +335,7 @@ namespace doge
         }
     }
 
-    void nine_slice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size)
+    void NineSlice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size) const
     {
         comp_sprite.sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
 
@@ -344,14 +345,14 @@ namespace doge
         comp_sprite.sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2f::j);
     }
 
-    void nine_slice::Update9SliceSprite(
+    void NineSlice::Update9SliceSprite(
         CompoundSprite& comp_sprite,
         const std::string& texture_id,
         const Vec2f& center_texture_size,
         const Vec2f& size,
         const Rectf& border_thickness,
         const Vec2f& origin,
-        const Color& color)
+        const Color& color) const
     {
         auto tl0 = Vec2f::Zero;
         auto tl1 = border_thickness.GetPosition();
