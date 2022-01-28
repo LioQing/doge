@@ -10,7 +10,6 @@
   - [x] add custom sf text class
   - [x] make text works in window.Render() function
   - [x] align option for text
-  
 - [ ] extension: gui
   - [ ] main class gui
   - [ ] gui camera
@@ -45,4 +44,8 @@
 - [x] rework camera
   - [x] make default camera layer to be 0
   - [x] add render_order
+- [ ] rework extensions
+  - [ ] make nine_slice non static
+  - [ ] make physiccs non static
+
 
