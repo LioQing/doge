@@ -19,12 +19,6 @@ namespace doge
         return id;
     }
 
-    void GUIElement::SetCameraID(const std::string& camera)
-    {
-        this->camera = camera;
-        OnCameraUpdated();
-    }
-
     const std::string& GUIElement::GetCameraID() const
     {
         return camera;

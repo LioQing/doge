@@ -65,49 +65,36 @@ namespace doge
 
         auto entity = gui::GetElementEntity(GetID());
         entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID())));
-
-        if (Is9Slice())
-        {
-            nine_slice::Add9SliceSpriteBySize(
-                engine.assets,
-                entity,
-                GetTextureID(),
-                GetSize(),
-                GetCenterTextureSize(),
-                GetBorderThickness(),
-                GetOrigin() + GetSize() / 2.f,
-                GetColor()
-            );
-        }
-        else
-        {
-            entity.AddComponent(Sprite
-            {
-                .texture_id = GetTextureID(),
-                .atlas_rectangle_id = GetAtlasRectangleID(),
-                .texture_rectangle = GetTextureRectangle(),
-                .size = GetSize(),
-                .origin = GetOrigin() + GetSize() / 2.f,
-                .color = GetColor()
-            });
-        }
-
         entity.AddComponent<doge::Position>(GetPosition());
+        
+        InitializeSpriteComponent(engine, entity);
+
+        text_entity = engine.AddEntity();
+        text_entity.SetParent(entity);
+        text_entity.AddComponent(Tag::Create(GetID() + "_text"));
+        text_entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID()) + 1));
+        text_entity.AddComponent(Text
+        {
+            .font_id = "arial",
+            .string = U"Button",
+            .align = Text::Align::Center,
+            .origin = Vec2f(0, 9),
+            .character_appearances = { std::pair<std::size_t, Text::Appearance>(0, Text::Appearance{ .fill_color = Color::Black }) },
+        });
 
         on_state_transition(*this);
+
+        SetSize(Vec2f(100, 36));
     }
 
     void Button::SetTextureID(const std::string& texture_id)
     {
         this->texture_id = texture_id;
 
-        if (gui::HasElement(GetID()))
-        {
-            if (Is9Slice())
-                nine_slice::SetSpriteTextureID(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
-            else
-                gui::GetElementEntity(GetID()).GetComponent<Sprite>().texture_id = GetTextureID();
-        }
+        if (Is9Slice())
+            nine_slice::SetSpriteTextureID(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetTextureID());
+        else
+            gui::GetElementEntity(GetID()).GetComponent<Sprite>().texture_id = GetTextureID();
     }
 
     const std::string& Button::GetTextureID() const
@@ -115,9 +102,11 @@ namespace doge
         return texture_id;
     }
 
-    void Button::SetIs9Slice(bool is_9_slice)
+    void Button::SetIs9Slice(Engine& engine, bool is_9_slice)
     {
         this->is_9_slice = is_9_slice;
+
+        InitializeSpriteComponent(engine, gui::GetElementEntity(GetID()));
     }
 
     bool Button::Is9Slice() const
@@ -181,18 +170,45 @@ namespace doge
     {
         this->color = color;
 
-        if (gui::HasElement(GetID()))
-        {
-            if (Is9Slice())
-                nine_slice::SetSpriteColor(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
-            else
-                gui::GetElementEntity(GetID()).GetComponent<Sprite>().color = GetColor();
-        }
+        if (Is9Slice())
+            nine_slice::SetSpriteColor(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetColor());
+        else
+            gui::GetElementEntity(GetID()).GetComponent<Sprite>().color = GetColor();
     }
 
     const Color& Button::GetColor() const
     {
         return color;
+    }
+
+    void Button::SetText(const std::u32string& text)
+    {
+        text_entity.GetComponent<Text>().string = text;
+    }
+
+    const std::u32string& Button::GetText() const
+    {
+        return text_entity.GetComponent<Text>().string;
+    }
+
+    void Button::SetTextFont(const std::string& font_id)
+    {
+        text_entity.GetComponent<Text>().font_id = font_id;
+    }
+
+    const std::string& Button::GetTextFontID() const
+    {
+        return text_entity.GetComponent<Text>().font_id;
+    }
+
+    void Button::SetTextAppearance(const Text::Appearance& appear)
+    {
+        text_entity.GetComponent<Text>().character_appearances.at(0) = appear;
+    }
+
+    const Text::Appearance& Button::GetTextAppearance() const
+    {
+        return text_entity.GetComponent<Text>().character_appearances.at(0);
     }
 
     bool Button::IsDown() const
@@ -250,6 +266,35 @@ namespace doge
                 nine_slice::SetSpriteOrigin(gui::GetElementEntity(GetID()).GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
             else
                 gui::GetElementEntity(GetID()).GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
+        }
+    }
+
+    void Button::InitializeSpriteComponent(Engine& engine, EntityID entity_id)
+    {
+        if (Is9Slice())
+        {
+            nine_slice::Add9SliceSpriteBySize(
+                engine.assets,
+                engine.GetEntity(entity_id),
+                GetTextureID(),
+                GetSize(),
+                GetCenterTextureSize(),
+                GetBorderThickness(),
+                GetOrigin() + GetSize() / 2.f,
+                GetColor()
+            );
+        }
+        else
+        {
+            engine.GetEntity(entity_id).AddComponent(Sprite
+            {
+                .texture_id = GetTextureID(),
+                .atlas_rectangle_id = GetAtlasRectangleID(),
+                .texture_rectangle = GetTextureRectangle(),
+                .size = GetSize(),
+                .origin = GetOrigin() + GetSize() / 2.f,
+                .color = GetColor()
+            });
         }
     }
 }

@@ -28,7 +28,6 @@ namespace doge
 
         const std::string& GetID() const;
 
-        void SetCameraID(const std::string& owner_camera);
         const std::string& GetCameraID() const;
         doge::Component<Camera>& GetCameraComponent() const;
 
@@ -45,7 +44,6 @@ namespace doge
 
     protected:
 
-        virtual void OnCameraUpdated() {};
         virtual void OnSizeUpdated() {};
         virtual void OnPositionUpdated() {};
         virtual void OnOriginUpdated() {};

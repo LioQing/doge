@@ -36,7 +36,7 @@ namespace doge
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    void gui::AddCamera(Engine& engine, const std::string& id, std::int32_t render_order, std::int32_t layer, bool destroy_on_finish)
+    void gui::AddCamera(Engine& engine, const std::string& id, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
@@ -44,7 +44,12 @@ namespace doge
             throw std::invalid_argument("Failed to add camera to gui");
 
         itr->second.AddComponent(Camera{ .render_order = render_order });
-        itr->second.AddComponent(Layer::Create(layer));
+
+        std::set<std::int32_t> layers;
+        for (std::int32_t i = start_layer; i < end_layer; ++i)
+            layers.emplace(i);
+
+        itr->second.AddComponent<Layer>(layers);
     }
 
     void gui::RemoveCamera(Engine& engine, const std::string& id)
@@ -65,7 +70,12 @@ namespace doge
 
     std::int32_t gui::GetCameraLayer(const std::string& id)
     {
-        return *GetCameraEntity(id).GetComponent<Layer>().layers.begin();
+        return (*GetCameraEntity(id).GetComponent<Layer>().layers.begin() + *GetCameraEntity(id).GetComponent<Layer>().layers.rbegin()) / 2;
+    }
+
+    const std::set<std::int32_t>& gui::GetCameraLayers(const std::string& id)
+    {
+        return GetCameraEntity(id).GetComponent<Layer>().layers;
     }
 
     bool gui::HasCamera(const std::string& id)

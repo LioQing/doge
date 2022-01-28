@@ -21,6 +21,11 @@ namespace doge
         return id.substr(prefix_size, id.find(NineSliceTexture::PostFixFromSlice(slice)) - prefix_size - 1);
     }
 
+    std::string nine_slice::SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite)
+    {
+        return SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::Center).texture_id, Texture::Slice::Center);
+    }
+
     std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
     nine_slice::AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle)
     {
@@ -283,7 +288,7 @@ namespace doge
 
     void nine_slice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness)
     {
-        auto& slice_tex = textures.at(SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::Center).texture_id, Texture::Slice::Center));
+        auto& slice_tex = textures.at(SliceTextureIDFromCompoundSprite(comp_sprite));
         
         auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
         auto bord_thick = border_thickness == Rectf() ? slice_tex.border_thickness.Cast<float>() : border_thickness;

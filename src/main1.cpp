@@ -226,35 +226,17 @@ namespace ParticleSim
         // gui elements
         gui::AddCamera(engine, "gui_cam");
         
-        Button button0;
-        button0.SetCameraID("gui_cam");
+        Button& button0 = gui::AddElement<Button>(engine, "button0", "gui_cam");
         button0.SetPosition(Vec2f(-300, 0));
-        button0.on_state_transition = [](Button& button)
-        {
-            if (button.IsDown())
-            {
-                button.SetColor(0xAAAAAAFF);
-                button.SetSize(Vec2f(98, 27));
-            }
-            else if (button.IsMouseOver())
-            {
-                button.SetColor(0xEEEEEEFF);
-                button.SetSize(Vec2f(101, 29));
-            }
-            else
-            {
-                button.SetColor(0xCFCFCFFF);
-                button.SetSize(Vec2f(100, 28));
-            }
-        };
+        auto appear = button0.GetTextAppearance();
+        appear.fill_color = Color::Red;
+        button0.SetTextAppearance(appear);
 
         button0.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
         button0.on_released += [](){ std::cout << "Released" << std::endl; };
         button0.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
         button0.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
         button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
-
-        gui::AddElement(engine, "button0", button0);
 
         // text
         {

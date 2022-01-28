@@ -29,6 +29,7 @@ namespace doge
 
         static std::string TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id);
         static std::string SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice);
+        static std::string SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite);
 
         std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
         static AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle);

@@ -21,21 +21,22 @@ namespace doge
         static void Enable(Engine& engine);
         static void Disable(Engine& engine);
 
-        static void AddCamera(Engine& engine, const std::string& id, std::int32_t render_order = 32, std::int32_t layer = 32, bool destroy_on_finish = true);
+        static void AddCamera(Engine& engine, const std::string& id, std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
 
         static void RemoveCamera(Engine& engine, const std::string& id);
 
         static doge::Component<Camera>& GetCameraComponent(const std::string& id);
         static Entity GetCameraEntity(const std::string& id);
         static std::int32_t GetCameraLayer(const std::string& id);
+        static const std::set<std::int32_t>& GetCameraLayers(const std::string& id);
 
         static bool HasCamera(const std::string& id);
 
         template <typename E>
         requires std::derived_from<std::remove_reference_t<E>, Element>
-        static void AddElement(Engine& engine, const std::string& id, E&& element)
+        static E& AddElement(Engine& engine, const std::string& id, const std::string& cam_id)
         {
-            auto cam_itr = cameras.find(element.GetCameraID());
+            auto cam_itr = cameras.find(cam_id);
             if (cam_itr == cameras.end())
                 throw std::invalid_argument("Camera property of GUIElement (gui::Element) is not found in gui::cameras");
 
@@ -44,8 +45,9 @@ namespace doge
 
             entity.AddComponent(Layer::Create(*cam_itr->second.GetComponent<Layer>().layers.begin()));
 
-            auto& comp = entity.AddComponent(GUIElementComponent::Create(std::forward<E>(element)));
+            auto& comp = entity.AddComponent(GUIElementComponent::Create(E()));
             comp.element->id = id;
+            comp.element->camera = cam_id;
 
             if (comp.element->GetID() == "")
                 idless_elements.emplace(entity);
@@ -53,6 +55,8 @@ namespace doge
                 elements.emplace(comp.element->GetID(), entity);
             
             comp.element->Initialize(engine);
+
+            return static_cast<E&>(*comp.element);
         }
 
         static void RemoveElement(Engine& engine, const std::string& id);

@@ -2,6 +2,8 @@
 
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Color.hpp>
+#include <doge/core/Entity.hpp>
+#include <doge/components/Text.hpp>
 #include <doge/extensions/gui/GUIElement.hpp>
 #include <functional>
 #include <variant>
@@ -16,14 +18,19 @@ namespace doge
         Event<> on_mouse_left;
         Event<> on_clicked;
 
-        std::function<void(Button&)> on_state_transition = Button::DefaultOnStateTransition;
-
         void Initialize(Engine& engine) override;
+
+        template <std::invocable<Button&> T>
+        void SetOnStateTransition(T transition)
+        {
+            on_state_transition = transition;
+            transition(*this);
+        }
 
         void SetTextureID(const std::string& texture_id);
         const std::string& GetTextureID() const;
 
-        void SetIs9Slice(bool is_9_slice);
+        void SetIs9Slice(Engine& engine, bool is_9_slice);
         bool Is9Slice() const;
 
         void SetAtlasRectangleID(const std::string& id);
@@ -41,6 +48,15 @@ namespace doge
         void SetColor(const Color& color);
         const Color& GetColor() const;
 
+        void SetText(const std::u32string& text);
+        const std::u32string& GetText() const;
+
+        void SetTextFont(const std::string& font_id);
+        const std::string& GetTextFontID() const;
+
+        void SetTextAppearance(const Text::Appearance& appear);
+        const Text::Appearance& GetTextAppearance() const;
+
         bool IsDown() const;
         bool IsMouseOver() const;
 
@@ -54,6 +70,8 @@ namespace doge
 
     private:
 
+        void InitializeSpriteComponent(Engine& engine, EntityID entity_id);
+
         enum State
         {
             Down = 0,
@@ -62,6 +80,8 @@ namespace doge
         };
 
         std::bitset<State::Count> states;
+        std::function<void(Button&)> on_state_transition = Button::DefaultOnStateTransition;
+
         std::string texture_id = "doge_gui_button";
         bool is_9_slice = true;
         std::string atlas_rectangle_id = "";
@@ -69,5 +89,7 @@ namespace doge
         Vec2i center_texture_size = Vec2i::Zero;
         Rectf border_thickness = Rectf();
         Color color = Color::White;
+
+        Entity text_entity;
     };
 }
