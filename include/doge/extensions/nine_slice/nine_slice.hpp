@@ -34,7 +34,7 @@ namespace doge
         std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
         static AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle);
 
-        static std::size_t EraseTexture(Assets& assets, const std::string& id);
+        static void EraseTexture(Assets& assets, const std::string& id);
 
         static const std::unordered_map<std::string, NineSliceTexture>& GetTextures();
 

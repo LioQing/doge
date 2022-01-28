@@ -65,7 +65,7 @@ namespace doge::io
             shape.setOutlineThickness(comp.outline_thickness);
             if (comp.texture_id != "")
             {
-                auto& texture = engine.assets.textures.at(comp.texture_id);
+                auto& texture = engine.assets.GetTexture(comp.texture_id);
                 shape.setTexture(&texture.texture);
 
                 Recti rect = comp.texture_rectangle;
@@ -293,7 +293,7 @@ namespace doge::io
         {
             SyncTransformable(sprite, sprite_comp, entity);
 
-            auto& texture = engine.assets.textures.at(sprite_comp.texture_id);
+            auto& texture = engine.assets.GetTexture(sprite_comp.texture_id);
 
             Recti rect = sprite_comp.texture_rectangle;
             if (!sprite_comp.atlas_rectangle_id.empty())
@@ -356,7 +356,7 @@ namespace doge::io
 
             if (polygon_comp.texture_id != "")
             {
-                vertices.texture = &engine.assets.textures.at(polygon_comp.texture_id).texture;
+                vertices.texture = &engine.assets.GetTexture(polygon_comp.texture_id).texture;
             }
             else
             {

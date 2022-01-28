@@ -41,12 +41,12 @@ namespace doge
         return result;
     }
 
-    std::size_t nine_slice::EraseTexture(Assets& assets, const std::string& id)
+    void nine_slice::EraseTexture(Assets& assets, const std::string& id)
     {
         for (auto& texture_id : textures.at(id).textures)
-            assets.textures.erase(texture_id);
+            assets.EraseTexture(texture_id);
 
-        return textures.erase(id);
+        textures.erase(id);
     }
 
     const std::unordered_map<std::string, NineSliceTexture>& nine_slice::GetTextures()
@@ -165,7 +165,7 @@ namespace doge
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.textures.at(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetRenderOptions(options);
         }
@@ -175,7 +175,7 @@ namespace doge
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.textures.at(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetSmooth(smooth);
         }
@@ -183,14 +183,14 @@ namespace doge
 
     bool nine_slice::IsSmooth(const Assets& assets, const std::string& id)
     {
-        return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
+        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
     }
 
     void nine_slice::SetSRGB(Assets& assets, const std::string& id, bool srgb)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.textures.at(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetSRGB(srgb);
         }
@@ -198,14 +198,14 @@ namespace doge
 
     bool nine_slice::IsSRGB(const Assets& assets, const std::string& id)
     {
-        return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
+        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
     }
 
     void nine_slice::SetRepeated(Assets& assets, const std::string& id, bool repeated)
     {
         for (auto i = 0; i < Texture::Slice::Count; ++i)
         {
-            auto& texture = assets.textures.at(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
             texture.SetRepeated(repeated);
         }
@@ -213,7 +213,7 @@ namespace doge
 
     bool nine_slice::IsRepeated(const Assets& assets, const std::string& id)
     {
-        return assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
+        return assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
     Component<CompoundSprite>& nine_slice::Add9SliceSpriteBySize(
@@ -246,7 +246,7 @@ namespace doge
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
         auto& slice_tex = textures.at(texture_id);
 
-        auto texture_center_size = assets.textures.at(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
+        auto texture_center_size = assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
         auto center_texture_size = texture_center_size * tile_count;
 
         auto size = tile_size * tile_count;

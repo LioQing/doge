@@ -75,10 +75,9 @@ namespace doge
         text_entity.AddComponent(Layer::Create(gui::GetCameraLayer(GetCameraID()) + 1));
         text_entity.AddComponent(Text
         {
-            .font_id = "arial",
+            .font_id = "",
             .string = U"Button",
             .align = Text::Align::Center,
-            .origin = Vec2f(0, 9),
             .character_appearances = { std::pair<std::size_t, Text::Appearance>(0, Text::Appearance{ .fill_color = Color::Black }) },
         });
 

@@ -17,8 +17,11 @@ namespace doge::custom_sf
     {
         auto GetOffset = [&](std::size_t index, const doge::Text::Appearance& appear)
         {
+            if (!assets.HasFont(text_comp.font_id))
+                return Vec2f::Zero;
+
             Vec2f offset;
-            const io::Font& font = assets.fonts.at(text_comp.font_id);
+            const io::Font& font = assets.GetFont(text_comp.font_id);
 
             std::size_t line = 0;
             std::size_t i;
@@ -75,6 +78,7 @@ namespace doge::custom_sf
 
         auto UpdateText = [&](sf::Text& text, std::size_t start, std::size_t end, const doge::Text::Appearance& appear)
         {
+
             text.setPosition(getPosition());
             text.setScale(getScale());
             text.setRotation(getRotation());
@@ -86,7 +90,8 @@ namespace doge::custom_sf
                 string += sf::Uint32(text_comp.string.at(i));
             }
             text.setString(string);
-            text.setFont(assets.fonts.at(text_comp.font_id).font);
+            if (assets.HasFont(text_comp.font_id))
+                text.setFont(assets.GetFont(text_comp.font_id).font);
             text.setCharacterSize(text_comp.font_size);
             text.setLineSpacing(text_comp.line_spacing_factor);
             text.setLetterSpacing(appear.letter_spacing_factor);

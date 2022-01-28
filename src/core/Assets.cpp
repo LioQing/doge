@@ -39,6 +39,26 @@ namespace doge
         return SearchForAsset(filename, font_sub_paths);
     }
 
+    io::Font& Assets::GetFont(const std::string& id)
+    {
+        return fonts.at(id);
+    }
+
+    const io::Font& Assets::GetFont(const std::string& id) const
+    {
+        return fonts.at(id);
+    }
+
+    void Assets::EraseFont(const std::string& id)
+    {
+        fonts.erase(id);
+    }
+
+    bool Assets::HasFont(const std::string& id) const
+    {
+        return fonts.contains(id);
+    }
+
     std::pair<std::unordered_map<std::string, io::Font>::iterator, bool>
     Assets::LoadFont(const std::string& id, const std::string& filename)
     {
@@ -71,6 +91,26 @@ namespace doge
     std::string Assets::SearchForTexture(const std::string& filename)
     {
         return SearchForAsset(filename, texture_sub_paths);
+    }
+
+    TextureEx& Assets::GetTexture(const std::string& id)
+    {
+        return textures.at(id);
+    }
+
+    const TextureEx& Assets::GetTexture(const std::string& id) const
+    {
+        return textures.at(id);
+    }
+
+    void Assets::EraseTexture(const std::string& id)
+    {
+        textures.erase(id);
+    }
+
+    bool Assets::HasTexture(const std::string& id) const
+    {
+        return textures.contains(id);
     }
 
     std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
@@ -118,6 +158,26 @@ namespace doge
         return SearchForAsset(filename, image_sub_paths);
     }
 
+    io::Image& Assets::GetImage(const std::string& id)
+    {
+        return images.at(id);
+    }
+
+    const io::Image& Assets::GetImage(const std::string& id) const
+    {
+        return images.at(id);
+    }
+
+    void Assets::EraseImage(const std::string& id)
+    {
+        images.erase(id);
+    }
+
+    bool Assets::HasImage(const std::string& id) const
+    {
+        return images.contains(id);
+    }
+
     std::pair<std::unordered_map<std::string, io::Image>::iterator, bool>
     Assets::LoadImage(const std::string& id, const std::string& filename)
     {
@@ -150,6 +210,26 @@ namespace doge
     std::string Assets::SearchForCursor(const std::string& filename)
     {
         return SearchForAsset(filename, cursor_sub_paths);
+    }
+
+    io::Cursor& Assets::GetCursor(const std::string& id)
+    {
+        return cursors.at(id);
+    }
+
+    const io::Cursor& Assets::GetCursor(const std::string& id) const
+    {
+        return cursors.at(id);
+    }
+
+    void Assets::EraseCursor(const std::string& id)
+    {
+        cursors.erase(id);
+    }
+
+    bool Assets::HasCursor(const std::string& id) const
+    {
+        return cursors.contains(id);
     }
 
     std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
@@ -214,6 +294,46 @@ namespace doge
     std::string Assets::SearchForSound(const std::string& filename)
     {
         return SearchForAsset(filename, sound_sub_paths);
+    }
+
+    io::SoundBuffer& Assets::GetSoundBuffer(const std::string& id)
+    {
+        return sound_buffers.at(id);
+    }
+
+    const io::SoundBuffer& Assets::GetSoundBuffer(const std::string& id) const
+    {
+        return sound_buffers.at(id);
+    }
+
+    void Assets::EraseSoundBuffer(const std::string& id)
+    {
+        sound_buffers.erase(id);
+    }
+
+    bool Assets::HasSoundBuffer(const std::string& id) const
+    {
+        return sound_buffers.contains(id);
+    }
+    
+    io::Sound& Assets::GetSound(const std::string& id)
+    {
+        return sounds.at(id);
+    }
+    
+    const io::Sound& Assets::GetSound(const std::string& id) const
+    {
+        return sounds.at(id);
+    }
+
+    void Assets::EraseSound(const std::string& id)
+    {
+        sounds.erase(id);
+    }
+
+    bool Assets::HasSound(const std::string& id) const
+    {
+        return sounds.contains(id);
     }
 
     std::pair<std::unordered_map<std::string, io::SoundBuffer>::iterator, bool>
@@ -323,6 +443,26 @@ namespace doge
     std::string Assets::SearchForMusic(const std::string& filename)
     {
         return SearchForAsset(filename, music_sub_paths);
+    }
+    
+    io::Music& Assets::GetMusic(const std::string& id)
+    {
+        return musics.at(id);
+    }
+    
+    const io::Music& Assets::GetMusic(const std::string& id) const
+    {
+        return musics.at(id);
+    }
+
+    void Assets::EraseMusic(const std::string& id)
+    {
+        musics.erase(id);
+    }
+
+    bool Assets::HasMusic(const std::string& id) const
+    {
+        return musics.contains(id);
     }
 
     std::pair<std::unordered_map<std::string, io::Music>::iterator, bool>

@@ -17,7 +17,7 @@ namespace doge
         events.on_window_opened();
 
         if (assets.LoadTexture("missing_texture", "missing_texture.png").second)
-            assets.textures.at("missing_texture").SetRepeated(true);
+            assets.GetTexture("missing_texture").SetRepeated(true);
         else
             std::cerr << "Failed to load defaut texture missing_texture.png" << std::endl;
 
@@ -27,7 +27,7 @@ namespace doge
 
     void Engine::CloseWindow()
     {
-        assets.textures.erase("missing_texture");
+        assets.EraseTexture("missing_texture");
         window.CloseWindow();
     }
 

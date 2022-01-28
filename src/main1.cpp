@@ -173,7 +173,7 @@ namespace ParticleSim
                     shoot_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
                     shoot_particle = entity.id;
 
-                    engine.window.window_io.SetMouseCursor(engine.assets.cursors.at("grab"));
+                    engine.window.window_io.SetMouseCursor(engine.assets.GetCursor("grab"));
 
                     return;
                 }
@@ -216,10 +216,10 @@ namespace ParticleSim
 
                 shoot_particle = -1;
 
-                engine.assets.sounds.at("shoot").SetVolume(std::clamp(impulse.Magnitude() * 10.f, 0.f, 100.f));
-                engine.assets.sounds.at("shoot").Play();
+                engine.assets.GetSound("shoot").SetVolume(std::clamp(impulse.Magnitude() * 10.f, 0.f, 100.f));
+                engine.assets.GetSound("shoot").Play();
 
-                engine.window.window_io.SetMouseCursor(engine.assets.cursors.at("normal"));
+                engine.window.window_io.SetMouseCursor(engine.assets.GetCursor("normal"));
             }
         };
 
