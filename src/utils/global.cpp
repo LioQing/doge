@@ -3,6 +3,7 @@
 #include <doge/core/Engine.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/core/Component.hpp>
+#include <doge/core/TextureEx.hpp>
 
 namespace doge
 {
@@ -101,11 +102,12 @@ namespace doge
 
     Rectf global::GetAABB(const RectangleShape& rectangle, const Entity& entity)
     {
-        auto tl = ((Vec2f::Zero - rectangle.origin) * GetScale(entity)).Rotated(GetRotation(entity));
-        auto br = ((rectangle.size - rectangle.origin) * GetScale(entity)).Rotated(GetRotation(entity));
+        auto tl = ((-rectangle.origin) * GetScale(entity));
+        auto br = ((rectangle.size - rectangle.origin) * GetScale(entity));
 
         return GetAABB(
-            tl, br,
+            tl.Rotated(GetRotation(entity)),
+            br.Rotated(GetRotation(entity)),
             Vec2f(tl.x, br.y).Rotated(GetRotation(entity)),
             Vec2f(br.x, tl.y).Rotated(GetRotation(entity)),
             GetPosition(entity)
@@ -119,11 +121,18 @@ namespace doge
 
     Rectf global::GetAABB(const Sprite& sprite, const Entity& entity)
     {
-        auto tl = ((Vec2f::Zero - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
-        auto br = ((sprite.size - sprite.origin) * GetScale(entity)).Rotated(GetRotation(entity));
+        if (sprite.size.x == 0 && sprite.texture_rectangle.GetSize().x == 0 ||
+            sprite.size.y == 0 && sprite.texture_rectangle.GetSize().y == 0 )
+            throw std::invalid_argument("Sprite::size has member of value 0, GetAABB should be called with doge::Engine");
+
+        auto size = math::AutoSize(sprite.size, sprite.texture_rectangle.GetSize());
+
+        auto tl = (-sprite.origin) * GetScale(entity);
+        auto br = (size - sprite.origin) * GetScale(entity);
 
         return GetAABB(
-            tl, br,
+            tl.Rotated(GetRotation(entity)),
+            br.Rotated(GetRotation(entity)),
             Vec2f(tl.x, br.y).Rotated(GetRotation(entity)),
             Vec2f(br.x, tl.y).Rotated(GetRotation(entity)),
             GetPosition(entity)
@@ -133,6 +142,29 @@ namespace doge
     Rectf global::GetAABB(const Component<Sprite>& sprite)
     {
         return GetAABB(sprite, sprite.GetEntity());
+    }
+
+    Rectf global::GetAABB(const Sprite& sprite, const Entity& entity, const Engine& engine)
+    {
+        auto size = math::AutoSize(sprite.size, math::AutoSize(sprite.texture_rectangle.GetSize(), engine.assets.GetTexture(sprite.texture_id).GetSize()));
+        if (!sprite.atlas_rectangle_id.empty())
+            size = engine.assets.GetTexture(sprite.texture_id).atlas_rectangles.at(sprite.atlas_rectangle_id).GetSize();
+
+        auto tl = (-sprite.origin) * GetScale(entity);
+        auto br = (size - sprite.origin) * GetScale(entity);
+
+        return GetAABB(
+            tl.Rotated(GetRotation(entity)),
+            br.Rotated(GetRotation(entity)),
+            Vec2f(tl.x, br.y).Rotated(GetRotation(entity)),
+            Vec2f(br.x, tl.y).Rotated(GetRotation(entity)),
+            GetPosition(entity)
+        );
+    }
+    
+    Rectf global::GetAABB(const Component<Sprite>& sprite, const Engine& engine)
+    {
+        return GetAABB(sprite, sprite.GetEntity(), engine);
     }
 
     Rectf global::GetAABB(const PolygonShape& polygon, const Entity& entity)
@@ -154,7 +186,7 @@ namespace doge
         Rectf aabb(
             std::min({ tl.x, br.x, bl.x, tr.x }), 
             std::min({ tl.y, br.y, bl.y, tr.y }), 
-            std::max({ tl.x, br.x, bl.x, tr.x }), 
+            std::max({ tl.x, br.x, bl.x, tr.x }),
             std::max({ tl.y, br.y, bl.y, tr.y })
         );
 

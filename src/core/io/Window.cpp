@@ -73,9 +73,9 @@ namespace doge::io
                 {
                     rect = texture.atlas_rectangles.at(comp.atlas_rectangle_id);
                 }
-                else if (rect.width == 0 && rect.height == 0)
+                else
                 {
-                    rect.SetSize(texture.GetSize());
+                    rect.SetSize(math::AutoSize(rect.GetSize(), texture.GetSize()));
                 }
 
                 shape.setTextureRect(cast::ToSfRect(rect));
@@ -180,6 +180,8 @@ namespace doge::io
             const Entity& entity, 
             const DrawableKey& key)
         {
+            if constexpr (std::is_same_v<TComp, Sprite>)
+                return InAnyViewHelperHelper(global::GetAABB(comp, entity, engine), key);
             return InAnyViewHelperHelper(global::GetAABB(comp, entity), key);
         };
 

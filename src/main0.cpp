@@ -9,6 +9,8 @@
 
 namespace TestScene
 {
+    std::unique_ptr<doge::Physics> phy = nullptr;
+
     doge::Entity AddGreenRect(doge::Engine& e)
     {
         auto my_shape = e.AddEntity(false);
@@ -50,10 +52,10 @@ namespace TestScene
         my_shape.AddComponent<doge::Position>();
         my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
 
-        doge::physics::BodyInit init;
+        doge::Physics::BodyInit init;
         init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f * 0.01;
         init.angular_velocity = 20.f;
-        doge::physics::SetBodyInit(my_shape, init);
+        phy->SetBodyInit(my_shape, init);
 
         my_shape.AddComponent(doge::ConvexShape
         {
@@ -112,10 +114,10 @@ namespace TestScene
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
             my_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
-            doge::physics::BodyInit init;
+            doge::Physics::BodyInit init;
             init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f * 0.01;
             init.angular_velocity = 20.f;
-            doge::physics::SetBodyInit(my_shape, init);
+            phy->SetBodyInit(my_shape, init);
 
             // auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
             // (
@@ -134,19 +136,6 @@ namespace TestScene
                     .color = doge::Color(0x0000FF88),
                 });
             //));
-
-            auto aabb = e.AddEntity();
-            aabb.SetParent(my_shape);
-            aabb.AddComponent(doge::Tag::Create(std::to_string(my_shape.id)));
-            aabb.AddComponent(doge::RectangleShape
-            {
-                .color = doge::Color::Transparent(),
-                .outline_color = doge::Color::White,
-                .outline_thickness = 0.01f,
-            });
-            aabb.AddComponent<doge::Position>();
-            aabb.AddComponent<doge::Scale>();
-            aabb.AddComponent<doge::Rotation>();
         }
 
         auto my_sprite = e.AddEntity();
@@ -164,6 +153,19 @@ namespace TestScene
             .size = { 100, 100 },
         });
         my_sprite.AddComponent<doge::Scale>(0.01, 0.01);
+
+        auto aabb = e.AddEntity();
+        aabb.SetParent(my_sprite);
+        aabb.AddComponent(doge::Tag::Create(std::to_string(my_sprite.id)));
+        aabb.AddComponent(doge::RectangleShape
+        {
+            .color = doge::Color::Transparent,
+            .outline_color = doge::Color::White,
+            .outline_thickness = 0.01f,
+        });
+        aabb.AddComponent<doge::Position>();
+        aabb.AddComponent<doge::Scale>();
+        aabb.AddComponent<doge::Rotation>();
     }
 
     int count = 0;
@@ -176,6 +178,9 @@ namespace TestScene
 
     void Start(doge::Engine& e)
     {
+        phy = std::make_unique<doge::Physics>(e);
+        phy->SetGravity(doge::Vec2f(0, 1.96f));
+
         count = 0;
 
         cam = e.AddCamera();
@@ -205,7 +210,7 @@ namespace TestScene
                 doge::Vec2f(0, -100), 
                 doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
             },
-            .color = doge::Color::Red(),
+            .color = doge::Color::Red,
         });
 
         ground.AddComponent<doge::Scale>(0.01, 0.01);
@@ -216,9 +221,9 @@ namespace TestScene
             .type = doge::PolygonShape::Type::Triangles,
             .vertices = 
             {
-                doge::PolygonShape::Vertex({ 0, 0 }, doge::Color::Red()),
-                doge::PolygonShape::Vertex({ 100, 100 }, doge::Color::Green()),
-                doge::PolygonShape::Vertex({ 100, 0 }, doge::Color::Blue()),
+                doge::PolygonShape::Vertex({ 0, 0 }, doge::Color::Red),
+                doge::PolygonShape::Vertex({ 100, 100 }, doge::Color::Green),
+                doge::PolygonShape::Vertex({ 100, 0 }, doge::Color::Blue),
             },
             .origin = { 50, 50 },
             .texture_id = "missing_texture",
@@ -238,7 +243,7 @@ namespace TestScene
         my_custom_shape.AddComponent<doge::Rotation>();
         my_custom_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
-        doge::physics::SetBodyInit(my_custom_shape.id, doge::physics::BodyInit{ .angular_velocity = 5.f });
+        phy->SetBodyInit(my_custom_shape.id, doge::Physics::BodyInit{ .angular_velocity = 5.f });
 
         AddBlocks(e);
 
@@ -259,7 +264,7 @@ namespace TestScene
                 for (auto entity : e.Select<doge::ConvexCollider>().Entities())
                 {
                     mouse_down = e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>());
-                    if (!doge::physics::GetCollider(entity).TestPoint(mouse_down))
+                    if (!phy->GetCollider(entity).TestPoint(mouse_down))
                         continue;
 
                     line.GetComponent<doge::Position>().position = mouse_down;
@@ -282,10 +287,10 @@ namespace TestScene
 
                 std::cout << line << " " << mouse_down_id << std::endl;
 
-                if (!e.HasEntity(mouse_down_id) || !doge::physics::HasBody(mouse_down_id))
+                if (!e.HasEntity(mouse_down_id) || !phy->HasBody(mouse_down_id))
                     return;
                 
-                doge::physics::GetBody(mouse_down_id).ApplyImpulse((mouse_down - e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>())), mouse_down);
+                phy->GetBody(mouse_down_id).ApplyImpulse((mouse_down - e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>())), mouse_down);
                 mouse_down_id = -1;
             }
         };
@@ -316,7 +321,7 @@ namespace TestScene
         {
             if (entity == mouse_down_id)
             {
-                auto body = doge::physics::GetBody(entity);
+                auto body = phy->GetBody(entity);
 
                 if (position.position != mouse_down_entity_pos)
                 {
@@ -349,14 +354,14 @@ namespace TestScene
 
         for (auto [sprite] : e.Select<doge::Sprite>().Components())
         {
-            if (doge::global::GetAABB(sprite).top > e.window.settings.size.y / 2.f * 0.01)
+            if (doge::global::GetAABB(sprite, e).top > e.window.settings.size.y / 2.f * 0.01)
                 e.DestroyEntity(sprite.GetEntity());
         }
 
         for (auto [tag, position, shape, rot, scale] : e.Select<doge::Tag, doge::Position, doge::RectangleShape, doge::Rotation, doge::Scale>().Components())
         {
-            auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::CircleShape>();
-            doge::Rectf aabb = doge::global::GetAABB(comp, comp.GetEntity());
+            auto& comp = e.GetEntity(std::stoi(tag.tags.begin().operator*())).GetComponent<doge::Sprite>();
+            doge::Rectf aabb = doge::global::GetAABB(comp, comp.GetEntity(), e);
             doge::global::SetPosition(position, aabb.GetPosition());
             doge::global::SetRotation(rot, 0);
             doge::global::SetScale(scale, doge::Vec2f::One);
@@ -382,6 +387,7 @@ namespace TestScene
 
     void Finish(doge::Engine& e)
     {
+        phy.release();
         doge::default_functions::Finish(e);
     }
 };
@@ -405,13 +411,7 @@ int main()
 
     e.AddScene("Test", test);
 
-    doge::physics::SetGravity(doge::Vec2f(0, 1.96f));
-
-    doge::physics::Enable(e);
-
     e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Style::Default));
-
-    doge::physics::Disable(e);
 
     return 0;
 }

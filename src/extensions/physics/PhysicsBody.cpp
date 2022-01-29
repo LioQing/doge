@@ -1,17 +1,17 @@
 #include <doge/extensions/physics/PhysicsBody.hpp>
 
-#include <doge/extensions/physics/physics.hpp>
+#include <doge/extensions/physics/Physics.hpp>
 
 namespace doge
 {
     void PhysicsBody::SetTransform(const Vec2f& position, float rotation)
     {
-        b2_body->SetTransform(physics::ToB2Vec2(position), rotation);
+        b2_body->SetTransform(Physics::ToB2Vec2(position), rotation);
     }
 
     Vec2f PhysicsBody::GetPosition() const
     {
-        return physics::FromB2Vec2(b2_body->GetPosition());
+        return Physics::FromB2Vec2(b2_body->GetPosition());
     }
 
     float PhysicsBody::GetRotation() const
@@ -21,22 +21,22 @@ namespace doge
 
     Vec2f PhysicsBody::GetCenterOfMass() const
     {
-        return physics::FromB2Vec2(b2_body->GetWorldCenter());
+        return Physics::FromB2Vec2(b2_body->GetWorldCenter());
     }
 
     Vec2f PhysicsBody::GetLocalCenterOfMass() const
     {
-        return physics::FromB2Vec2(b2_body->GetLocalCenter());
+        return Physics::FromB2Vec2(b2_body->GetLocalCenter());
     }
 
     void PhysicsBody::SetVelocity(const Vec2f& velocity)
     {
-        b2_body->SetLinearVelocity(physics::ToB2Vec2(velocity));
+        b2_body->SetLinearVelocity(Physics::ToB2Vec2(velocity));
     }
 
     Vec2f PhysicsBody::GetVelocity() const
     {
-        return physics::FromB2Vec2(b2_body->GetLinearVelocity());
+        return Physics::FromB2Vec2(b2_body->GetLinearVelocity());
     }
 
     void PhysicsBody::SetAngularVelocity(float angular_velocity)
@@ -81,12 +81,12 @@ namespace doge
 
     void PhysicsBody::ApplyForce(const Vec2f& force)
     {
-        b2_body->ApplyForceToCenter(physics::ToB2Vec2(force), true);
+        b2_body->ApplyForceToCenter(Physics::ToB2Vec2(force), true);
     }
 
     void PhysicsBody::ApplyForce(const Vec2f& force, const Vec2f& position)
     {
-        b2_body->ApplyForce(physics::ToB2Vec2(force), physics::ToB2Vec2(position), true);
+        b2_body->ApplyForce(Physics::ToB2Vec2(force), Physics::ToB2Vec2(position), true);
     }
 
     void PhysicsBody::ApplyAcceleration(const Vec2f& acceleration)
@@ -101,12 +101,12 @@ namespace doge
 
     void PhysicsBody::ApplyImpulse(const Vec2f& impulse)
     {
-        b2_body->ApplyLinearImpulseToCenter(physics::ToB2Vec2(impulse), true);
+        b2_body->ApplyLinearImpulseToCenter(Physics::ToB2Vec2(impulse), true);
     }
 
     void PhysicsBody::ApplyImpulse(const Vec2f& impulse, const Vec2f& position)
     {
-        b2_body->ApplyLinearImpulse(physics::ToB2Vec2(impulse), physics::ToB2Vec2(position), true);
+        b2_body->ApplyLinearImpulse(Physics::ToB2Vec2(impulse), Physics::ToB2Vec2(position), true);
     }
 
     void PhysicsBody::ApplyTorque(float torque)

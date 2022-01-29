@@ -1,6 +1,6 @@
 #include <doge/extensions/physics/PhysicsCollider.hpp>
 
-#include <doge/extensions/physics/physics.hpp>
+#include <doge/extensions/physics/Physics.hpp>
 
 namespace doge
 {
@@ -16,6 +16,6 @@ namespace doge
 
     bool PhysicsCollider::TestPoint(const Vec2f& point)
     {
-        return b2_fixture->TestPoint(physics::ToB2Vec2(point));
+        return b2_fixture->TestPoint(Physics::ToB2Vec2(point));
     }
 }

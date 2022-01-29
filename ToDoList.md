@@ -44,7 +44,7 @@
 - [x] rework camera
   - [x] make default camera layer to be 0
   - [x] add render_order
-- [ ] rework extensions
+- [x] rework extensions
   - [x] make nine_slice non static
-  - [ ] make physiccs non static
+  - [x] make physiccs non static
 

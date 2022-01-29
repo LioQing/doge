@@ -21,7 +21,7 @@ namespace doge
         
         bool is_trigger = false;
         
-        // doge::physics check this every frame
+        // doge::Physics check this every frame
         // after changes are applied, it will be reset to false
         bool apply_changes = false;
     };

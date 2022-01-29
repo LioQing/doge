@@ -10,6 +10,7 @@
 namespace doge
 {
     struct Entity;
+    struct Engine;
     template <typename TComp>
     struct Component;
 
@@ -40,6 +41,9 @@ namespace doge
 
         static Rectf GetAABB(const Sprite& sprite, const Entity& entity);
         static Rectf GetAABB(const Component<Sprite>& sprite);
+
+        static Rectf GetAABB(const Sprite& sprite, const Entity& entity, const Engine& engine);
+        static Rectf GetAABB(const Component<Sprite>& sprite, const Engine& engine);
 
         static Rectf GetAABB(const PolygonShape& polygon, const Entity& entity);
         static Rectf GetAABB(const Component<PolygonShape>& custom);

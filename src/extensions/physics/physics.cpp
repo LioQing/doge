@@ -1,4 +1,4 @@
-#include <doge/extensions/physics/physics.hpp>
+#include <doge/extensions/physics/Physics.hpp>
 
 #include <doge/core/Engine.hpp>
 #include <doge/components.hpp>
@@ -7,59 +7,58 @@
 
 namespace doge
 {
-    std::unique_ptr<b2World> physics::world;
-    std::unordered_map<EntityID, b2Body*> physics::bodies;
-    std::unordered_map<EntityID, physics::BodyInit> physics::body_inits;
-    std::map<physics::FixtureKey, b2Fixture*> physics::fixtures;
-    Vec2f physics::gravity = Vec2f(0.f, 9.8f);
-
-    void physics::Enable(Engine& engine)
+    Physics::Physics(Engine& engine) : engine(engine)
     {
         GameLoopFunctions glf;
-        glf.start = Start;
-        glf.update = Update;
-        glf.fixed_update = FixedUpdate;
-        glf.finish = Finish;
+        glf.start = [&](Engine& engine){ Start(engine); };
+        glf.update = [&](Engine& engine, DeltaTime dt){ Update(engine, dt); };
+        glf.fixed_update = [&](Engine& engine, DeltaTime dt){ FixedUpdate(engine, dt); };
+        glf.finish = [&](Engine& engine){ Finish(engine); };
         
         engine.scenes.extensions.emplace("doge_physics", glf);
         world = std::make_unique<b2World>(ToB2Vec2(gravity));
     }
 
-    void physics::Disable(Engine& engine)
+    Physics::~Physics()
     {
         world.release();
         engine.scenes.extensions.erase("doge_physics");
     }
 
-    void physics::SetGravity(const Vec2f& gravity)
+    void Physics::SetGravity(const Vec2f& gravity)
     {
         if (world)
             world->SetGravity(ToB2Vec2(gravity));
-        physics::gravity = gravity;
+        Physics::gravity = gravity;
     }
 
-    const Vec2f& physics::GetGravity()
+    const Vec2f& Physics::GetGravity() const
     {
         return gravity;
     }
 
-    void physics::SetBodyInit(EntityID entity_id, const BodyInit& init_values)
+    void Physics::SetBodyInit(EntityID entity_id, const BodyInit& init_values)
     {
         if (!body_inits.emplace(entity_id, init_values).second)
             throw std::invalid_argument(std::string("Failed to set BodyInit for Entity ") + std::to_string(entity_id));
     }
 
-    physics::Body physics::GetBody(EntityID entity_id)
+    Physics::Body Physics::GetBody(EntityID entity_id)
     {
         return Body(bodies.at(entity_id));
     }
 
-    bool physics::HasBody(EntityID entity_id)
+    const Physics::Body Physics::GetBody(EntityID entity_id) const
+    {
+        return Body(bodies.at(entity_id));
+    }
+
+    bool Physics::HasBody(EntityID entity_id) const
     {
         return bodies.find(entity_id) != bodies.end();
     }
 
-    bool physics::HasCompoundCollider(EntityID entity_id)
+    bool Physics::HasCompoundCollider(EntityID entity_id) const
     {
         return std::find_if(fixtures.begin(), fixtures.end(),
         [&](const std::pair<FixtureKey, b2Fixture*>& p)
@@ -67,27 +66,37 @@ namespace doge
         != fixtures.end();
     }
 
-    physics::Collider physics::GetCollider(EntityID entity_id)
+    Physics::Collider Physics::GetCollider(EntityID entity_id)
     {
         return Collider(GetBody(entity_id).b2_body->GetFixtureList());
     }
 
-    physics::Collider physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index)
+    Physics::Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index)
     {
         return Collider(fixtures.at(FixtureKey(entity_id, type, index)));
     }
     
-    Vec2f physics::FromB2Vec2(const b2Vec2& v)
+    const Physics::Collider Physics::GetCollider(EntityID entity_id) const
+    {
+        return Collider(GetBody(entity_id).b2_body->GetFixtureList());
+    }
+
+    const Physics::Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index) const
+    {
+        return Collider(fixtures.at(FixtureKey(entity_id, type, index)));
+    }
+    
+    Vec2f Physics::FromB2Vec2(const b2Vec2& v)
     {
         return Vec2f(v.x, v.y);
     }
 
-    b2Vec2 physics::ToB2Vec2(const Vec2f& v)
+    b2Vec2 Physics::ToB2Vec2(const Vec2f& v)
     {
         return b2Vec2(v.x, v.y);
     }
 
-    b2BodyType physics::ToB2BodyType(RigidBody::Type type)
+    b2BodyType Physics::ToB2BodyType(RigidBody::Type type)
     {
         switch (type)
         {
@@ -98,7 +107,7 @@ namespace doge
         }
     }
 
-    RigidBody::Type physics::FromB2BodyType(b2BodyType type)
+    RigidBody::Type Physics::FromB2BodyType(b2BodyType type)
     {
         switch (type)
         {
@@ -109,11 +118,11 @@ namespace doge
         }
     }
 
-    void physics::Start(Engine& engine)
+    void Physics::Start(Engine& engine)
     {
     }
 
-    void physics::Update(Engine& engine, DeltaTime dt)
+    void Physics::Update(Engine& engine, DeltaTime dt)
     {
         // helper functions
         auto CreateBody = [&](const Entity& entity, const RigidBody& rgbd) -> b2Body*
@@ -471,7 +480,7 @@ namespace doge
         body_inits.clear();
     }
 
-    void physics::FixedUpdate(Engine& engine, DeltaTime dt)
+    void Physics::FixedUpdate(Engine& engine, DeltaTime dt)
     {
         world->Step(dt / 1000.f, 1, 1);
 
@@ -491,7 +500,7 @@ namespace doge
         }
     }
 
-    void physics::Finish(Engine& engine)
+    void Physics::Finish(Engine& engine)
     {
         bodies.clear();
     }

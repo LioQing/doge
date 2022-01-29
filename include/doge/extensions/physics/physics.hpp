@@ -16,28 +16,31 @@ namespace doge
 {
     struct Engine;
 
-    struct physics
+    struct Physics
     {
         using Body = PhysicsBody;
         using Collider = PhysicsCollider;
         using BodyInit = PhysicsBodyInit;
         using FixtureKey = std::tuple<EntityID, Collider::Type, std::size_t>; // eid, fixture type, index
 
-        physics(const physics&) = delete;
-        static void Enable(Engine& engine);
-        static void Disable(Engine& engine);
+        Physics(Engine& engine);
+        ~Physics();
 
-        static void SetGravity(const Vec2f& gravity);
-        static const Vec2f& GetGravity();
+        void SetGravity(const Vec2f& gravity);
+        const Vec2f& GetGravity() const;
 
-        static void SetBodyInit(EntityID entity_id, const BodyInit& init_values);
-        static Body GetBody(EntityID entity_id);
+        void SetBodyInit(EntityID entity_id, const BodyInit& init_values);
+        Body GetBody(EntityID entity_id);
+        const Body GetBody(EntityID entity_id) const;
 
-        static bool HasBody(EntityID entity_id);
-        static bool HasCompoundCollider(EntityID entity_id);
+        bool HasBody(EntityID entity_id) const;
+        bool HasCompoundCollider(EntityID entity_id) const;
 
-        static Collider GetCollider(EntityID entity_id);
-        static Collider GetCollider(EntityID entity_id, Collider::Type type, std::size_t index);
+        Collider GetCollider(EntityID entity_id);
+        Collider GetCollider(EntityID entity_id, Collider::Type type, std::size_t index);
+
+        const Collider GetCollider(EntityID entity_id) const;
+        const Collider GetCollider(EntityID entity_id, Collider::Type type, std::size_t index) const;
 
         static Vec2f FromB2Vec2(const b2Vec2& v);
         static b2Vec2 ToB2Vec2(const Vec2f& v);
@@ -47,15 +50,17 @@ namespace doge
 
     private:
 
-        static std::unique_ptr<b2World> world;
-        static std::unordered_map<EntityID, b2Body*> bodies;
-        static std::unordered_map<EntityID, BodyInit> body_inits;
-        static std::map<FixtureKey, b2Fixture*> fixtures;
-        static Vec2f gravity;
+        Engine& engine;
 
-        static void Start(Engine& engine);
-        static void Update(Engine& engine, DeltaTime dt);
-        static void FixedUpdate(Engine& engine, DeltaTime dt);
-        static void Finish(Engine& engine);
+        std::unique_ptr<b2World> world;
+        std::unordered_map<EntityID, b2Body*> bodies;
+        std::unordered_map<EntityID, BodyInit> body_inits;
+        std::map<FixtureKey, b2Fixture*> fixtures;
+        Vec2f gravity = Vec2f(0, 9.8f);
+
+        void Start(Engine& engine);
+        void Update(Engine& engine, DeltaTime dt);
+        void FixedUpdate(Engine& engine, DeltaTime dt);
+        void Finish(Engine& engine);
     };
 }
