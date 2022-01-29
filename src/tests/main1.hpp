@@ -5,10 +5,10 @@
 #include <doge/extensions/physics.hpp>
 #include <doge/extensions/GUI.hpp>
 
-using namespace doge;
-
-namespace ParticleSim
+namespace main1
 {
+    using namespace doge;
+
     std::unique_ptr<GUI> gui = nullptr;
     std::unique_ptr<Physics> phy = nullptr;
 
@@ -353,30 +353,31 @@ namespace ParticleSim
         gui.release();
         phy.release();
     }
+
+    int Main()
+    {
+        Engine engine;
+        engine.window.settings.fps = 120;
+        engine.window.settings.msaa_level = 4;
+        engine.window.settings.size = Vec2u(1280, 720);
+        engine.window.settings.title = "Particle Simulation";
+
+        engine.assets.AddSound("shoot", "shoot", "shoot.wav");
+
+        engine.assets.LoadCursor("normal", io::Cursor::Type::Arrow);
+        engine.assets.LoadCursor("grab", io::Cursor::Type::Hand);
+
+        GameLoopFunctions glf;
+        glf.start           = Start;
+        glf.update          = Update;
+        glf.fixed_update    = FixedUpdate;
+        glf.finish          = Finish;
+
+        engine.AddScene("particle_sim", glf);
+
+        engine.StartScene("particle_sim");
+
+        return 0;
+    }
 }
 
-int main()
-{
-    Engine engine;
-    engine.window.settings.fps = 120;
-    engine.window.settings.msaa_level = 4;
-    engine.window.settings.size = Vec2u(1280, 720);
-    engine.window.settings.title = "Particle Simulation";
-
-    engine.assets.AddSound("shoot", "shoot", "shoot.wav");
-
-    engine.assets.LoadCursor("normal", io::Cursor::Type::Arrow);
-    engine.assets.LoadCursor("grab", io::Cursor::Type::Hand);
-
-    GameLoopFunctions glf;
-    glf.start           = ParticleSim::Start;
-    glf.update          = ParticleSim::Update;
-    glf.fixed_update    = ParticleSim::FixedUpdate;
-    glf.finish          = ParticleSim::Finish;
-
-    engine.AddScene("particle_sim", glf);
-
-    engine.StartScene("particle_sim");
-
-    return 0;
-}

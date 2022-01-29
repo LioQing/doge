@@ -80,7 +80,7 @@ target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
 target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
 
 add_executable(test
-    main1.cpp
+    main.cpp
 )
 
 target_link_libraries(test ${PROJECT_NAME}-static)

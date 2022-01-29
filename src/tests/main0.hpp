@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <numbers>
 
-namespace TestScene
+namespace main0
 {
     std::unique_ptr<doge::Physics> phy = nullptr;
 
@@ -390,28 +390,28 @@ namespace TestScene
         phy.release();
         doge::default_functions::Finish(e);
     }
+
+    int Main()
+    {
+        srand(time(0));
+        doge::Engine e;
+        e.window.settings.title = "doge test";
+        e.window.settings.fps = 120;
+        e.window.settings.v_sync = true;
+        e.scenes.fixed_time_step = 20;
+
+        e.window.SetIcon("assets/textures/missing_texture.png");
+
+        doge::GameLoopFunctions test;
+        test.start = Start;
+        test.update = Update;
+        test.fixed_update = FixedUpdate;
+        test.finish = Finish;
+
+        e.AddScene("Test", test);
+
+        e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Style::Default));
+
+        return 0;
+    }
 };
-
-int main()
-{
-    srand(time(0));
-    doge::Engine e;
-    e.window.settings.title = "doge test";
-    e.window.settings.fps = 120;
-    e.window.settings.v_sync = true;
-    e.scenes.fixed_time_step = 20;
-
-    e.window.SetIcon("assets/textures/missing_texture.png");
-
-    doge::GameLoopFunctions test;
-    test.start = TestScene::Start;
-    test.update = TestScene::Update;
-    test.fixed_update = TestScene::FixedUpdate;
-    test.finish = TestScene::Finish;
-
-    e.AddScene("Test", test);
-
-    e.StartScene("Test", doge::Window::Settings({ 1280, 720 }, "doge test", 60, doge::Window::Settings::Style::Default));
-
-    return 0;
-}
