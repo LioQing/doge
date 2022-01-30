@@ -5,6 +5,7 @@
 - [x] visibility component to support drawable to be only on drawn on certain camera
 - [x] remove sprite sheet member of texture and unify all io classes into doge::io
 - [x] texture atlas
+- [ ] sprite mask
 - [x] core text
   - [x] add text component
   - [x] add custom sf text class
@@ -27,7 +28,6 @@
       - [ ] grid
       - [ ] list
     - [ ] outputs
-      - [ ] dialog box
       - [ ] text
       - [ ] image
   - [ ] widget traits

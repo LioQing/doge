@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gui/GUI.hpp"
-#include "gui/GUIElement.hpp"
-#include "gui/GUIElementComponent.hpp"
+#include "gui/Element.hpp"
+#include "gui/Component.hpp"
 
 #include "gui/Button.hpp"

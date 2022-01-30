@@ -1,73 +1,73 @@
-#include <doge/extensions/gui/GUIElement.hpp>
+#include <doge/extensions/gui/Element.hpp>
 
 #include <doge/extensions/gui/GUI.hpp>
 #include <doge/core/Entity.hpp>
 
-namespace doge
+namespace doge::gui
 {
-    GUIElement::~GUIElement()
+    Element::~Element()
     {
     };
 
-    GUI& GUIElement::GetGUI() const
+    GUI& Element::GetGUI() const
     {
         return *gui;
     }
 
-    Entity GUIElement::GetEntity() const
+    Entity Element::GetEntity() const
     {
         return GetGUI().GetElementEntity(GetID());
     }
 
-    const std::string& GUIElement::GetID() const
+    const std::string& Element::GetID() const
     {
         return id;
     }
 
-    const std::string& GUIElement::GetCameraID() const
+    const std::string& Element::GetCameraID() const
     {
         return camera;
     }
 
-    doge::Component<Camera>& GUIElement::GetCameraComponent() const
+    doge::Component<Camera>& Element::GetCameraComponent() const
     {
         return GetGUI().GetCameraComponent(camera);
     }
 
-    void GUIElement::SetSize(const Vec2f& size)
+    void Element::SetSize(const Vec2f& size)
     {
         this->size = size;
         OnSizeUpdated();
     }
 
-    const Vec2f& GUIElement::GetSize() const
+    const Vec2f& Element::GetSize() const
     {
         return size;
     }
 
-    void GUIElement::SetPosition(const Vec2f& position)
+    void Element::SetPosition(const Vec2f& position)
     {
         this->position = position;
         OnPositionUpdated();
     }
 
-    const Vec2f& GUIElement::GetPosition() const
+    const Vec2f& Element::GetPosition() const
     {
         return position;
     }
 
-    void GUIElement::SetOrigin(const Vec2f& origin)
+    void Element::SetOrigin(const Vec2f& origin)
     {
         this->origin = origin;
         OnOriginUpdated();
     }
 
-    const Vec2f& GUIElement::GetOrigin() const
+    const Vec2f& Element::GetOrigin() const
     {
         return origin;
     }
 
-    Rectf GUIElement::GetRectangle() const
+    Rectf Element::GetRectangle() const
     {
         return Rectf(position - origin - size / 2.f, size);
     }

@@ -1,6 +1,9 @@
 #pragma once
 
-namespace doge
+#include <doge/utils/Vec2.hpp>
+#include <doge/utils/aliases.hpp>
+
+namespace doge::physics
 {
     struct CircleCollider
     {

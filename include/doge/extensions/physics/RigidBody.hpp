@@ -2,7 +2,7 @@
 
 #include <box2d/box2d.h>
 
-namespace doge
+namespace doge::physics
 {
     struct RigidBody
     {

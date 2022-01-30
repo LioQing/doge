@@ -3,9 +3,9 @@
 #include <doge/utils/Vec2.hpp>
 #include <box2d/box2d.h>
 
-namespace doge
+namespace doge::physics
 {
-    struct PhysicsBody
+    struct Body
     {
         b2Body* b2_body;
 

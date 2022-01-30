@@ -4,19 +4,21 @@
 #include <doge/utils/Color.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/components/Text.hpp>
-#include <doge/extensions/gui/GUIElement.hpp>
+#include <doge/extensions/gui/Element.hpp>
 #include <functional>
 #include <variant>
 
-namespace doge
+namespace doge::gui
 {
-    struct Button : GUIElement
+    struct Button : Element
     {
         Event<> on_pressed;
         Event<> on_released;
         Event<> on_mouse_entered;
         Event<> on_mouse_left;
         Event<> on_clicked;
+
+        static const Vec2f DefaultSize;
 
         void Initialize() override;
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <doge/utils/Rect.hpp>
 
-namespace doge
+namespace doge::nine_slice
 {
     struct NineSliceTexture
     {

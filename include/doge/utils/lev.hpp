@@ -91,7 +91,7 @@ namespace doge::lev
             }
             else
             {
-                static_assert(std::is_base_of<Event, std::tuple_element_t<0, std::tuple<TArgs...>>>::value && 
+                static_assert(std::is_base_of<Event, std::tuple_element_t<0, std::tuple<TArgs...>>>::value,
                     "Cannot call raise event when lev::Event<TArg> is not base of TArg");
 
                 for (auto& [id, function] : listeners)

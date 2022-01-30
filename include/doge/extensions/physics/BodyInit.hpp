@@ -2,9 +2,9 @@
 
 #include <doge/utils/Vec2.hpp>
 
-namespace doge
+namespace doge::physics
 {
-    struct PhysicsBodyInit
+    struct BodyInit
     {
         Vec2f position = Vec2f::Zero;
         float rotation = 0.f;

@@ -41,7 +41,7 @@ namespace doge
                 else if constexpr (std::is_constructible_v<S, Text>)
                     comp_sprite.texts.emplace_back(sprite);
                 else
-                    static_assert(false && "Invalid Sprite Type");
+                    static_assert(false, "Invalid Sprite Type");
             };
 
             (emplace_sprite(sprites), ...);

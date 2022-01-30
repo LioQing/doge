@@ -2,7 +2,7 @@
 
 #include <doge/utils/Vec2.hpp>
 
-namespace doge
+namespace doge::physics
 {
     struct RectangleCollider
     {

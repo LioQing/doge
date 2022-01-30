@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-namespace doge
+namespace doge::nine_slice
 {
     std::string NineSliceTexture::PostFixFromSlice(Slice slice)
     {

@@ -9,19 +9,19 @@
 
 namespace main0
 {
-    std::unique_ptr<doge::Physics> phy = nullptr;
+    std::unique_ptr<doge::physics::Physics> phy = nullptr;
 
     doge::Entity AddGreenRect(doge::Engine& e)
     {
         auto my_shape = e.AddEntity(false);
 
-        auto& rgbd = my_shape.AddComponent(doge::RigidBody
+        auto& rgbd = my_shape.AddComponent(doge::physics::RigidBody
         {
-            .type = doge::RigidBody::Type::Dynamic, 
+            .type = doge::physics::RigidBody::Type::Dynamic, 
             //.continuous = true,
         });
 
-        my_shape.AddComponent(doge::ConvexCollider
+        my_shape.AddComponent(doge::physics::ConvexCollider
         {
             .rigid_body_entity = my_shape,
             .points =
@@ -36,7 +36,7 @@ namespace main0
         auto instant_dest = e.AddEntity();
         instant_dest.AddComponent<doge::Scale>(0.01, 0.01);
         instant_dest.AddComponent<doge::Position>();
-        instant_dest.AddComponent(doge::CircleCollider
+        instant_dest.AddComponent(doge::physics::CircleCollider
         {
             .rigid_body_entity = my_shape,
             .radius = 50.f,
@@ -52,7 +52,7 @@ namespace main0
         my_shape.AddComponent<doge::Position>();
         my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
 
-        doge::Physics::BodyInit init;
+        doge::physics::BodyInit init;
         init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 200.f * 0.01;
         init.angular_velocity = 20.f;
         phy->SetBodyInit(my_shape, init);
@@ -83,14 +83,14 @@ namespace main0
         {
             auto my_shape = e.AddEntity();
 
-            my_shape.AddComponent(doge::RigidBody
+            my_shape.AddComponent(doge::physics::RigidBody
             {
-                .type = doge::RigidBody::Type::Dynamic, 
+                .type = doge::physics::RigidBody::Type::Dynamic, 
             });
 
-            my_shape.AddComponent(doge::CompoundCollider::Create
+            my_shape.AddComponent(doge::physics::CompoundCollider::Create
             (
-                doge::CircleCollider
+                doge::physics::CircleCollider
                 {
                     .rigid_body_entity = my_shape,
                     .radius = 10.f,
@@ -99,7 +99,7 @@ namespace main0
                     .friction = .3f,
                     .restitution = .5f,
                 },
-                doge::RectangleCollider
+                doge::physics::RectangleCollider
                 {
                     .rigid_body_entity = my_shape,
                     .size = { 30, 8 },
@@ -114,7 +114,7 @@ namespace main0
             my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
             my_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
-            doge::Physics::BodyInit init;
+            doge::physics::BodyInit init;
             init.velocity = doge::Vec2f(std::fmod(rand(), 10) - 5, std::fmod(rand(), 10) - 5).Normalized() * 50.f * 0.01;
             init.angular_velocity = 20.f;
             phy->SetBodyInit(my_shape, init);
@@ -144,10 +144,10 @@ namespace main0
             .texture_rectangle = { 0, 0, 100, 100 },
             .origin = { 50, 50 },
         });
-        my_sprite.AddComponent(doge::RigidBody{ .type = doge::RigidBody::Type::Dynamic });
+        my_sprite.AddComponent(doge::physics::RigidBody{ .type = doge::physics::RigidBody::Type::Dynamic });
         my_sprite.AddComponent<doge::Position>(0, -2);
         my_sprite.AddComponent<doge::Rotation>();
-        my_sprite.AddComponent(doge::RectangleCollider
+        my_sprite.AddComponent(doge::physics::RectangleCollider
         {
             .rigid_body_entity = my_sprite,
             .size = { 100, 100 },
@@ -178,7 +178,7 @@ namespace main0
 
     void Start(doge::Engine& e)
     {
-        phy = std::make_unique<doge::Physics>(e);
+        phy = std::make_unique<doge::physics::Physics>(e);
         phy->SetGravity(doge::Vec2f(0, 1.96f));
 
         count = 0;
@@ -189,8 +189,8 @@ namespace main0
         cam.AddComponent<doge::Scale>(0.01, 0.01);
 
         auto ground = e.AddEntity();
-        ground.AddComponent<doge::RigidBody>(doge::RigidBody::Type::Static);
-        ground.AddComponent(doge::ConvexCollider
+        ground.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Type::Static);
+        ground.AddComponent(doge::physics::ConvexCollider
         {
             .rigid_body_entity = ground,
             .points = // shape: /\.
@@ -228,8 +228,8 @@ namespace main0
             .origin = { 50, 50 },
             .texture_id = "missing_texture",
         });
-        my_custom_shape.AddComponent(doge::RigidBody(doge::RigidBody::Kinematic));
-        my_custom_shape.AddComponent(doge::ConvexCollider
+        my_custom_shape.AddComponent(doge::physics::RigidBody(doge::physics::RigidBody::Kinematic));
+        my_custom_shape.AddComponent(doge::physics::ConvexCollider
         {
             .rigid_body_entity = my_custom_shape,
             .points = 
@@ -243,7 +243,7 @@ namespace main0
         my_custom_shape.AddComponent<doge::Rotation>();
         my_custom_shape.AddComponent<doge::Scale>(0.01, 0.01);
 
-        phy->SetBodyInit(my_custom_shape.id, doge::Physics::BodyInit{ .angular_velocity = 5.f });
+        phy->SetBodyInit(my_custom_shape.id, doge::physics::BodyInit{ .angular_velocity = 5.f });
 
         AddBlocks(e);
 
@@ -261,7 +261,7 @@ namespace main0
         {
             if (button.button == doge::event::MouseButton::Button::Left)
             {
-                for (auto entity : e.Select<doge::ConvexCollider>().Entities())
+                for (auto entity : e.Select<doge::physics::ConvexCollider>().Entities())
                 {
                     mouse_down = e.window.MapPixelToCoords(button.position, cam.GetComponent<doge::Camera>());
                     if (!phy->GetCollider(entity).TestPoint(mouse_down))
@@ -317,7 +317,7 @@ namespace main0
             count = 0;
         }
 
-        for (auto [entity, rgbd, scale, position, convex, coll, rot] : e.Select<doge::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
+        for (auto [entity, rgbd, scale, position, convex, coll, rot] : e.Select<doge::physics::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::physics::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
         {
             if (entity == mouse_down_id)
             {
@@ -344,7 +344,7 @@ namespace main0
         //         e.DestroyEntity(entity);
         // }
 
-        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CircleShape, doge::CompoundCollider>().EntitiesAndComponents())
+        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::physics::RigidBody, doge::Position, doge::CircleShape, doge::physics::CompoundCollider>().EntitiesAndComponents())
         {
             auto aabb = doge::global::GetAABB(shape, entity);
 

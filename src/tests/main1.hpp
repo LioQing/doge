@@ -3,14 +3,14 @@
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
-#include <doge/extensions/GUI.hpp>
+#include <doge/extensions/gui.hpp>
 
 namespace main1
 {
     using namespace doge;
 
-    std::unique_ptr<GUI> gui = nullptr;
-    std::unique_ptr<Physics> phy = nullptr;
+    std::unique_ptr<gui::GUI> gui = nullptr;
+    std::unique_ptr<physics::Physics> phy = nullptr;
 
     int shoot_particle = -1;
     Vec2f shoot_particle_position;
@@ -32,8 +32,8 @@ namespace main1
             .texture_rectangle = Recti(0, 0, 32, 32),
         });
 
-        particle.AddComponent<RigidBody>(RigidBody::Type::Dynamic, true);
-        particle.AddComponent(CircleCollider
+        particle.AddComponent<physics::RigidBody>(physics::RigidBody::Type::Dynamic, true);
+        particle.AddComponent(physics::CircleCollider
         {
             .rigid_body_entity = particle,
             .radius = .2f,
@@ -49,8 +49,8 @@ namespace main1
 
     void Start(Engine& engine)
     {
-        gui = std::make_unique<GUI>(engine);
-        phy = std::make_unique<Physics>(engine);
+        gui = std::make_unique<gui::GUI>(engine);
+        phy = std::make_unique<physics::Physics>(engine);
 
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
@@ -110,11 +110,11 @@ namespace main1
             .points = math::RoundedRectangle(Vec2f(1, 1), 0.08),
             .origin = Vec2f(0.5, 0.5),
         });
-        rr.AddComponent(RigidBody
+        rr.AddComponent(physics::RigidBody
         {
-            .type = RigidBody::Type::Static,
+            .type = physics::RigidBody::Type::Static,
         });
-        rr.AddComponent(RectangleCollider
+        rr.AddComponent(physics::RectangleCollider
         {
             .rigid_body_entity = rr,
             .size = Vec2f(1, 1),
@@ -123,8 +123,8 @@ namespace main1
         // wall
         Entity wall = engine.AddEntity();
 
-        wall.AddComponent<RigidBody>(RigidBody::Type::Static);
-        wall.AddComponent(EdgeCollider
+        wall.AddComponent<physics::RigidBody>(physics::RigidBody::Type::Static);
+        wall.AddComponent(physics::EdgeCollider
         {
             .rigid_body_entity = wall,
             .points = 
@@ -232,10 +232,11 @@ namespace main1
         // gui elements
         gui->AddCamera("gui_cam");
         
-        Button& button0 = gui->AddElement<Button>("button0", "gui_cam");
+        gui::Button& button0 = gui->AddElement<gui::Button>("button0", "gui_cam");
         button0.SetPosition(Vec2f(-300, 0));
+        button0.SetSize(gui::Button::DefaultSize * Vec2f(1, 2));
         button0.SetTextFont("arial");
-        button0.SetText(U"Testing");
+        button0.SetText(U"Hello\nthis is me");
         auto appear = button0.GetTextAppearance();
         appear.fill_color = Color::Red;
         button0.SetTextAppearance(appear);
@@ -341,7 +342,7 @@ namespace main1
             if (entity != shoot_particle)
                 continue;
             
-            Physics::Body body = phy->GetBody(entity);
+            physics::Body body = phy->GetBody(entity);
 
             Vec2f diff = shoot_particle_position - position.position;
             body.SetVelocity(diff);

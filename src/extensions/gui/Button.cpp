@@ -6,8 +6,10 @@
 #include <doge/utils/math.hpp>
 #include <algorithm>
 
-namespace doge
+namespace doge::gui
 {
+    const Vec2f Button::DefaultSize = Vec2f(100, 36);
+
     void Button::Initialize()
     {
         GetGUI().GetEngine().events.on_mouse_button_pressed +=
@@ -84,7 +86,7 @@ namespace doge
 
         on_state_transition(*this);
 
-        SetSize(Vec2f(100, 36));
+        SetSize(DefaultSize);
     }
 
     void Button::SetTextureID(const std::string& texture_id)

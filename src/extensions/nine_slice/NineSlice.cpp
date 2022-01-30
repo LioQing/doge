@@ -7,7 +7,7 @@
 #include <doge/core/TextureEx.hpp>
 #include <doge/utils/math.hpp>
 
-namespace doge
+namespace doge::nine_slice
 {
     NineSlice::NineSlice(Engine& engine) : engine(engine) 
     {

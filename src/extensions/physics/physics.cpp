@@ -5,7 +5,7 @@
 #include <doge/extensions/physics.hpp>
 #include <algorithm>
 
-namespace doge
+namespace doge::physics
 {
     Physics::Physics(Engine& engine) : engine(engine)
     {
@@ -43,12 +43,12 @@ namespace doge
             throw std::invalid_argument(std::string("Failed to set BodyInit for Entity ") + std::to_string(entity_id));
     }
 
-    Physics::Body Physics::GetBody(EntityID entity_id)
+    Body Physics::GetBody(EntityID entity_id)
     {
         return Body(bodies.at(entity_id));
     }
 
-    const Physics::Body Physics::GetBody(EntityID entity_id) const
+    const Body Physics::GetBody(EntityID entity_id) const
     {
         return Body(bodies.at(entity_id));
     }
@@ -66,22 +66,22 @@ namespace doge
         != fixtures.end();
     }
 
-    Physics::Collider Physics::GetCollider(EntityID entity_id)
+    Collider Physics::GetCollider(EntityID entity_id)
     {
         return Collider(GetBody(entity_id).b2_body->GetFixtureList());
     }
 
-    Physics::Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index)
+    Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index)
     {
         return Collider(fixtures.at(FixtureKey(entity_id, type, index)));
     }
     
-    const Physics::Collider Physics::GetCollider(EntityID entity_id) const
+    const Collider Physics::GetCollider(EntityID entity_id) const
     {
         return Collider(GetBody(entity_id).b2_body->GetFixtureList());
     }
 
-    const Physics::Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index) const
+    const Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index) const
     {
         return Collider(fixtures.at(FixtureKey(entity_id, type, index)));
     }

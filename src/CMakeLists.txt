@@ -51,12 +51,12 @@ set(SRC_FILES
 
     # physics
     extensions/physics/Physics.cpp
-    extensions/physics/PhysicsBody.cpp
-    extensions/physics/PhysicsCollider.cpp
+    extensions/physics/Body.cpp
+    extensions/physics/Collider.cpp
 
     # gui
     extensions/gui/GUI.cpp
-    extensions/gui/GUIElement.cpp
+    extensions/gui/Element.cpp
     extensions/gui/Button.cpp
 
     # nine_slice

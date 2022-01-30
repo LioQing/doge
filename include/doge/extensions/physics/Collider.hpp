@@ -3,9 +3,9 @@
 #include <box2d/box2d.h>
 #include <doge/utils/Vec2.hpp>
 
-namespace doge
+namespace doge::physics
 {
-    struct PhysicsCollider
+    struct Collider
     {
         enum Type
         {

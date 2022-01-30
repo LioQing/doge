@@ -4,11 +4,11 @@
 
 namespace main2
 {
-    std::unique_ptr<doge::NineSlice> ns = nullptr;
+    std::unique_ptr<doge::nine_slice::NineSlice> ns = nullptr;
 
     void Start(doge::Engine& engine)
     {
-        ns = std::make_unique<doge::NineSlice>(engine);
+        ns = std::make_unique<doge::nine_slice::NineSlice>(engine);
 
         engine.assets.LoadTexture("crate", "test2.png").first->second.SetRenderOptions(doge::TextureEx::RenderOptions::Repeated);
         engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23)).first->second.SetRenderOptions(doge::TextureEx::RenderOptions::Repeated);
@@ -48,7 +48,7 @@ namespace main2
             "crate",
             doge::Vec2f(100, 100),
             doge::Vec2u(2, 2),
-            doge::NineSlice::BorderThickness::TileScale,
+            doge::nine_slice::NineSlice::BorderThickness::TileScale,
             doge::Vec2f(100, 100)
         );
 

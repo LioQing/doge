@@ -3,7 +3,7 @@
 #include <doge/core/Engine.hpp>
 #include <doge/extensions/nine_slice.hpp>
 
-namespace doge
+namespace doge::gui
 {
     GUI::GUI(Engine& engine) : engine(engine), nine_slice(engine)
     {
@@ -84,25 +84,25 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            if (element.GetComponent<GUIElementComponent>().element->GetCameraID() == camera_id)
+            if (element.GetComponent<Component>().element->GetCameraID() == camera_id)
                 engine.DestroyEntity(element);
         }
 
         for (auto& element : idless_elements)
         {
-            if (element.GetComponent<GUIElementComponent>().element->GetCameraID() == camera_id)
+            if (element.GetComponent<Component>().element->GetCameraID() == camera_id)
                 engine.DestroyEntity(element);
         }
     }
 
-    GUIElement& GUI::GetElement(const std::string& id)
+    Element& GUI::GetElement(const std::string& id)
     {
         return *GetElementComponent(id).element;
     }
 
-    doge::Component<GUIElementComponent>& GUI::GetElementComponent(const std::string& id)
+    doge::Component<Component>& GUI::GetElementComponent(const std::string& id)
     {
-        return elements.at(id).GetComponent<GUIElementComponent>();
+        return elements.at(id).GetComponent<Component>();
     }
 
     Entity GUI::GetElementEntity(const std::string& id)
@@ -120,7 +120,7 @@ namespace doge
         return engine;
     }
 
-    NineSlice& GUI::GetNineSlice()
+    doge::nine_slice::NineSlice& GUI::GetNineSlice()
     {
         return nine_slice;
     }
@@ -134,12 +134,12 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<GUIElementComponent>().element->Update(dt);
+            element.GetComponent<Component>().element->Update(dt);
         }
 
         for (auto& element : idless_elements)
         {
-            element.GetComponent<GUIElementComponent>().element->Update(dt);
+            element.GetComponent<Component>().element->Update(dt);
         }
     }
 
@@ -147,12 +147,12 @@ namespace doge
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<GUIElementComponent>().element->FixedUpdate(dt);
+            element.GetComponent<Component>().element->FixedUpdate(dt);
         }
 
         for (auto& element : idless_elements)
         {
-            element.GetComponent<GUIElementComponent>().element->FixedUpdate(dt);
+            element.GetComponent<Component>().element->FixedUpdate(dt);
         }
     }
 

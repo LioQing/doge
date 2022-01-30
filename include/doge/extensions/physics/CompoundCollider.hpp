@@ -5,7 +5,7 @@
 #include <doge/extensions/physics/CircleCollider.hpp>
 #include <doge/extensions/physics/RectangleCollider.hpp>
 
-namespace doge
+namespace doge::physics
 {
     struct CompoundCollider
     {
@@ -26,16 +26,16 @@ namespace doge
             CompoundCollider comp_coll;
 
             auto emplace_coll =
-            [&]<typename Collider>(const Collider& coll)
+            [&]<typename C>(const C& coll)
             {
-                if constexpr (std::is_constructible_v<Collider, ConvexCollider>)
+                if constexpr (std::is_constructible_v<ConvexCollider, C>)
                     comp_coll.convex_colliders.emplace_back(coll);
-                else if constexpr (std::is_constructible_v<Collider, CircleCollider>)
+                else if constexpr (std::is_constructible_v<CircleCollider, C>)
                     comp_coll.circle_colliders.emplace_back(coll);
-                else if constexpr (std::is_constructible_v<Collider, RectangleCollider>)
+                else if constexpr (std::is_constructible_v<RectangleCollider, C>)
                     comp_coll.rectangle_colliders.emplace_back(coll);
                 else
-                    static_assert(false && "Invalid Collider Type");
+                    static_assert(false, "Invalid collider type");
             };
 
             (emplace_coll(colliders), ...);
