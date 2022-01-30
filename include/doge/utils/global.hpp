@@ -48,6 +48,8 @@ namespace doge
         static Rectf GetAABB(const PolygonShape& polygon, const Entity& entity);
         static Rectf GetAABB(const Component<PolygonShape>& custom);
 
+        static bool IsEnabled(const Entity& entity);
+
     private:
 
         static Rectf GetAABB(const Vec2f& tl, const Vec2f& br, const Vec2f& bl, const Vec2f& tr, const Vec2f& position);

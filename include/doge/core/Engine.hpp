@@ -79,7 +79,14 @@ namespace doge
         {
             if (include_disabled)
                 return Range<TComps...>(lic::Select<TComps...>());
-            return Range<TComps...>(lic::Select<TComps...>().Where([](lic::Entity entity, TComps... c){ return entity.GetComponent<EntityInfo>().enabled; }));
+            
+            return Range<TComps...>(
+                lic::Select<TComps...>()
+                .Where(
+                    [&](lic::Entity entity, TComps... c)
+                    { return global::IsEnabled(GetEntity(entity.id)); }
+                )
+            );
         }
 
         // assets

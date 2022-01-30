@@ -225,12 +225,12 @@ namespace doge::physics
             if (body_itr != bodies.end())
             {
                 b2Body* body = body_itr->second;
-                bool is_enabled = entity_info.enabled && rgbd.enabled;
+                bool enabled = global::IsEnabled(entity) && rgbd.enabled;
 
-                if (is_enabled != body->IsEnabled())
-                    body->SetEnabled(is_enabled);
+                if (enabled != body->IsEnabled())
+                    body->SetEnabled(enabled);
 
-                if (!is_enabled)
+                if (!enabled)
                     continue;
                 
                 body->SetAwake(rgbd.awake);

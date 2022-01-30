@@ -163,6 +163,7 @@ namespace main1
         {
             if (event.button == event::MouseButton::Button::Left)
             {
+                gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = false;
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                 for (auto entity : engine.Select<Tag>()
                     .Where([](const Entity& _, const Tag& tag)
@@ -207,6 +208,7 @@ namespace main1
         {
             if (event.button == event::MouseButton::Button::Left)
             {
+                gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = true;
                 if (shoot_particle == -1) return;
 
                 if (!engine.HasEntity(shoot_particle) || !phy->HasBody(shoot_particle))

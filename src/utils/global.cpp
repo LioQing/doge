@@ -181,6 +181,21 @@ namespace doge
         return GetAABB(polygon, polygon.GetEntity());
     }
 
+    bool global::IsEnabled(const Entity& entity)
+    {
+        Entity curr_entity = entity;
+
+        while (curr_entity.HasParent())
+        {
+            if (!curr_entity.GetComponent<EntityInfo>().enabled)
+                return false;
+            
+            curr_entity = curr_entity.GetParent();
+        }
+
+        return curr_entity.GetComponent<EntityInfo>().enabled;
+    }
+
     Rectf global::GetAABB(const Vec2f& tl, const Vec2f& br, const Vec2f& bl, const Vec2f& tr, const Vec2f& position)
     {
         Rectf aabb(
