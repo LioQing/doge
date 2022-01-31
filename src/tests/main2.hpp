@@ -32,7 +32,7 @@ namespace main2
 
         doge::Entity crate_9sliced = engine.AddEntity();
         crate_9sliced.AddComponent(doge::Position(-150, 0));
-        ns->Add9SliceSpriteBySize(
+        auto& cs = ns->Add9SliceSpriteBySize(
             crate_9sliced,
             "crate",
             doge::Vec2f(200, 200),

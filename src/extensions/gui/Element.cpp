@@ -9,6 +9,11 @@ namespace doge::gui
     {
     };
 
+    std::int32_t Element::GetLayer() const
+    {
+        return GetGUI().GetCameraLayer(GetCameraID());
+    }
+
     GUI& Element::GetGUI() const
     {
         return *gui;

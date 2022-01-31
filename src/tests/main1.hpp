@@ -164,7 +164,7 @@ namespace main1
         {
             if (event.button == event::MouseButton::Button::Left)
             {
-                gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = false;
+                // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = false;
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                 for (auto entity : engine.Select<Tag>()
                     .Where([](const Entity& _, const Tag& tag)
@@ -209,7 +209,7 @@ namespace main1
         {
             if (event.button == event::MouseButton::Button::Left)
             {
-                gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = true;
+                // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = true;
                 if (shoot_particle == -1) return;
 
                 if (!engine.HasEntity(shoot_particle) || !phy->HasBody(shoot_particle))
@@ -249,6 +249,9 @@ namespace main1
         button0.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
         button0.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
         button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
+
+        gui::Window& window = gui->AddElement<gui::Window>("window0", "gui_cam");
+        window.SetSize(Vec2f(400, 400));
 
         // text
         {
@@ -365,6 +368,7 @@ namespace main1
         engine.window.settings.msaa_level = 4;
         engine.window.settings.size = Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";
+        engine.window.SetBackgroundColor(0xF0F0F0FF);
 
         engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 

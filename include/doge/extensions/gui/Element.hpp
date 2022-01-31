@@ -29,6 +29,8 @@ namespace doge
             virtual void Update(DeltaTime) {};
             virtual void FixedUpdate(DeltaTime) {};
 
+            virtual std::int32_t GetLayer() const;
+
             GUI& GetGUI() const;
             Entity GetEntity() const;
             bool IsInitialized() const;

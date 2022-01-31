@@ -51,7 +51,30 @@ namespace doge::gui
         GetEngine().events.on_window_resized.AddListener(
             std::string("doge_gui_camera_") + id,
             [this, val_id = id](const event::Size& event)
-            { GetCameraComponent(val_id).size = GetEngine().window.window_io.GetSize() * GetCameraComponent(val_id).port.GetSize(); }
+            { GetCameraComponent(val_id).size = event.size * GetCameraComponent(val_id).port.GetSize(); }
+        );
+
+        std::set<std::int32_t> layers;
+        for (std::int32_t i = start_layer; i < end_layer; ++i)
+            layers.emplace(i);
+
+        itr->second.AddComponent<Layer>(layers);
+    }
+
+    void GUI::AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    {
+        auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
+
+        if (!success)
+            throw std::invalid_argument("Failed to add camera to gui");
+
+        auto& cam_comp = itr->second.AddComponent(Camera{ .size = rectangle.GetSize(), .render_order = render_order });
+        cam_comp.port = Rectf(rectangle.GetPosition() / GetEngine().window.window_io.GetSize(), rectangle.GetSize() / GetEngine().window.window_io.GetSize());
+
+        GetEngine().events.on_window_resized.AddListener(
+            std::string("doge_gui_camera_") + id,
+            [this, val_id = id](const event::Size& event)
+            { GetCameraComponent(val_id).port.SetSize(GetCameraComponent(val_id).size / event.size); }
         );
 
         std::set<std::int32_t> layers;
@@ -68,27 +91,27 @@ namespace doge::gui
         cameras.erase(id);
     }
 
-    doge::Component<Camera>& GUI::GetCameraComponent(const std::string& id)
+    doge::Component<Camera>& GUI::GetCameraComponent(const std::string& id) const
     {
         return cameras.at(id).GetComponent<Camera>();
     }
 
-    Entity GUI::GetCameraEntity(const std::string& id)
+    Entity GUI::GetCameraEntity(const std::string& id) const
     {
         return cameras.at(id);
     }
 
-    std::int32_t GUI::GetCameraLayer(const std::string& id)
+    std::int32_t GUI::GetCameraLayer(const std::string& id) const
     {
         return (*GetCameraEntity(id).GetComponent<Layer>().layers.begin() + *GetCameraEntity(id).GetComponent<Layer>().layers.rbegin()) / 2;
     }
 
-    const std::set<std::int32_t>& GUI::GetCameraLayers(const std::string& id)
+    const std::set<std::int32_t>& GUI::GetCameraLayers(const std::string& id) const
     {
         return GetCameraEntity(id).GetComponent<Layer>().layers;
     }
 
-    bool GUI::HasCamera(const std::string& id)
+    bool GUI::HasCamera(const std::string& id) const
     {
         return cameras.find(id) != cameras.end();
     }
@@ -114,27 +137,27 @@ namespace doge::gui
         }
     }
 
-    Element& GUI::GetElement(const std::string& id)
+    Element& GUI::GetElement(const std::string& id) const
     {
         return *GetElementComponent(id).element;
     }
 
-    doge::Component<Component>& GUI::GetElementComponent(const std::string& id)
+    doge::Component<Component>& GUI::GetElementComponent(const std::string& id) const
     {
         return elements.at(id).GetComponent<Component>();
     }
 
-    Entity GUI::GetElementEntity(const std::string& id)
+    Entity GUI::GetElementEntity(const std::string& id) const
     {
         return elements.at(id);
     }
 
-    bool GUI::HasElement(const std::string& id)
+    bool GUI::HasElement(const std::string& id) const
     {
         return elements.find(id) != elements.end();
     }
 
-    Engine& GUI::GetEngine()
+    Engine& GUI::GetEngine() const
     {
         return engine;
     }
@@ -142,6 +165,38 @@ namespace doge::gui
     doge::nine_slice::NineSlice& GUI::GetNineSlice()
     {
         return nine_slice;
+    }
+
+    const doge::nine_slice::NineSlice& GUI::GetNineSlice() const
+    {
+        return nine_slice;
+    }
+
+    std::shared_ptr<Element> GUI::GetElementBelowCursor() const
+    {
+        std::shared_ptr<Element> ret_ptr = nullptr;
+
+        for (auto& [id, element] : elements)
+        {
+            auto& ptr = element.GetComponent<Component>().element;
+            if (math::TestPoint(GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent()), ptr->GetRectangle()) &&
+                (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer()))
+            {
+                ret_ptr = ptr;
+            }
+        }
+
+        for (auto& element : idless_elements)
+        {
+            auto& ptr = element.GetComponent<Component>().element;
+            if (math::TestPoint(GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent()), ptr->GetRectangle()) &&
+                (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer()))
+            {
+                ret_ptr = ptr;
+            }
+        }
+
+        return ret_ptr;
     }
 
     void GUI::Start(Engine& engine)

@@ -78,7 +78,7 @@ namespace doge::gui
 
     private:
 
-        void InitializeSpriteComponent(EntityID entity_id);
+        void UpdateSprite();
 
         enum State
         {

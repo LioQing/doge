@@ -5,3 +5,4 @@
 #include "gui/Component.hpp"
 
 #include "gui/Button.hpp"
+#include "gui/Window.hpp"
