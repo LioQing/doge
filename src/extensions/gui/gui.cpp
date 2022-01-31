@@ -17,6 +17,9 @@ namespace doge::gui
 
         engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
         nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
+
+        engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
+        nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
     }
 
     GUI::~GUI()
@@ -28,6 +31,9 @@ namespace doge::gui
 
         engine.assets.EraseTexture("doge_gui_button");
         nine_slice.EraseTexture("doge_gui_button");
+
+        engine.assets.EraseTexture("doge_gui_window");
+        nine_slice.EraseTexture("doge_gui_window");
 
         engine.scenes.extensions.erase("doge_gui");
     }

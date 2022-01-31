@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <doge/utils/Rect.hpp>
 #include <doge/core/Component.hpp>
-#include <doge/extensions/nine_slice/NineSliceTexture.hpp>
+#include <doge/extensions/nine_slice/Texture.hpp>
 #include <doge/core/TextureEx.hpp>
 
 namespace doge
@@ -16,7 +16,7 @@ namespace doge
     {
         struct NineSlice
         {
-            using Texture = NineSliceTexture;
+            using Texture = Texture;
 
             enum BorderThickness
             {
@@ -29,24 +29,23 @@ namespace doge
 
             NineSlice(Engine& engine);
 
-            static std::string TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id);
-            static std::string SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice);
-            static std::string SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite);
+            static std::string TextureIDFromSlice(Texture::Slice slice, const std::string& id);
+            static std::string SliceTextureIDFromTextureID(const std::string& id, Texture::Slice slice);
 
-            std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+            std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle);
 
             void EraseTexture(const std::string& id);
 
-            const std::unordered_map<std::string, NineSliceTexture>& GetTextures() const;
+            const std::unordered_map<std::string, Texture>& GetTextures() const;
 
-            std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+            std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             LoadTexture(const std::string& id, const std::string& filename, const Recti& border_thickness, const Recti& area = Recti());
 
-            std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+            std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& border_thickness, const Recti& area = Recti());
 
-            std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+            std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             LoadTexture(const std::string& id, const io::Image& image, const Recti& border_thickness, const Recti& area = Recti());
 
             void SetRenderOptions(const std::string& id, TextureEx::RenderOptions options);
@@ -84,7 +83,16 @@ namespace doge
             void SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness) const;
             void SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin) const;
             void SetSpriteColor(CompoundSprite& comp_sprite, const Color& color) const;
-            void SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size) const;
+            void SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2i& center_texture_size) const;
+
+            std::string GetSpriteTextureID(const CompoundSprite& comp_sprite) const;
+            const std::string& GetSpriteTextureID(const CompoundSprite& comp_sprite, Texture::Slice slice) const;
+            const Sprite& GetSprite(const CompoundSprite& comp_sprite, Texture::Slice slice) const;
+            Vec2f GetSpriteSize(const CompoundSprite& comp_sprite) const;
+            Rectf GetSpriteBorderThickness(const CompoundSprite& comp_sprite) const;
+            const Vec2f& GetSpriteOrigin(const CompoundSprite& comp_sprite) const;
+            const Color& GetSpriteColor(const CompoundSprite& comp_sprite) const;
+            Vec2i GetSpriteCenterTextureSize(const CompoundSprite& comp_sprite) const;
 
         private:
 
@@ -100,7 +108,7 @@ namespace doge
 
             Engine& engine;
 
-            std::unordered_map<std::string, NineSliceTexture> textures;
+            std::unordered_map<std::string, Texture> textures;
         };
     }
 }

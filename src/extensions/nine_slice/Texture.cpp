@@ -1,10 +1,10 @@
-#include <doge/extensions/nine_slice/NineSliceTexture.hpp>
+#include <doge/extensions/nine_slice/Texture.hpp>
 
 #include <stdexcept>
 
 namespace doge::nine_slice
 {
-    std::string NineSliceTexture::PostFixFromSlice(Slice slice)
+    std::string Texture::PostFixFromSlice(Slice slice)
     {
         switch (slice)
         {
@@ -21,7 +21,7 @@ namespace doge::nine_slice
         }
     }
 
-    NineSliceTexture::Slice NineSliceTexture::SliceFromPostFix(const std::string& post_fix)
+    Texture::Slice Texture::SliceFromPostFix(const std::string& post_fix)
     {
         if (post_fix == "center")          return Slice::Center;
         if (post_fix == "top_left")        return Slice::TopLeft;

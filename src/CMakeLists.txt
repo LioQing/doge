@@ -58,10 +58,11 @@ set(SRC_FILES
     extensions/gui/GUI.cpp
     extensions/gui/Element.cpp
     extensions/gui/Button.cpp
+    extensions/gui/Window.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp
-    extensions/nine_slice/NineSliceTexture.cpp
+    extensions/nine_slice/Texture.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})

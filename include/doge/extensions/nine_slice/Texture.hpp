@@ -6,7 +6,7 @@
 
 namespace doge::nine_slice
 {
-    struct NineSliceTexture
+    struct Texture
     {
         enum Slice
         {

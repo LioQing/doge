@@ -1,6 +1,6 @@
 #include <doge/extensions/nine_slice/NineSlice.hpp>
 
-#include <doge/extensions/nine_slice/NineSliceTexture.hpp>
+#include <doge/extensions/nine_slice/Texture.hpp>
 #include <doge/core/Engine.hpp>
 #include <doge/core/Assets.hpp>
 #include <doge/core/io/Texture.hpp>
@@ -13,23 +13,18 @@ namespace doge::nine_slice
     {
     }
 
-    std::string NineSlice::TextureIDFromSlice(NineSliceTexture::Slice slice, const std::string& id)
+    std::string NineSlice::TextureIDFromSlice(Texture::Slice slice, const std::string& id)
     {
         return std::string("nine_slice_") + id + "_" + Texture::PostFixFromSlice(slice);
     }
 
-    std::string NineSlice::SliceTextureIDFromTextureID(const std::string& id, NineSliceTexture::Slice slice)
+    std::string NineSlice::SliceTextureIDFromTextureID(const std::string& id, Texture::Slice slice)
     {
         auto prefix_size = std::string("nine_slice_").size();
-        return id.substr(prefix_size, id.find(NineSliceTexture::PostFixFromSlice(slice)) - prefix_size - 1);
+        return id.substr(prefix_size, id.find(Texture::PostFixFromSlice(slice)) - prefix_size - 1);
     }
 
-    std::string NineSlice::SliceTextureIDFromCompoundSprite(const CompoundSprite& comp_sprite)
-    {
-        return SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::Center).texture_id, Texture::Slice::Center);
-    }
-
-    std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
     NineSlice::AddTexture(const std::string& id, const Recti& border_thickness, const Recti& texture_rectangle)
     {
         auto result = textures.emplace(id, Texture{ .texture_rectangle = texture_rectangle, .border_thickness = border_thickness});
@@ -52,12 +47,12 @@ namespace doge::nine_slice
         textures.erase(id);
     }
 
-    const std::unordered_map<std::string, NineSliceTexture>& NineSlice::GetTextures() const
+    const std::unordered_map<std::string, Texture>& NineSlice::GetTextures() const
     {
         return textures;
     }
 
-    std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
     NineSlice::LoadTexture(const std::string& id, const std::string& filename, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
@@ -98,7 +93,7 @@ namespace doge::nine_slice
         return result;
     }
 
-    std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
     NineSlice::LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
@@ -131,7 +126,7 @@ namespace doge::nine_slice
         return result;
     }
 
-    std::pair<std::unordered_map<std::string, NineSliceTexture>::iterator, bool>
+    std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
     NineSlice::LoadTexture(const std::string& id, const io::Image& image, const Recti& border_thickness, const Recti& area)
     {
         auto result = AddTexture(id, border_thickness, area);
@@ -289,7 +284,7 @@ namespace doge::nine_slice
 
     void NineSlice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness) const
     {
-        auto& slice_tex = textures.at(SliceTextureIDFromCompoundSprite(comp_sprite));
+        auto& slice_tex = GetTextures().at(GetSpriteTextureID(comp_sprite));
         
         auto rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
         auto bord_thick = border_thickness == Rectf() ? slice_tex.border_thickness.Cast<float>() : border_thickness;
@@ -335,14 +330,56 @@ namespace doge::nine_slice
         }
     }
 
-    void NineSlice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2f& center_texture_size) const
+    void NineSlice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2i& center_texture_size) const
     {
         comp_sprite.sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
 
-        comp_sprite.sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(center_texture_size * Vec2f::i);
-        comp_sprite.sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(center_texture_size * Vec2f::j);
-        comp_sprite.sprites.at(Texture::Slice::Bottom)  .texture_rectangle.SetSize(center_texture_size * Vec2f::i);
-        comp_sprite.sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2f::j);
+        comp_sprite.sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
+        comp_sprite.sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
+        comp_sprite.sprites.at(Texture::Slice::Bottom)  .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
+        comp_sprite.sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
+    }
+
+    std::string NineSlice::GetSpriteTextureID(const CompoundSprite& comp_sprite) const
+    {
+        return SliceTextureIDFromTextureID(comp_sprite.sprites.at(Texture::Slice::TopLeft).texture_id, Texture::Slice::TopLeft);
+    }
+
+    const std::string& NineSlice::GetSpriteTextureID(const CompoundSprite& comp_sprite, Texture::Slice slice) const
+    {
+        return comp_sprite.sprites.at(slice).texture_id;
+    }
+
+    const Sprite& NineSlice::GetSprite(const CompoundSprite& comp_sprite, Texture::Slice slice) const
+    {
+        return comp_sprite.sprites.at(slice);
+    }
+
+    Vec2f NineSlice::GetSpriteSize(const CompoundSprite& comp_sprite) const
+    {
+        return GetSprite(comp_sprite, Texture::Slice::TopLeft).size
+        + GetSprite(comp_sprite, Texture::Slice::Center).size
+        + GetSprite(comp_sprite, Texture::Slice::BottomRight).size;
+    }
+
+    Rectf NineSlice::GetSpriteBorderThickness(const CompoundSprite& comp_sprite) const
+    {
+        return Rectf(GetSprite(comp_sprite, Texture::Slice::TopLeft).size, GetSprite(comp_sprite, Texture::Slice::BottomRight).size);
+    }
+
+    const Vec2f& NineSlice::GetSpriteOrigin(const CompoundSprite& comp_sprite) const
+    {
+        return GetSprite(comp_sprite, Texture::Slice::TopLeft).origin;
+    }
+
+    const Color& NineSlice::GetSpriteColor(const CompoundSprite& comp_sprite) const
+    {
+        return GetSprite(comp_sprite, Texture::Slice::TopLeft).color;
+    }
+
+    Vec2i NineSlice::GetSpriteCenterTextureSize(const CompoundSprite& comp_sprite) const
+    {
+        return GetSprite(comp_sprite, Texture::Slice::Center).texture_rectangle.GetSize();
     }
 
     void NineSlice::Update9SliceSprite(
