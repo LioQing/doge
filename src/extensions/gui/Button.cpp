@@ -10,9 +10,19 @@ namespace doge::gui
 {
     const Vec2f Button::DefaultSize = Vec2f(100, 36);
 
+    Button::~Button()
+    {
+        if (IsInitialized())
+        {
+            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener(std::string("doge_gui_button_" + GetID()));
+            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener(std::string("doge_gui_button_" + GetID()));
+            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener(std::string("doge_gui_button_" + GetID()));
+        }
+    }
+
     void Button::Initialize()
     {
-        GetGUI().GetEngine().events.on_mouse_button_pressed +=
+        GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener(std::string("doge_gui_button_" + GetID()),
         [&](const event::MouseButton& event)
         {
             if (
@@ -24,9 +34,9 @@ namespace doge::gui
                 states.set(State::Down, true);
                 on_state_transition(*this);
             }
-        };
+        });
 
-        GetGUI().GetEngine().events.on_mouse_button_released +=
+        GetGUI().GetEngine().events.on_mouse_button_released.AddListener(std::string("doge_gui_button_" + GetID()),
         [&](const event::MouseButton& event)
         {
             if (
@@ -41,9 +51,9 @@ namespace doge::gui
 
             states.set(State::Down, false);
             on_state_transition(*this);
-        };
+        });
 
-        GetGUI().GetEngine().events.on_mouse_moved +=
+        GetGUI().GetEngine().events.on_mouse_moved.AddListener(std::string("doge_gui_button_" + GetID()),
         [&](const event::MouseMove& event)
         {
             if (
@@ -64,7 +74,7 @@ namespace doge::gui
                 states.set(State::MouseOver, false);
                 on_state_transition(*this);
             }
-        };
+        });
 
         auto entity = GetGUI().GetElementEntity(GetID());
         entity.AddComponent(Layer::Create(GetGUI().GetCameraLayer(GetCameraID())));

@@ -36,20 +36,20 @@ namespace doge
         scenes.active_scene_id = scenes.current_scene_id;
         auto& active_scene = scenes.scenes.at(scenes.current_scene_id);
 
-        events.on_window_closed.AddListener("Engine_OnWindowClosed", 
+        events.on_window_closed.AddListener("doge_engine", 
         [&]()
         {
             scenes.is_open = false;
             scenes.is_running = false;
         });
 
-        events.on_window_resized.AddListener("Engine_OnWindowResized", 
+        events.on_window_resized.AddListener("doge_engine", 
         [&](const event::Size& size)
         {
             window.settings.size = size.size;
         });
 
-        window.window_io.sf_event.AddListener("events_event_io_OnPollEvent", std::bind(&io::Event::OnPollEvent, events.event_io, std::placeholders::_1));
+        window.window_io.sf_event.AddListener("events_event_io", std::bind(&io::Event::OnPollEvent, events.event_io, std::placeholders::_1));
 
         scenes.is_running = true;
         if (active_scene.start)
@@ -106,9 +106,10 @@ namespace doge
         scenes.is_running = false;
         DestroyEntities();
 
-        window.window_io.sf_event.RemoveListener("events_event_io_OnPollEvent");
+        window.window_io.sf_event.RemoveListener("events_event_io");
 
-        events.on_window_closed.RemoveListener("Engine_OnWindowClosed");
+        events.on_window_closed.RemoveListener("doge_engine");
+        events.on_window_resized.RemoveListener("doge_engine");
     }
 
     void Engine::StartScene(const std::string& id)

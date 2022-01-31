@@ -66,6 +66,7 @@ namespace main1
         // cam
         Entity cam = engine.AddCamera(Camera{ .size = Vec2f(12.8, 7.2), .render_order = 1 });
         cam_comp = &cam.GetComponent<Camera>();
+        engine.events.on_window_resized += [&](const event::Size& event){ cam_comp->size = event.size.Cast<float>() / 100.f; };
         cam.AddComponent(Layer::Create(1, 0, -1));
 
         // smaller cam

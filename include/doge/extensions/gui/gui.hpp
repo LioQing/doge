@@ -21,7 +21,7 @@ namespace doge
             GUI(Engine& engine);
             ~GUI();
 
-            void AddCamera(const std::string& id, std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
+            void AddCamera(const std::string& id, const Rectf& port = Rectf(0, 0, 1, 1), std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
 
             void RemoveCamera(const std::string& id);
 

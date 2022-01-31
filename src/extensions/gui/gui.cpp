@@ -21,20 +21,32 @@ namespace doge::gui
 
     GUI::~GUI()
     {
+        for (auto& [id, cam] : cameras)
+        {
+            RemoveCamera(id);
+        }
+
         engine.assets.EraseTexture("doge_gui_button");
         nine_slice.EraseTexture("doge_gui_button");
 
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    void GUI::AddCamera(const std::string& id, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    void GUI::AddCamera(const std::string& id, const Rectf& port, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
         if (!success)
             throw std::invalid_argument("Failed to add camera to gui");
 
-        itr->second.AddComponent(Camera{ .render_order = render_order });
+        auto& cam_comp = itr->second.AddComponent(Camera{ .port = port, .render_order = render_order });
+        cam_comp.size = GetEngine().window.window_io.GetSize() * port.GetSize();
+
+        GetEngine().events.on_window_resized.AddListener(
+            std::string("doge_gui_camera_") + id,
+            [this, val_id = id](const event::Size& event)
+            { GetCameraComponent(val_id).size = GetEngine().window.window_io.GetSize() * GetCameraComponent(val_id).port.GetSize(); }
+        );
 
         std::set<std::int32_t> layers;
         for (std::int32_t i = start_layer; i < end_layer; ++i)
@@ -45,6 +57,7 @@ namespace doge::gui
 
     void GUI::RemoveCamera(const std::string& id)
     {
+        GetEngine().events.on_window_resized.RemoveListener(std::string("doge_gui_camera_") + id);
         RemoveElements(id);
         cameras.erase(id);
     }

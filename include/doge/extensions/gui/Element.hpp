@@ -5,6 +5,7 @@
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Rect.hpp>
 #include <string>
+#include <bitset>
 
 namespace doge
 {
@@ -30,6 +31,7 @@ namespace doge
 
             GUI& GetGUI() const;
             Entity GetEntity() const;
+            bool IsInitialized() const;
 
             const std::string& GetID() const;
 

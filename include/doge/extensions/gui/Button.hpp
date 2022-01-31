@@ -20,6 +20,7 @@ namespace doge::gui
 
         static const Vec2f DefaultSize;
 
+        ~Button();
         void Initialize() override;
 
         template <std::invocable<Button&> T>
