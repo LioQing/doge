@@ -489,7 +489,7 @@ namespace doge::io
                         }
                     }
                 }
-                else
+                else if (!layers_draws.empty())
                 {
                     for (auto& draw_key : layers_draws.at(0))
                     {

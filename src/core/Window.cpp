@@ -48,10 +48,10 @@ namespace doge
         settings.v_sync = enabled;
     }
 
-    void Window::SetSize(const Vec2u& position)
+    void Window::SetSize(const Vec2u& size)
     {
-        window_io.SetSize(position);
-        settings.size = position;
+        window_io.SetSize(size);
+        settings.size = size;
     }
 
     Vec2i Window::GetClientAreaPosition() const
