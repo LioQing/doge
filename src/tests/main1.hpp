@@ -240,18 +240,18 @@ namespace main1
         button0.SetSize(gui::Button::DefaultSize * Vec2f(1, 2));
         button0.SetTextFont("arial");
         button0.SetText(U"Hello\nthis is me");
-        auto appear = button0.GetTextAppearance();
-        appear.fill_color = Color::Red;
-        button0.SetTextAppearance(appear);
-
-        button0.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
-        button0.on_released += [](){ std::cout << "Released" << std::endl; };
-        button0.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
-        button0.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
-        button0.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
 
         gui::Window& window = gui->AddElement<gui::Window>("window0", "gui_cam");
-        window.SetSize(Vec2f(400, 400));
+
+        gui::Button& button1 = window.AddElement<gui::Button>("button1");
+        button1.SetTextFont("arial");
+        button1.SetText(U"Button In Window");
+
+        button1.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
+        button1.on_released += [](){ std::cout << "Released" << std::endl; };
+        button1.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
+        button1.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
+        button1.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
 
         // text
         {

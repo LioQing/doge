@@ -76,7 +76,6 @@ namespace doge::gui
             }
         });
 
-        GetEntity().AddComponent(Layer::Create(GetLayer()));
         GetEntity().AddComponent<doge::Position>(0, 0);
         
         UpdateSprite();
@@ -265,15 +264,15 @@ namespace doge::gui
     {
         if (button.IsDown())
         {
-            button.SetColor(0xF4F4F4FF);
+            button.SetColor(0xF0F0F0FF);
         }
         else if (button.IsMouseOver())
         {
-            button.SetColor(0xF9F9F9FF);
+            button.SetColor(0xF6F6F6FF);
         }
         else
         {
-            button.SetColor(0xF7F7F7FF);
+            button.SetColor(0xF3F3F3FF);
         }
     }
 

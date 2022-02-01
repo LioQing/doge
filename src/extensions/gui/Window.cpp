@@ -9,15 +9,21 @@ namespace doge::gui
 
     Window::~Window()
     {
-
+        if (IsInitialized())
+        {
+            GetGUI().RemoveElements(GetWindowCameraID());
+        }
     }
 
     void Window::Initialize()
     {
         // camera
-        GetGUI().AddCamera(std::string("doge_gui_window_") + GetID());
-        camera_entity = GetGUI().GetCameraEntity(std::string("doge_gui_window_") + GetID());
+        camera_entity = GetGUI().AddCamera(GetWindowCameraID());
         camera_entity.SetParent(GetEntity());
+
+        // camera
+        auto& cam_comp = camera_entity.GetComponent<Camera>();
+        cam_comp.render_order = GetGUI().GetCameraRenderOrder(GetCameraID()) + 1;
 
         // cam layer
         auto& parent_cam_layers = GetGUI().GetCameraLayers(GetCameraID());
@@ -27,9 +33,6 @@ namespace doge::gui
             layers.emplace(layer + *max_itr - *min_itr + 1);
         
         camera_entity.AddComponent<Layer>(layers);
-
-        // layer
-        GetEntity().AddComponent(Layer::Create(GetLayer()));
 
         // sprite
         GetGUI().GetNineSlice().Add9SliceSpriteBySize(
@@ -48,6 +51,11 @@ namespace doge::gui
     std::int32_t Window::GetLayer() const
     {
         return GetGUI().GetCameraLayer(GetCameraID()) + 2;
+    }
+
+    std::string Window::GetWindowCameraID() const
+    {
+        return std::string("doge_gui_window_") + GetID();
     }
 
     void Window::SetTextureID(const std::string& texture_id)
@@ -114,6 +122,9 @@ namespace doge::gui
     {
         auto& cam_comp = camera_entity.GetComponent<Camera>();
         cam_comp.size = GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize();
+        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) + (GetPosition() - GetBorderThickness().GetPosition() - cam_comp.size / 2.f) / GetCameraComponent().size);
         cam_comp.port.SetSize(cam_comp.size / GetCameraComponent().size);
+
+        std::cout << cam_comp.port << std::endl;
     }
 }

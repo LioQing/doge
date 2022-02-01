@@ -38,7 +38,7 @@ namespace doge::gui
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    void GUI::AddCamera(const std::string& id, const Rectf& port, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    Entity GUI::AddCamera(const std::string& id, const Rectf& port, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
@@ -59,9 +59,11 @@ namespace doge::gui
             layers.emplace(i);
 
         itr->second.AddComponent<Layer>(layers);
+
+        return itr->second;
     }
 
-    void GUI::AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    Entity GUI::AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
@@ -82,6 +84,8 @@ namespace doge::gui
             layers.emplace(i);
 
         itr->second.AddComponent<Layer>(layers);
+
+        return itr->second;
     }
 
     void GUI::RemoveCamera(const std::string& id)
@@ -109,6 +113,11 @@ namespace doge::gui
     const std::set<std::int32_t>& GUI::GetCameraLayers(const std::string& id) const
     {
         return GetCameraEntity(id).GetComponent<Layer>().layers;
+    }
+
+    std::int32_t GUI::GetCameraRenderOrder(const std::string& id) const
+    {
+        return GetCameraComponent(id).render_order;
     }
 
     bool GUI::HasCamera(const std::string& id) const

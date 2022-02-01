@@ -21,8 +21,8 @@ namespace doge
             GUI(Engine& engine);
             ~GUI();
 
-            void AddCamera(const std::string& id, const Rectf& port = Rectf(0, 0, 1, 1), std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
-            void AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
+            Entity AddCamera(const std::string& id, const Rectf& port = Rectf(0, 0, 1, 1), std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
+            Entity AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
 
             void RemoveCamera(const std::string& id);
 
@@ -30,6 +30,7 @@ namespace doge
             Entity GetCameraEntity(const std::string& id) const;
             std::int32_t GetCameraLayer(const std::string& id) const;
             const std::set<std::int32_t>& GetCameraLayers(const std::string& id) const;
+            std::int32_t GetCameraRenderOrder(const std::string& id) const;
 
             bool HasCamera(const std::string& id) const;
 
@@ -44,8 +45,6 @@ namespace doge
                 auto entity = engine.AddEntity();
                 entity.SetParent(cam_itr->second);
 
-                entity.AddComponent(Layer::Create(*cam_itr->second.GetComponent<Layer>().layers.begin()));
-
                 auto& comp = entity.AddComponent(Component::Create(E()));
                 comp.element->id = id;
                 comp.element->camera = cam_id;
@@ -56,6 +55,7 @@ namespace doge
                 else
                     elements.emplace(comp.element->GetID(), entity);
                 
+                entity.AddComponent(Layer::Create(comp.element->GetLayer()));
                 comp.element->Initialize();
 
                 return static_cast<E&>(*comp.element);

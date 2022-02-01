@@ -12,6 +12,7 @@
   - [x] align option for text
 - [ ] extension: gui
   - [ ] main class gui
+  - [ ] gui element event
   - [ ] gui camera
   - [ ] widgets
     - [ ] inputs
