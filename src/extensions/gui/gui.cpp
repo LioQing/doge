@@ -171,13 +171,13 @@ namespace doge::gui
         {
             auto& ptr = element.GetComponent<Component>().element;
             Vec2f cursor_pos = GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent());
-            Recti window_rect = Recti(
+            Recti cam_rect = Recti(
                 ptr->GetCameraComponent().port.GetPosition() * GetEngine().window.window_io.GetSize(),
                 ptr->GetCameraComponent().port.GetSize() * GetEngine().window.window_io.GetSize()
             );
 
             if (
-                math::TestPoint(GetEngine().window.window_io.GetMousePosition(), window_rect) &&
+                math::TestPoint(GetEngine().window.window_io.GetMousePosition(), cam_rect) &&
                 math::TestPoint(cursor_pos, ptr->GetRectangle()) &&
                 (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer())
             )

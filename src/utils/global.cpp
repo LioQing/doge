@@ -146,7 +146,7 @@ namespace doge
 
     Rectf global::GetAABB(const Sprite& sprite, const Entity& entity, const Engine& engine)
     {
-        auto size = math::AutoSize(sprite.size, math::AutoSize(sprite.texture_rectangle.GetSize(), engine.assets.GetTexture(sprite.texture_id).GetSize()));
+        auto size = math::AutoSize(sprite.size, math::AutoSize(sprite.texture_rectangle.GetSize(), engine.assets.GetTexture(sprite.texture_id).texture.GetSize()));
         if (!sprite.atlas_rectangle_id.empty())
             size = engine.assets.GetTexture(sprite.texture_id).atlas_rectangles.at(sprite.atlas_rectangle_id).GetSize();
 

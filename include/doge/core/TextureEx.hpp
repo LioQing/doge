@@ -7,8 +7,9 @@
 
 namespace doge
 {
-    struct TextureEx : io::Texture
+    struct TextureEx
     {
+        io::Texture texture;
         std::unordered_map<std::string, Recti> atlas_rectangles;
     };
 }

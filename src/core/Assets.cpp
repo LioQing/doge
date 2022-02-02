@@ -8,11 +8,11 @@ namespace doge
 {
     std::unordered_set<std::string> Assets::asset_paths = { "assets" };
     std::unordered_set<std::string> Assets::font_sub_paths = { "fonts" };
-    std::unordered_set<std::string> Assets::texture_sub_paths = { "textures" };
+    std::unordered_set<std::string> Assets::texture_sub_paths = { "images" };
     std::unordered_set<std::string> Assets::image_sub_paths = { "images" };
     std::unordered_set<std::string> Assets::cursor_sub_paths = { "cursors" };
-    std::unordered_set<std::string> Assets::sound_sub_paths = { "sounds" };
-    std::unordered_set<std::string> Assets::music_sub_paths = { "musics " };
+    std::unordered_set<std::string> Assets::sound_sub_paths = { "audio" };
+    std::unordered_set<std::string> Assets::music_sub_paths = { "audio" };
 
     std::string Assets::SearchForAsset(const std::string& filename, const std::unordered_set<std::string>& sub_paths)
     {

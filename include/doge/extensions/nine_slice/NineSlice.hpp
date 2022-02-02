@@ -48,7 +48,7 @@ namespace doge
             std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             LoadTexture(const std::string& id, const io::Image& image, const Recti& border_thickness, const Recti& area = Recti());
 
-            void SetRenderOptions(const std::string& id, TextureEx::RenderOptions options);
+            void SetRenderOptions(const std::string& id, doge::io::Texture::RenderOptions options);
 
             void SetSmooth(const std::string& id, bool smooth);
             bool IsSmooth(const std::string& id) const;
