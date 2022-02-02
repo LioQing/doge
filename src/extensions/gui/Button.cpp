@@ -10,16 +10,6 @@ namespace doge::gui
 {
     const Vec2f Button::DefaultSize = Vec2f(100, 36);
 
-    Button::~Button()
-    {
-        if (IsInitialized())
-        {
-            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener(std::string("doge_gui_button_" + GetID()));
-            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener(std::string("doge_gui_button_" + GetID()));
-            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener(std::string("doge_gui_button_" + GetID()));
-        }
-    }
-
     void Button::Initialize()
     {
         GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener(std::string("doge_gui_button_" + GetID()),
@@ -74,6 +64,13 @@ namespace doge::gui
                 states.set(State::MouseOver, false);
                 on_state_transition(*this);
             }
+        });
+
+        GetEntity().GetComponent<doge::gui::Component>().OnRemoval([&]
+        {
+            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener(std::string("doge_gui_button_" + GetID()));
+            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener(std::string("doge_gui_button_" + GetID()));
+            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener(std::string("doge_gui_button_" + GetID()));
         });
 
         GetEntity().AddComponent<doge::Position>(0, 0);

@@ -3,6 +3,7 @@
 #include <ctime>
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
+#include <doge/extensions/gui.hpp>
 
 namespace main3
 {
@@ -44,9 +45,9 @@ namespace main3
             particle.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Dynamic, true);
 
             doge::physics::BodyInit init;
-            init.velocity = doge::Vec2f(std::fmod(rand() / 100.f, 1.f), std::fmod(rand() / 100.f, 1.f));
+            init.velocity = doge::Vec2f(std::fmod(rand() / 100.f, 10.f) - 5.f, std::fmod(rand() / 100.f, 10.f) - 5.f);
 
-            //phy.SetBodyInit(particle, init);
+            phy.SetBodyInit(particle, init);
 
             return particle;
         }
@@ -79,7 +80,7 @@ namespace main3
                     }
                     else if (event.button == doge::io::Mouse::Right)
                     {
-                        this->engine.RestartScene("a");
+                        this->engine.RestartScene("b");
                     }
                 }
             );
@@ -110,6 +111,75 @@ namespace main3
         }
     };
 
+    struct SceneB
+    {
+        doge::Engine& engine;
+        doge::gui::GUI gui;
+
+        doge::Component<doge::CircleShape>* circle_comp;
+
+        SceneB(doge::Engine& engine) : engine(engine), gui(engine)
+        {
+        }
+
+        void Start(doge::Engine& engine)
+        {
+            gui.AddCamera("my_cam");
+
+            auto& window = gui.AddElement<doge::gui::Window>("my_window", "my_cam");
+
+            auto& button = window.AddElement<doge::gui::Button>("my_button");
+            button.SetTextFont("arial");
+            button.SetSize(doge::Vec2f(300, 300));
+
+            button.on_clicked +=
+            [this]
+            {
+                if (this->circle_comp->color == doge::Color::Red)
+                    this->circle_comp->color = doge::Color::Green;
+                else
+                    this->circle_comp->color = doge::Color::Red;
+            };
+
+            doge::Entity circle_entity = engine.AddEntity();
+
+            circle_comp = &circle_entity.AddComponent(doge::CircleShape
+            {
+                .radius = 5.f,
+                .color = doge::Color::Red,
+            });
+
+            circle_entity.AddComponent<doge::Position>(0, -50);
+            circle_entity.AddComponent(doge::Layer::Create(gui.GetCameraLayer("my_cam")));
+
+            engine.events.on_mouse_button_pressed.AddListener(
+                "scene_b",
+                [this](const doge::event::MouseButton& event)
+                {
+                    if (event.button == doge::io::Mouse::Right)
+                    {
+                        this->engine.RestartScene("a");
+                    }
+                }
+            );
+        }
+
+        void Update(doge::Engine& engine, doge::DeltaTime dt)
+        {
+
+        }
+
+        void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
+        {
+
+        }
+
+        void Finish(doge::Engine& engine)
+        {
+            engine.events.on_mouse_button_pressed.RemoveListener("scene_b");
+        }
+    };
+
     int Main()
     {
         srand(time(NULL));
@@ -121,6 +191,9 @@ namespace main3
         
         SceneA a(engine);
         engine.AddScene("a", doge::GameLoopFunctions::Create(a, &SceneA::Start, &SceneA::Update, &SceneA::FixedUpdate, &SceneA::Finish));
+
+        SceneB b(engine);
+        engine.AddScene("b", doge::GameLoopFunctions::Create(b, &SceneB::Start, &SceneB::Update, &SceneB::FixedUpdate, &SceneB::Finish));
 
         engine.StartScene("a");
 

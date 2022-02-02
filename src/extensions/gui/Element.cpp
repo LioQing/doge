@@ -24,11 +24,6 @@ namespace doge::gui
         return GetGUI().GetElementEntity(GetID());
     }
 
-    bool Element::IsInitialized() const
-    {
-        return gui != nullptr;
-    }
-
     const std::string& Element::GetID() const
     {
         return id;

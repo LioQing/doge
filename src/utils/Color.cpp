@@ -2,7 +2,7 @@
 
 namespace doge
 {
-    Color::Color(uint32_t value)
+    Color::Color(std::uint32_t value)
     {
         a = value % 0x100;
         b = value >> 8 % 0x100;
@@ -10,9 +10,14 @@ namespace doge
         r = value >> 24 % 0x100;
     }
 
-    Color::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+    Color::Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a)
         : r(r), g(g), b(b), a(a)
     {
+    }
+
+    Color::operator std::uint32_t() const
+    {
+        return r << 24 | g << 16 | b << 8 | a;
     }
 
     const Color Color::Red          = 0xFF0000FF;

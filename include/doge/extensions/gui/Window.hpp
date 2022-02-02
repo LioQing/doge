@@ -13,7 +13,6 @@ namespace doge::gui
     {
         static const Vec2f DefaultSize;
 
-        ~Window();
         void Initialize() override;
 
         std::int32_t GetLayer() const override;

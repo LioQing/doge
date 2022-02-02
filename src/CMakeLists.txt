@@ -27,7 +27,6 @@ set(SRC_FILES
     components/Scale.cpp
     components/Position.cpp
     core/Entity.cpp
-    utils/default_functions.cpp
     core/PCNode.cpp
     core/Range.cpp
     utils/math.cpp

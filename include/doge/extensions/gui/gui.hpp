@@ -50,10 +50,12 @@ namespace doge
                 comp.element->camera = cam_id;
                 comp.element->gui = this;
 
-                if (comp.element->GetID() == "")
-                    idless_elements.emplace(entity);
-                else
-                    elements.emplace(comp.element->GetID(), entity);
+                comp.OnRemoval([&, val_id = id]()
+                {
+                    elements.erase(val_id);
+                });
+
+                elements.emplace(comp.element->GetID(), entity);
                 
                 entity.AddComponent(Layer::Create(comp.element->GetLayer()));
                 comp.element->Initialize();
@@ -83,7 +85,6 @@ namespace doge
 
             std::unordered_map<std::string, Entity> cameras;
             std::unordered_map<std::string, Entity> elements;
-            std::set<Entity> idless_elements;
 
             void Start(Engine& engine);
             void Update(Engine& engine, DeltaTime dt);

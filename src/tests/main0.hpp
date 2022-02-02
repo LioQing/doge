@@ -388,7 +388,6 @@ namespace main0
     void Finish(doge::Engine& e)
     {
         phy.release();
-        doge::default_functions::Finish(e);
     }
 
     int Main()

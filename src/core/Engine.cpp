@@ -28,6 +28,7 @@ namespace doge
     void Engine::CloseWindow()
     {
         assets.EraseTexture("missing_texture");
+        assets.EraseFont("arial");
         window.CloseWindow();
     }
 
@@ -52,13 +53,13 @@ namespace doge
         window.window_io.sf_event.AddListener("events_event_io", std::bind(&io::Event::OnPollEvent, events.event_io, std::placeholders::_1));
 
         scenes.is_running = true;
-        if (active_scene.start)
-            active_scene.start(*this);
         for (auto [id, extension] : scenes.extensions)
         {
             if (extension.start)
                 extension.start(*this);
         }
+        if (active_scene.start)
+            active_scene.start(*this);
 
         DeltaTime acc_fixed_dt = 0;
         DeltaTime dt;
@@ -73,22 +74,22 @@ namespace doge
             
             for (; acc_fixed_dt > scenes.fixed_time_step; acc_fixed_dt -= scenes.fixed_time_step)
             {
-                if (active_scene.fixed_update)
-                    active_scene.fixed_update(*this, scenes.fixed_time_step);
                 for (auto [id, extension] : scenes.extensions)
                 {
                     if (extension.fixed_update)
                         extension.fixed_update(*this, scenes.fixed_time_step);
                 }
+                if (active_scene.fixed_update)
+                    active_scene.fixed_update(*this, scenes.fixed_time_step);
             }
 
-            if (active_scene.update)
-                active_scene.update(*this, dt);
             for (auto [id, extension] : scenes.extensions)
             {
                 if(extension.update)
                     extension.update(*this, dt);
             }
+            if (active_scene.update)
+                active_scene.update(*this, dt);
 
             DestroyEntities();
 
@@ -103,6 +104,15 @@ namespace doge
         }
         if (active_scene.finish)
             active_scene.finish(*this);
+
+        for (auto entity : Select<EntityInfo>(true)
+            .Where([](Entity _, const EntityInfo& entity_info)
+            { return entity_info.destroy_on_finish; })
+            .Entities())
+        {
+            DestroyEntity(entity);
+        }
+
         scenes.is_running = false;
         DestroyEntities();
 

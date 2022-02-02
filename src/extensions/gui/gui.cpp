@@ -7,33 +7,13 @@ namespace doge::gui
 {
     GUI::GUI(Engine& engine) : engine(engine), nine_slice(engine)
     {
-        GameLoopFunctions glf;
-        glf.start = [&](Engine& engine){ Start(engine); };
-        glf.update = [&](Engine& engine, DeltaTime dt){ Update(engine, dt); };
-        glf.fixed_update = [&](Engine& engine, DeltaTime dt){ FixedUpdate(engine, dt); };
-        glf.finish = [&](Engine& engine){ Finish(engine); };
-        
-        engine.scenes.extensions.emplace("doge_gui", glf);
-
-        engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
-        nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
-
-        engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
-        nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
+        engine.scenes.extensions.emplace("doge_gui", GameLoopFunctions::Create(*this, &GUI::Start, &GUI::Update, &GUI::FixedUpdate, &GUI::Finish));
     }
 
     GUI::~GUI()
     {
-        for (auto& [id, cam] : cameras)
-        {
-            RemoveCamera(id);
-        }
-
-        engine.assets.EraseTexture("doge_gui_button");
-        nine_slice.EraseTexture("doge_gui_button");
-
-        engine.assets.EraseTexture("doge_gui_window");
-        nine_slice.EraseTexture("doge_gui_window");
+        cameras.clear();
+        elements.clear();
 
         engine.scenes.extensions.erase("doge_gui");
     }
@@ -53,6 +33,11 @@ namespace doge::gui
             [this, val_id = id](const event::Size& event)
             { GetCameraComponent(val_id).size = event.size * GetCameraComponent(val_id).port.GetSize(); }
         );
+
+        cam_comp.OnRemoval([&, val_id = id]()
+        {
+            cameras.erase(val_id);
+        });
 
         std::set<std::int32_t> layers;
         for (std::int32_t i = start_layer; i < end_layer; ++i)
@@ -79,6 +64,11 @@ namespace doge::gui
             { GetCameraComponent(val_id).port.SetSize(GetCameraComponent(val_id).size / event.size); }
         );
 
+        cam_comp.OnRemoval([&, val_id = id]()
+        {
+            cameras.erase(val_id);
+        });
+
         std::set<std::int32_t> layers;
         for (std::int32_t i = start_layer; i < end_layer; ++i)
             layers.emplace(i);
@@ -91,8 +81,7 @@ namespace doge::gui
     void GUI::RemoveCamera(const std::string& id)
     {
         GetEngine().events.on_window_resized.RemoveListener(std::string("doge_gui_camera_") + id);
-        RemoveElements(id);
-        cameras.erase(id);
+        GetEngine().DestroyEntity(GetCameraEntity(id));
     }
 
     doge::Component<Camera>& GUI::GetCameraComponent(const std::string& id) const
@@ -128,18 +117,11 @@ namespace doge::gui
     void GUI::RemoveElement(const std::string& id)
     {
         engine.DestroyEntity(elements.at(id));
-        elements.erase(id);
     }
 
     void GUI::RemoveElements(const std::string& camera_id)
     {
         for (auto& [id, element] : elements)
-        {
-            if (element.GetComponent<Component>().element->GetCameraID() == camera_id)
-                engine.DestroyEntity(element);
-        }
-
-        for (auto& element : idless_elements)
         {
             if (element.GetComponent<Component>().element->GetCameraID() == camera_id)
                 engine.DestroyEntity(element);
@@ -195,32 +177,21 @@ namespace doge::gui
             }
         }
 
-        for (auto& element : idless_elements)
-        {
-            auto& ptr = element.GetComponent<Component>().element;
-            if (math::TestPoint(GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent()), ptr->GetRectangle()) &&
-                (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer()))
-            {
-                ret_ptr = ptr;
-            }
-        }
-
         return ret_ptr;
     }
 
     void GUI::Start(Engine& engine)
     {
+        engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
+        nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
 
+        engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
+        nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
     }
 
     void GUI::Update(Engine& engine, DeltaTime dt)
     {
         for (auto& [id, element] : elements)
-        {
-            element.GetComponent<Component>().element->Update(dt);
-        }
-
-        for (auto& element : idless_elements)
         {
             element.GetComponent<Component>().element->Update(dt);
         }
@@ -232,15 +203,17 @@ namespace doge::gui
         {
             element.GetComponent<Component>().element->FixedUpdate(dt);
         }
-
-        for (auto& element : idless_elements)
-        {
-            element.GetComponent<Component>().element->FixedUpdate(dt);
-        }
     }
 
     void GUI::Finish(Engine& engine)
     {
-        
+        cameras.clear();
+        elements.clear();
+
+        engine.assets.EraseTexture("doge_gui_button");
+        nine_slice.EraseTexture("doge_gui_button");
+
+        engine.assets.EraseTexture("doge_gui_window");
+        nine_slice.EraseTexture("doge_gui_window");
     }
 }

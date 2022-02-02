@@ -6,14 +6,16 @@ namespace doge
 {
     struct Color
     {
-        uint8_t r = 0;
-        uint8_t g = 0;
-        uint8_t b = 0;
-        uint8_t a = 0xFFu;
+        std::uint8_t r = 0;
+        std::uint8_t g = 0;
+        std::uint8_t b = 0;
+        std::uint8_t a = 0xFFu;
 
         Color() = default;
-        Color(uint32_t value);
-        Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xFFu);
+        Color(std::uint32_t value);
+        Color(std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 0xFFu);
+
+        operator std::uint32_t() const;
 
         static const Color Red;
         static const Color Green;

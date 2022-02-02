@@ -33,7 +33,6 @@ namespace doge
 
             GUI& GetGUI() const;
             Entity GetEntity() const;
-            bool IsInitialized() const;
 
             const std::string& GetID() const;
 

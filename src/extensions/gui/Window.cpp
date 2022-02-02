@@ -7,14 +7,6 @@ namespace doge::gui
 {
     const Vec2f Window::DefaultSize = Vec2f(600, 480);
 
-    Window::~Window()
-    {
-        if (IsInitialized())
-        {
-            GetGUI().RemoveElements(GetWindowCameraID());
-        }
-    }
-
     void Window::Initialize()
     {
         // camera
@@ -24,6 +16,11 @@ namespace doge::gui
         // camera
         auto& cam_comp = camera_entity.GetComponent<Camera>();
         cam_comp.render_order = GetGUI().GetCameraRenderOrder(GetCameraID()) + 1;
+
+        cam_comp.OnRemoval([&]()
+        {
+            GetGUI().RemoveElements(GetWindowCameraID());
+        });
 
         // cam layer
         auto& parent_cam_layers = GetGUI().GetCameraLayers(GetCameraID());
@@ -42,7 +39,7 @@ namespace doge::gui
             Vec2i::Zero,
             Rectf(),
             GetSize() / 2.f,
-            0xF0F0F0FF
+            0xECECECFF
         );
 
         SetSize(DefaultSize);
@@ -122,9 +119,7 @@ namespace doge::gui
     {
         auto& cam_comp = camera_entity.GetComponent<Camera>();
         cam_comp.size = GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize();
-        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) + (GetPosition() - GetBorderThickness().GetPosition() - cam_comp.size / 2.f) / GetCameraComponent().size);
+        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetSize() / 2.f - GetBorderThickness().GetPosition()) / GetCameraComponent().size);
         cam_comp.port.SetSize(cam_comp.size / GetCameraComponent().size);
-
-        std::cout << cam_comp.port << std::endl;
     }
 }
