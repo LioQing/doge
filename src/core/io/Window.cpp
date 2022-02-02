@@ -66,7 +66,7 @@ namespace doge::io
             if (comp.texture_id != "")
             {
                 auto& texture = engine.assets.GetTexture(comp.texture_id);
-                shape.setTexture(&texture.texture.texture);
+                shape.setTexture(&texture.texture);
 
                 Recti rect = comp.texture_rectangle;
                 if (!comp.atlas_rectangle_id.empty())
@@ -75,7 +75,7 @@ namespace doge::io
                 }
                 else
                 {
-                    rect.SetSize(math::AutoSize(rect.GetSize(), texture.texture.GetSize()));
+                    rect.SetSize(math::AutoSize(rect.GetSize(), texture.GetSize()));
                 }
 
                 shape.setTextureRect(cast::ToSfRect(rect));
@@ -304,7 +304,7 @@ namespace doge::io
             }
             else
             {
-                rect = math::AutoSize(rect, texture.texture.GetSize());
+                rect = math::AutoSize(rect, texture.GetSize());
             }
 
             auto scale = sprite_comp.size / rect.GetSize();
@@ -312,7 +312,7 @@ namespace doge::io
             sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
             sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
 
-            sprite.setTexture(texture.texture.texture);
+            sprite.setTexture(texture.texture);
 
             sprite.setTextureRect(cast::ToSfRect(rect));
             sprite.setColor(cast::ToSfColor(sprite_comp.color));
@@ -358,7 +358,7 @@ namespace doge::io
 
             if (polygon_comp.texture_id != "")
             {
-                vertices.texture = &engine.assets.GetTexture(polygon_comp.texture_id).texture.texture;
+                vertices.texture = &engine.assets.GetTexture(polygon_comp.texture_id).texture;
             }
             else
             {

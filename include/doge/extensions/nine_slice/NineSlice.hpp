@@ -5,7 +5,7 @@
 #include <doge/utils/Rect.hpp>
 #include <doge/core/Component.hpp>
 #include <doge/extensions/nine_slice/Texture.hpp>
-#include <doge/core/TextureEx.hpp>
+#include <doge/core/io/Texture.hpp>
 
 namespace doge
 {

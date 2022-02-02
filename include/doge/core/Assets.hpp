@@ -13,7 +13,7 @@ namespace doge
 {
     struct Engine;
     struct Entity;
-    struct TextureEx;
+    struct Texture;
 
     namespace io
     {
@@ -39,7 +39,7 @@ namespace doge
     private:
 
         std::unordered_map<std::string, io::Font> fonts;
-        std::unordered_map<std::string, TextureEx> textures; // require windows to be created
+        std::unordered_map<std::string, io::Texture> textures; // require windows to be created
         std::unordered_map<std::string, io::Image> images;
         std::unordered_map<std::string, io::Cursor> cursors;
         std::unordered_map<std::string, io::SoundBuffer> sound_buffers;
@@ -65,18 +65,18 @@ namespace doge
 
         static std::string SearchForTexture(const std::string& filename);
 
-        TextureEx& GetTexture(const std::string& id);
-        const TextureEx& GetTexture(const std::string& id) const;
+        io::Texture& GetTexture(const std::string& id);
+        const io::Texture& GetTexture(const std::string& id) const;
         void EraseTexture(const std::string& id);
         bool HasTexture(const std::string& id) const;
 
-        std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, const std::string& filename, const Recti& area = Recti());
 
-        std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& area = Recti());
 
-        std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+        std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
         LoadTexture(const std::string& id, const io::Image& image, const Recti& area = Recti());
 
         static std::string SearchForImage(const std::string& filename);

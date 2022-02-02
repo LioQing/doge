@@ -10,8 +10,8 @@ namespace main2
     {
         ns = std::make_unique<doge::nine_slice::NineSlice>(engine);
 
-        engine.assets.LoadTexture("crate", "test2.png").first->second.texture.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
-        engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23)).first->second.texture.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
+        engine.assets.LoadTexture("crate", "test2.png").first->second.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
+        engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23)).first->second.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
 
         ns->LoadTexture("crate", "test2.png", doge::Recti(4, 5, 5, 4));
         ns->SetRepeated("crate", true);

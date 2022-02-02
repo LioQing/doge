@@ -2,7 +2,8 @@
 
 #include <filesystem>
 #include <doge/core.hpp>
-#include <doge/utils.hpp>
+#include <doge/utils/Vec2.hpp>
+#include <doge/utils/Rect.hpp>
 
 namespace doge
 {
@@ -93,12 +94,12 @@ namespace doge
         return SearchForAsset(filename, texture_sub_paths);
     }
 
-    TextureEx& Assets::GetTexture(const std::string& id)
+    io::Texture& Assets::GetTexture(const std::string& id)
     {
         return textures.at(id);
     }
 
-    const TextureEx& Assets::GetTexture(const std::string& id) const
+    const io::Texture& Assets::GetTexture(const std::string& id) const
     {
         return textures.at(id);
     }
@@ -113,7 +114,7 @@ namespace doge
         return textures.contains(id);
     }
 
-    std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, const std::string& filename, const Recti& area)
     {
         io::Texture texture;
@@ -131,7 +132,7 @@ namespace doge
         return std::make_pair(textures.end(), false);
     }
 
-    std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, void* data, std::size_t size, const Recti& area)
     {
         io::Texture texture;
@@ -142,7 +143,7 @@ namespace doge
         return std::make_pair(textures.end(), false);
     }
 
-    std::pair<std::unordered_map<std::string, TextureEx>::iterator, bool>
+    std::pair<std::unordered_map<std::string, io::Texture>::iterator, bool>
     Assets::LoadTexture(const std::string& id, const io::Image& image, const Recti& area)
     {
         io::Texture texture;

@@ -4,7 +4,6 @@
 #include <doge/core/Engine.hpp>
 #include <doge/core/Assets.hpp>
 #include <doge/core/io/Texture.hpp>
-#include <doge/core/TextureEx.hpp>
 #include <doge/utils/math.hpp>
 
 namespace doge::nine_slice
@@ -165,7 +164,7 @@ namespace doge::nine_slice
         {
             auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
-            texture.texture.SetRenderOptions(options);
+            texture.SetRenderOptions(options);
         }
     }
 
@@ -175,13 +174,13 @@ namespace doge::nine_slice
         {
             auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
-            texture.texture.SetSmooth(smooth);
+            texture.SetSmooth(smooth);
         }
     }
 
     bool NineSlice::IsSmooth(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).texture.IsSmooth();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
     }
 
     void NineSlice::SetSRGB(const std::string& id, bool srgb)
@@ -190,13 +189,13 @@ namespace doge::nine_slice
         {
             auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
-            texture.texture.SetSRGB(srgb);
+            texture.SetSRGB(srgb);
         }
     }
 
     bool NineSlice::IsSRGB(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).texture.IsSRGB();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
     }
 
     void NineSlice::SetRepeated(const std::string& id, bool repeated)
@@ -205,13 +204,13 @@ namespace doge::nine_slice
         {
             auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
 
-            texture.texture.SetRepeated(repeated);
+            texture.SetRepeated(repeated);
         }   
     }
 
     bool NineSlice::IsRepeated(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).texture.IsRepeated();
+        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
     }
 
     Component<CompoundSprite>& NineSlice::Add9SliceSpriteBySize(
@@ -242,7 +241,7 @@ namespace doge::nine_slice
         auto& comp_sprite = entity.AddComponent<CompoundSprite>();
         auto& slice_tex = textures.at(texture_id);
 
-        auto texture_center_size = engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).texture.GetSize();
+        auto texture_center_size = engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
         auto center_texture_size = texture_center_size * tile_count;
 
         auto size = tile_size * tile_count;

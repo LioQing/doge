@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Vec2.hpp>
+#include <unordered_map>
 
 namespace doge
 {
@@ -25,6 +26,7 @@ namespace doge
             };
 
             sf::Texture texture;
+            std::unordered_map<std::string, Recti> atlas_rectangles;
 
             Vec2u GetSize() const;
 
