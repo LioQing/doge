@@ -70,6 +70,7 @@ namespace main3
             );
             cam_comp->OnRemoval([this]{ this->engine.events.on_window_resized.RemoveListener("cam_resize"); });
 
+            // mouse
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_a",
                 [this](const doge::event::MouseButton& event)
@@ -103,6 +104,7 @@ namespace main3
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
         {
+            
         }
 
         void Finish(doge::Engine& engine)
@@ -127,9 +129,12 @@ namespace main3
             gui.AddCamera("my_cam");
 
             auto& window = gui.AddElement<doge::gui::Window>("my_window", "my_cam");
+            window.SetSize(doge::Vec2f(400, 400));
+            window.SetPosition(doge::Vec2f(0, -200));
 
             auto& button = window.AddElement<doge::gui::Button>("my_button");
             button.SetTextFont("arial");
+            button.SetPosition(doge::Vec2f(100, 0));
             button.SetSize(doge::Vec2f(300, 300));
 
             button.on_clicked +=

@@ -275,34 +275,25 @@ namespace doge::gui
 
     void Button::OnSizeUpdated()
     {
-        if (GetGUI().HasElement(GetID()))
-        {
-            if (Is9Slice())
-                GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
-            else
-                GetEntity().GetComponent<Sprite>().size = GetSize();
-            
-            SetOrigin(GetOrigin());
-        }
+        if (Is9Slice())
+            GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
+        else
+            GetEntity().GetComponent<Sprite>().size = GetSize();
+        
+        SetOrigin(GetOrigin());
     }
 
     void Button::OnPositionUpdated()
     {
-        if (GetGUI().HasElement(GetID()))
-        {
-            GetEntity().GetComponent<doge::Position>().position = GetPosition();
-        }
+        GetEntity().GetComponent<doge::Position>().position = GetPosition();
     }
 
     void Button::OnOriginUpdated()
     {
-        if (GetGUI().HasElement(GetID()))
-        {
-            if (Is9Slice())
-                GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
-            else
-                GetEntity().GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
-        }
+        if (Is9Slice())
+            GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
+        else
+            GetEntity().GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
     }
 
     void Button::UpdateSprite()

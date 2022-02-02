@@ -104,6 +104,52 @@ namespace doge
     };
 
     template <typename T, typename U>
+    Rect<T> operator+(const Rect<T>& r1, const Rect<U>& r2)
+    {
+        return Rect<T>(r1.GetPosition() + r2.GetPosition(), r1.GetSize() + r2.GetSize());
+    }
+    template <typename T, typename U>
+    Rect<T> operator-(const Rect<T>& r1, const Rect<U>& r2)
+    {
+        return Rect<T>(r1.GetPosition() - r2.GetPosition(), r1.GetSize() - r2.GetSize());
+    }
+    template <typename T, typename U>
+    Rect<T> operator*(const Rect<T>& r1, const Rect<U>& r2)
+    {
+        return Rect<T>(r1.GetPosition() * r2.GetPosition(), r1.GetSize() * r2.GetSize());
+    }
+    template <typename T, typename U>
+    Rect<T> operator/(const Rect<T>& r1, const Rect<U>& r2)
+    {
+        return Rect<T>(r1.GetPosition() / r2.GetPosition(), r1.GetSize() / r2.GetSize());
+    }
+
+    template <typename T, typename U>
+    Rect<T>& operator+=(Rect<T>& r1, const Rect<U>& r2)
+    {
+        r1 = r1 + r2;
+        return r1;
+    }
+    template <typename T, typename U>
+    Rect<T>& operator-=(Rect<T>& r1, const Rect<U>& r2)
+    {
+        r1 = r1 - r2;
+        return r1;
+    }
+    template <typename T, typename U>
+    Rect<T>& operator*=(Rect<T>& r1, const Rect<U>& r2)
+    {
+        r1 = r1 * r2;
+        return r1;
+    }
+    template <typename T, typename U>
+    Rect<T>& operator/=(Rect<T>& r1, const Rect<U>& r2)
+    {
+        r1 = r1 / r2;
+        return r1;
+    }
+
+    template <typename T, typename U>
     Rect<T> operator+(const Rect<T>& r, const Vec2<U>& v)
     {
         return Rect<T>(r.GetPosition() + v, r.GetSize());

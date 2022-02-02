@@ -45,12 +45,14 @@ namespace doge::gui
     protected:
 
         void OnSizeUpdated() override;
+        void OnPositionUpdated() override;
+        void OnOriginUpdated() override;
 
     private:
 
         void UpdateContainerArea();
 
-        Rectf border_thickness = Rectf(16, 16, 16, 16);
+        Rectf border_thickness = Rectf();
 
         std::unordered_set<std::string> contained_element_ids;
 
