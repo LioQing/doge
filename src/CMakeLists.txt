@@ -62,6 +62,7 @@ set(SRC_FILES
     extensions/gui/WindowEx.cpp
     extensions/gui/Text.cpp
     extensions/gui/Image.cpp
+    extensions/gui/NSImage.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp

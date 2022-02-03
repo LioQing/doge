@@ -38,6 +38,7 @@ namespace doge
             void EraseTexture(const std::string& id);
 
             const std::unordered_map<std::string, Texture>& GetTextures() const;
+            const Texture& GetTexture(const std::string& id) const;
 
             std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
             LoadTexture(const std::string& id, const std::string& filename, const Recti& border_thickness, const Recti& area = Recti());
@@ -61,7 +62,7 @@ namespace doge
 
             Component<CompoundSprite>& Add9SliceSpriteBySize(
                 Entity entity,
-                const std::string& texture_id,
+                const std::string& texture_id = "missing_texture",
                 const Vec2f& size = Vec2f::Zero,
                 const Vec2i& center_texture_size = Vec2i::Zero,
                 const Rectf& border_thickness = Rectf(),
@@ -89,6 +90,7 @@ namespace doge
             const std::string& GetSpriteTextureID(const CompoundSprite& comp_sprite, Texture::Slice slice) const;
             const Sprite& GetSprite(const CompoundSprite& comp_sprite, Texture::Slice slice) const;
             Vec2f GetSpriteSize(const CompoundSprite& comp_sprite) const;
+            Vec2f GetSpriteActualSize(const CompoundSprite& comp_sprite, const Assets& assets) const;
             Rectf GetSpriteBorderThickness(const CompoundSprite& comp_sprite) const;
             const Vec2f& GetSpriteOrigin(const CompoundSprite& comp_sprite) const;
             const Color& GetSpriteColor(const CompoundSprite& comp_sprite) const;

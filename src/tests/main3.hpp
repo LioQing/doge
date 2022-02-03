@@ -167,6 +167,8 @@ namespace main3
             window_count = 0;
 
             engine.assets.LoadTexture("test", "test.png");
+            gui.GetNineSlice().LoadTexture("test2", "test2.png", doge::Recti(4, 5, 5, 4));
+            gui.GetNineSlice().SetRepeated("test2", true);
 
             // gui cam
             gui.AddCamera("my_cam");
@@ -184,6 +186,13 @@ namespace main3
             image->SetTextureID("test");
             image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
             image->SetPosition(doge::Vec2f(300, 0));
+
+            // ns image
+            auto& ns_image = gui.AddElement<doge::gui::NSImage>("my_ns_image", "my_cam");
+            ns_image.SetTextureID("test2");
+            ns_image.SetSize(doge::Vec2f(200, 200));
+            ns_image.SetCenterTextureSize(doge::Vec2i(46, 46));
+            ns_image.SetPosition(doge::Vec2f(-300, 0));
 
             // circle in gui
             doge::Entity circle_entity = engine.AddEntity();
@@ -222,6 +231,7 @@ namespace main3
 
         void Finish(doge::Engine& engine)
         {
+            engine.assets.EraseTexture("test");
             engine.events.on_mouse_button_pressed.RemoveListener("scene_b");
         }
     };

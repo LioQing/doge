@@ -6,7 +6,7 @@ namespace doge::gui
 {
     void Text::Initialize()
     {
-        GetEntity().AddComponent(Layer::Create(GetLayer() + 1));
+        GetEntity().AddComponent(Layer::Create(GetLayer()));
         GetEntity().AddComponent<Position>(0, 0);
         GetEntity().AddComponent<doge::Text>();
 

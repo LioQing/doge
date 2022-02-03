@@ -9,3 +9,4 @@
 #include "gui/WindowEx.hpp"
 #include "gui/Text.hpp"
 #include "gui/Image.hpp"
+#include "gui/NSImage.hpp"
