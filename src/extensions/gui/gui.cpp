@@ -27,7 +27,14 @@ namespace doge::gui
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    Entity GUI::AddCamera(const std::string& id, const Rectf& port, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    Entity GUI::AddCamera(
+        const std::string& id,
+        const Rectf& port,
+        std::int32_t render_order,
+        std::int32_t layer,
+        std::size_t layer_width,
+        bool destroy_on_finish
+    )
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
@@ -49,15 +56,22 @@ namespace doge::gui
         });
 
         std::set<std::int32_t> layers;
-        for (std::int32_t i = start_layer; i < end_layer; ++i)
-            layers.emplace(i);
+        for (std::int32_t i = 0; i < layer_width; ++i)
+            layers.emplace(layer + i);
 
         itr->second.AddComponent<Layer>(layers);
 
         return itr->second;
     }
 
-    Entity GUI::AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order, std::int32_t start_layer, std::int32_t end_layer, bool destroy_on_finish)
+    Entity GUI::AddAbsoluteSizeCamera(
+        const std::string& id,
+        const Rectf& rectangle,
+        std::int32_t render_order,
+        std::int32_t layer,
+        std::size_t layer_width,
+        bool destroy_on_finish
+    )
     {
         auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
 
@@ -79,8 +93,8 @@ namespace doge::gui
         });
 
         std::set<std::int32_t> layers;
-        for (std::int32_t i = start_layer; i < end_layer; ++i)
-            layers.emplace(i);
+        for (std::int32_t i = 0; i < layer_width; ++i)
+            layers.emplace(layer + i);
 
         itr->second.AddComponent<Layer>(layers);
 

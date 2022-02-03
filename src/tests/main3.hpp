@@ -120,6 +120,7 @@ namespace main3
 
         doge::Component<doge::CircleShape>* circle_comp;
         doge::gui::Text* text;
+        doge::gui::Image* image;
 
         std::size_t window_count;
 
@@ -134,9 +135,11 @@ namespace main3
             window.SetPosition(doge::Vec2f(0, 0));
 
             auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
-            button.SetTextFont("arial");
-            button.SetText(U"Cancel");
             button.SetPosition(doge::Vec2f(0, 0));
+
+            auto& text = button.GetText();
+            text.SetFont("arial");
+            text.SetString(U"Cancel");
 
             button.on_clicked +=
             [this]
@@ -145,11 +148,14 @@ namespace main3
                 {
                     this->circle_comp->color = doge::Color::Green;
                     this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Top);
+                    this->image->SetTextureRectangle(doge::Recti(32, 0, 32, 32));
                 }
                 else
                 {
                     this->circle_comp->color = doge::Color::Red;
                     this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+                    this->image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
                 }
             };
 
@@ -159,6 +165,8 @@ namespace main3
         void Start(doge::Engine& engine)
         {
             window_count = 0;
+
+            engine.assets.LoadTexture("test", "test.png");
 
             // gui cam
             gui.AddCamera("my_cam");
@@ -170,6 +178,12 @@ namespace main3
             text->SetPosition(doge::Vec2f(0, -150));
             text->SetAlign(doge::Text::Align::Center);
             text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+
+            // image
+            image = &gui.AddElement<doge::gui::Image>("my_image", "my_cam");
+            image->SetTextureID("test");
+            image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
+            image->SetPosition(doge::Vec2f(300, 0));
 
             // circle in gui
             doge::Entity circle_entity = engine.AddEntity();

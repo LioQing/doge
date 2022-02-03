@@ -297,15 +297,7 @@ namespace doge::io
 
             auto& texture = engine.assets.GetTexture(sprite_comp.texture_id);
 
-            Recti rect = sprite_comp.texture_rectangle;
-            if (!sprite_comp.atlas_rectangle_id.empty())
-            {
-                rect = texture.atlas_rectangles.at(sprite_comp.atlas_rectangle_id);
-            }
-            else
-            {
-                rect = math::AutoSize(rect, texture.GetSize());
-            }
+            Recti rect = sprite_comp.GetActualRectangle(engine.assets);
 
             auto scale = sprite_comp.size / rect.GetSize();
             scale = math::AutoSize(scale, Vec2f::One);

@@ -6,6 +6,8 @@
 
 namespace doge
 {
+    struct Assets;
+
     struct Sprite
     {
         std::string texture_id = "missing_texture";
@@ -15,5 +17,8 @@ namespace doge
         
         Vec2f origin = Vec2f::Zero;
         Color color = Color::White;
+
+        Recti GetActualRectangle(const Assets& assets) const;
+        Vec2f GetActualSize(const Assets& assets) const;
     };
 }

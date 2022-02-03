@@ -14,7 +14,7 @@ namespace doge::gui
 
         virtual void Initialize() override;
 
-        virtual std::int32_t GetLayer() const;
+        virtual std::int32_t GetLayer() const override;
 
         void SetString(const std::u32string& str);
         const std::u32string& GetString() const;
@@ -44,9 +44,6 @@ namespace doge::gui
 
     private:
 
-        void UpdateVerticalOriginOffset();
-
         VerticalAlign vertical_align = VerticalAlign::Top;
-        float vertical_origin_offset = 0.f;
     };
 }

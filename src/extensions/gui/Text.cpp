@@ -7,13 +7,10 @@ namespace doge::gui
     void Text::Initialize()
     {
         GetEntity().AddComponent(Layer::Create(GetLayer() + 1));
-        GetEntity().AddComponent(doge::Text
-        {
-            .font_id = "",
-            .string = U"Text",
-            .align = doge::Text::Align::Left,
-        });
         GetEntity().AddComponent<Position>(0, 0);
+        GetEntity().AddComponent<doge::Text>();
+
+        SetString(U"Text");
     }
 
     std::int32_t Text::GetLayer() const
@@ -24,7 +21,7 @@ namespace doge::gui
     void Text::SetString(const std::u32string& str)
     {
         GetEntity().GetComponent<doge::Text>().string = str;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     const std::u32string& Text::GetString() const
@@ -35,7 +32,7 @@ namespace doge::gui
     void Text::SetFont(const std::string& font_id)
     {
         GetEntity().GetComponent<doge::Text>().font_id = font_id;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     const std::string& Text::GetTextFontID() const
@@ -46,7 +43,7 @@ namespace doge::gui
     void Text::SetFontSize(std::uint32_t font_size)
     {
         GetEntity().GetComponent<doge::Text>().font_size = font_size;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     std::uint32_t Text::GetFontSize() const
@@ -57,7 +54,7 @@ namespace doge::gui
     void Text::SetLineSpacingFactor(float factor)
     {
         GetEntity().GetComponent<doge::Text>().line_spacing_factor = factor;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     float Text::GetLineSpacingFactor() const
@@ -68,7 +65,7 @@ namespace doge::gui
     void Text::SetAlign(doge::Text::Align align)
     {
         GetEntity().GetComponent<doge::Text>().align = align;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     doge::Text::Align Text::GetAlign() const
@@ -79,7 +76,7 @@ namespace doge::gui
     void Text::SetVerticalAlign(Text::VerticalAlign vertical_align)
     {
         this->vertical_align = vertical_align;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     Text::VerticalAlign Text::GetVerticalAlign() const
@@ -90,7 +87,7 @@ namespace doge::gui
     void Text::SetAppearance(const doge::Text::Appearance& appear, std::size_t pos)
     {
         GetEntity().GetComponent<doge::Text>().character_appearances[pos] = appear;
-        UpdateVerticalOriginOffset();
+        OnOriginUpdated();
     }
 
     const doge::Text::Appearance& Text::GetAppearance(std::size_t pos) const
@@ -108,24 +105,16 @@ namespace doge::gui
 
     void Text::OnOriginUpdated()
     {
-        UpdateVerticalOriginOffset();
-        GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + vertical_origin_offset * doge::Vec2f::j;
-    }
-
-    void Text::UpdateVerticalOriginOffset()
-    {
         if (vertical_align == VerticalAlign::Top)
         {
-            vertical_origin_offset = 0.f;
-            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + vertical_origin_offset * doge::Vec2f::j;
+            GetEntity().GetComponent<doge::Text>().origin = GetOrigin();
             return;
         }
 
         auto& text = GetEntity().GetComponent<doge::Text>();
         if (text.font_id == "")
         {
-            vertical_origin_offset = 0.f;
-            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + vertical_origin_offset * doge::Vec2f::j;
+            GetEntity().GetComponent<doge::Text>().origin = GetOrigin();
             return;
         }
 
@@ -133,10 +122,8 @@ namespace doge::gui
         auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
 
         if (vertical_align == VerticalAlign::Center)
-            vertical_origin_offset = line * height / 2.f;
+            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height / 2.f * doge::Vec2f::j;
         else
-            vertical_origin_offset = line * height;
-
-        GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + vertical_origin_offset * doge::Vec2f::j;
+            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height * doge::Vec2f::j;
     }
 }

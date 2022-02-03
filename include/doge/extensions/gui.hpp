@@ -8,3 +8,4 @@
 #include "gui/Window.hpp"
 #include "gui/WindowEx.hpp"
 #include "gui/Text.hpp"
+#include "gui/Image.hpp"

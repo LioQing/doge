@@ -21,8 +21,23 @@ namespace doge
             GUI(Engine& engine);
             ~GUI();
 
-            Entity AddCamera(const std::string& id, const Rectf& port = Rectf(0, 0, 1, 1), std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
-            Entity AddAbsoluteSizeCamera(const std::string& id, const Rectf& rectangle, std::int32_t render_order = 32, std::int32_t start_layer = 32, std::int32_t end_layer = 36, bool destroy_on_finish = true);
+            Entity AddCamera(
+                const std::string& id,
+                const Rectf& port = Rectf(0, 0, 1, 1),
+                std::int32_t render_order = 32,
+                std::int32_t layer = 32,
+                std::size_t layer_width = 4,
+                bool destroy_on_finish = true
+            );
+
+            Entity AddAbsoluteSizeCamera(
+                const std::string& id,
+                const Rectf& rectangle,
+                std::int32_t render_order = 32,
+                std::int32_t layer = 32,
+                std::size_t layer_width = 4,
+                bool destroy_on_finish = true
+            );
 
             void RemoveCamera(const std::string& id);
 

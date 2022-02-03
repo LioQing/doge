@@ -3,8 +3,8 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/core/Entity.hpp>
-#include <doge/components/Text.hpp>
 #include <doge/extensions/gui/Element.hpp>
+#include <doge/extensions/gui/Text.hpp>
 #include <functional>
 #include <variant>
 
@@ -52,22 +52,11 @@ namespace doge::gui
         void SetColor(const Color& color);
         const Color& GetColor() const;
 
-        void SetText(const std::u32string& text);
-        const std::u32string& GetText() const;
-
-        void SetTextFont(const std::string& font_id);
-        const std::string& GetTextFontID() const;
-
-        void SetTextFontSize(std::uint32_t font_size);
-        std::uint32_t GetTextFontSize() const;
-
-        void SetTextAppearance(const Text::Appearance& appear);
-        const Text::Appearance& GetTextAppearance() const;
+        const std::string& GetTextElementID() const;
+        Text& GetText() const;
 
         bool IsDown() const;
         bool IsMouseOver() const;
-        
-        void UpdateTextOrigin();
 
         static void DefaultOnStateTransition(Button& button);
 
@@ -88,6 +77,7 @@ namespace doge::gui
             Count
         };
 
+        std::string text_id;
         std::bitset<State::Count> states;
         std::function<void(Button&)> on_state_transition = Button::DefaultOnStateTransition;
 
@@ -98,7 +88,5 @@ namespace doge::gui
         Vec2i center_texture_size = Vec2i::Zero;
         Rectf border_thickness = Rectf();
         Color color = Color::White;
-
-        Entity text_entity;
     };
 }

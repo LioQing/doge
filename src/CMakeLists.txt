@@ -47,6 +47,7 @@ set(SRC_FILES
     core/io/Font.cpp
     utils/custom_sf/Text.cpp
     utils/custom_sf/DrawableVertices.cpp
+    components/Sprite.cpp
 
     # physics
     extensions/physics/Physics.cpp
@@ -60,6 +61,7 @@ set(SRC_FILES
     extensions/gui/Window.cpp
     extensions/gui/WindowEx.cpp
     extensions/gui/Text.cpp
+    extensions/gui/Image.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp

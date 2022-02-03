@@ -238,14 +238,14 @@ namespace main1
         gui::Button& button0 = gui->AddElement<gui::Button>("button0", "gui_cam");
         button0.SetPosition(Vec2f(-300, 0));
         button0.SetSize(gui::Button::DefaultSize * Vec2f(1, 2));
-        button0.SetTextFont("arial");
-        button0.SetText(U"Hello\nthis is me");
+        button0.GetText().SetFont("arial");
+        button0.GetText().SetString(U"Hello\nthis is me");
 
         gui::Window& window = gui->AddElement<gui::Window>("window0", "gui_cam");
 
         gui::Button& button1 = window.AddElement<gui::Button>("button1");
-        button1.SetTextFont("arial");
-        button1.SetText(U"Button In Window");
+        button1.GetText().SetFont("arial");
+        button1.GetText().SetString(U"Button In Window");
 
         button1.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
         button1.on_released += [](){ std::cout << "Released" << std::endl; };

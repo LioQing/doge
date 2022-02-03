@@ -81,17 +81,14 @@ namespace doge::gui
         
         UpdateSprite();
 
-        text_entity = GetGUI().GetEngine().AddEntity();
-        text_entity.SetParent(GetEntity());
-        text_entity.AddComponent(Tag::Create(GetID() + "_text"));
-        text_entity.AddComponent(Layer::Create(GetLayer() + 1));
-        text_entity.AddComponent(Text
-        {
-            .font_id = "",
-            .string = U"Button",
-            .align = Text::Align::Center,
-            .character_appearances = { std::pair<std::size_t, Text::Appearance>(0, Text::Appearance{ .fill_color = Color::Black }) },
-        });
+        text_id = "doge_gui_button_" + GetID() + "_text";
+        
+        auto& text = GetGUI().AddElement<gui::Text>(text_id, GetCameraID());
+        text.GetEntity().SetParent(GetEntity());
+        text.SetString(U"Button");
+        text.SetAlign(doge::Text::Align::Center);
+        text.SetVerticalAlign(Text::VerticalAlign::Center);
+        text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
 
         on_state_transition(*this);
 
@@ -192,48 +189,14 @@ namespace doge::gui
         return color;
     }
 
-    void Button::SetText(const std::u32string& text)
+    const std::string& Button::GetTextElementID() const
     {
-        text_entity.GetComponent<Text>().string = text;
-        UpdateTextOrigin();
+        return text_id;
     }
 
-    const std::u32string& Button::GetText() const
+    Text& Button::GetText() const
     {
-        return text_entity.GetComponent<Text>().string;
-    }
-
-    void Button::SetTextFont(const std::string& font_id)
-    {
-        text_entity.GetComponent<Text>().font_id = font_id;
-        UpdateTextOrigin();
-    }
-
-    const std::string& Button::GetTextFontID() const
-    {
-        return text_entity.GetComponent<Text>().font_id;
-    }
-
-    void Button::SetTextFontSize(std::uint32_t font_size)
-    {
-        text_entity.GetComponent<Text>().font_size = font_size;
-        UpdateTextOrigin();
-    }
-
-    std::uint32_t Button::GetTextFontSize() const
-    {
-        return text_entity.GetComponent<Text>().font_size;
-    }
-
-    void Button::SetTextAppearance(const Text::Appearance& appear)
-    {
-        text_entity.GetComponent<Text>().character_appearances.at(0) = appear;
-        UpdateTextOrigin();
-    }
-
-    const Text::Appearance& Button::GetTextAppearance() const
-    {
-        return text_entity.GetComponent<Text>().character_appearances.at(0);
+        return static_cast<Text&>(GetGUI().GetElement(GetTextElementID()));
     }
 
     bool Button::IsDown() const
@@ -244,21 +207,6 @@ namespace doge::gui
     bool Button::IsMouseOver() const
     {
         return states.test(State::MouseOver);
-    }
-
-    void Button::UpdateTextOrigin()
-    {
-        auto& text = text_entity.GetComponent<Text>();
-        if (text.font_id == "")
-        {
-            text.origin = Vec2f::Zero;
-            return;
-        }
-
-        auto height = GetGUI().GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
-        auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
-
-        text.origin = Vec2f(0, line * height / 2.f);
     }
 
     void Button::DefaultOnStateTransition(Button& button)
