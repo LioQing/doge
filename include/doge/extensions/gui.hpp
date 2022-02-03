@@ -6,3 +6,5 @@
 
 #include "gui/Button.hpp"
 #include "gui/Window.hpp"
+#include "gui/WindowEx.hpp"
+#include "gui/Text.hpp"

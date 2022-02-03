@@ -13,12 +13,13 @@ namespace doge::gui
     {
         static const Vec2f DefaultSize;
 
-        void Initialize() override;
+        virtual ~Window();
 
-        std::int32_t GetLayer() const override;
+        virtual void Initialize() override;
 
-        template <typename E>
-        requires std::derived_from<std::remove_reference_t<E>, Element>
+        virtual std::int32_t GetLayer() const override;
+
+        template <std::derived_from<Element> E>
         E& AddElement(const std::string& id)
         {
             contained_element_ids.emplace(id);
@@ -44,9 +45,9 @@ namespace doge::gui
     
     protected:
 
-        void OnSizeUpdated() override;
-        void OnPositionUpdated() override;
-        void OnOriginUpdated() override;
+        virtual void OnSizeUpdated() override;
+        virtual void OnPositionUpdated() override;
+        virtual void OnOriginUpdated() override;
 
     private:
 

@@ -20,7 +20,9 @@ namespace doge::gui
 
         static const Vec2f DefaultSize;
 
-        void Initialize() override;
+        virtual ~Button();
+
+        virtual void Initialize() override;
 
         template <std::invocable<Button&> T>
         void SetOnStateTransition(T transition)
@@ -71,9 +73,9 @@ namespace doge::gui
 
     protected:
 
-        void OnSizeUpdated() override;
-        void OnPositionUpdated() override;
-        void OnOriginUpdated() override;
+        virtual void OnSizeUpdated() override;
+        virtual void OnPositionUpdated() override;
+        virtual void OnOriginUpdated() override;
 
     private:
 

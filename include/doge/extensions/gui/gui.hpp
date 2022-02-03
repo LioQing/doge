@@ -34,13 +34,12 @@ namespace doge
 
             bool HasCamera(const std::string& id) const;
 
-            template <typename E>
-            requires std::derived_from<std::remove_reference_t<E>, Element>
+            template <std::derived_from<Element> E>
             E& AddElement(const std::string& id, const std::string& cam_id)
             {
                 auto cam_itr = cameras.find(cam_id);
                 if (cam_itr == cameras.end())
-                    throw std::invalid_argument("Camera property of Element (GUI::Element) is not found in GUI::cameras");
+                    throw std::invalid_argument("Camera ID of gui::element is not found in GUI::cameras");
 
                 auto entity = engine.AddEntity();
                 entity.SetParent(cam_itr->second);

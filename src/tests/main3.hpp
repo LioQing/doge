@@ -119,43 +119,70 @@ namespace main3
         doge::gui::GUI gui;
 
         doge::Component<doge::CircleShape>* circle_comp;
+        doge::gui::Text* text;
+
+        std::size_t window_count;
 
         SceneB(doge::Engine& engine) : engine(engine), gui(engine)
         {
         }
 
-        void Start(doge::Engine& engine)
+        void AddWindow(const doge::Vec2f& position)
         {
-            gui.AddCamera("my_cam");
+            auto& window = gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
+            window.SetSize(doge::Vec2f(400, 200));
+            window.SetPosition(doge::Vec2f(0, 0));
 
-            auto& window = gui.AddElement<doge::gui::Window>("my_window", "my_cam");
-            window.SetSize(doge::Vec2f(400, 400));
-            window.SetPosition(doge::Vec2f(0, -200));
-
-            auto& button = window.AddElement<doge::gui::Button>("my_button");
+            auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
             button.SetTextFont("arial");
-            button.SetPosition(doge::Vec2f(100, 0));
-            button.SetSize(doge::Vec2f(300, 300));
+            button.SetText(U"Cancel");
+            button.SetPosition(doge::Vec2f(0, 0));
 
             button.on_clicked +=
             [this]
             {
                 if (this->circle_comp->color == doge::Color::Red)
+                {
                     this->circle_comp->color = doge::Color::Green;
+                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Top);
+                }
                 else
+                {
                     this->circle_comp->color = doge::Color::Red;
+                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+                }
             };
 
+            window_count++;
+        }
+
+        void Start(doge::Engine& engine)
+        {
+            window_count = 0;
+
+            // gui cam
+            gui.AddCamera("my_cam");
+            AddWindow(doge::Vec2f::Zero);
+
+            // text
+            text = &gui.AddElement<doge::gui::Text>("my_text", "my_cam");
+            text->SetFont("arial");
+            text->SetPosition(doge::Vec2f(0, -150));
+            text->SetAlign(doge::Text::Align::Center);
+            text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+
+            // circle in gui
             doge::Entity circle_entity = engine.AddEntity();
 
             circle_comp = &circle_entity.AddComponent(doge::CircleShape
             {
                 .radius = 5.f,
+                .origin = { 5.f, 5.f },
                 .color = doge::Color::Red,
             });
 
             circle_entity.AddComponent<doge::Position>(0, -50);
-            circle_entity.AddComponent(doge::Layer::Create(gui.GetCameraLayer("my_cam")));
+            circle_entity.AddComponent(doge::Layer::Create(gui.GetCameraLayer("doge_gui_window_my_window0")));
 
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_b",

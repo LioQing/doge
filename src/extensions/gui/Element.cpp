@@ -7,7 +7,7 @@ namespace doge::gui
 {
     Element::~Element()
     {
-    };
+    }
 
     std::int32_t Element::GetLayer() const
     {

@@ -58,6 +58,8 @@ set(SRC_FILES
     extensions/gui/Element.cpp
     extensions/gui/Button.cpp
     extensions/gui/Window.cpp
+    extensions/gui/WindowEx.cpp
+    extensions/gui/Text.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp

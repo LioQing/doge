@@ -10,6 +10,10 @@ namespace doge::gui
 {
     const Vec2f Button::DefaultSize = Vec2f(100, 36);
 
+    Button::~Button()
+    {
+    }
+
     void Button::Initialize()
     {
         GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener(std::string("doge_gui_button_" + GetID()),

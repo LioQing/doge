@@ -7,6 +7,10 @@ namespace doge::gui
 {
     const Vec2f Window::DefaultSize = Vec2f(600, 480);
 
+    Window::~Window()
+    {
+    }
+
     void Window::Initialize()
     {
         // camera

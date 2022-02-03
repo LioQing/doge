@@ -8,6 +8,15 @@ namespace doge::gui
     GUI::GUI(Engine& engine) : engine(engine), nine_slice(engine)
     {
         engine.scenes.extensions.emplace("doge_gui", GameLoopFunctions::Create(*this, &GUI::Start, &GUI::Update, &GUI::FixedUpdate, &GUI::Finish));
+
+        if (engine.scenes.is_running)
+        {
+            engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
+            nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
+
+            engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
+            nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
+        }
     }
 
     GUI::~GUI()
@@ -96,7 +105,7 @@ namespace doge::gui
 
     std::int32_t GUI::GetCameraLayer(const std::string& id) const
     {
-        return (*GetCameraEntity(id).GetComponent<Layer>().layers.begin() + *GetCameraEntity(id).GetComponent<Layer>().layers.rbegin()) / 2;
+        return GetCameraEntity(id).GetComponent<Layer>().layers.begin().operator*();
     }
 
     const std::set<std::int32_t>& GUI::GetCameraLayers(const std::string& id) const
