@@ -5,6 +5,7 @@
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Color.hpp>
+#include <doge/extensions/gui/Align.hpp>
 #include <string>
 #include <bitset>
 
@@ -60,6 +61,11 @@ namespace doge
             void SetColor(const Color& color);
             const Color& GetColor() const;
 
+            void SetAlign(Align align);
+            Align GetAlign() const;
+            Align GetHorizontalAlign() const;
+            Align GetVerticalAlign() const;
+
             Rectf GetRectangle() const;
 
         protected:
@@ -79,6 +85,7 @@ namespace doge
             Vec2f size = Vec2f::Zero;
             Vec2f origin = Vec2f::Zero;
             Color color = 0xFFFFFFFF;
+            Align align = Align::Center;
 
             GUI* gui = nullptr;
 

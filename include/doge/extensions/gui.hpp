@@ -10,3 +10,4 @@
 #include "gui/Text.hpp"
 #include "gui/Image.hpp"
 #include "gui/NSImage.hpp"
+#include "gui/Align.hpp"

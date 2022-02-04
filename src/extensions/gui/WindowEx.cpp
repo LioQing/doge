@@ -10,7 +10,7 @@ namespace doge::gui
     {
         Window::Initialize();
 
-        SetBorderThickness(Rectf(16, 16, 16, 16));
+        SetBorderThickness(Rectf(32, 32, 32, 32));
     }
 
     void WindowEx::SetTitleBar(bool enabled)

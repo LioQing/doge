@@ -90,8 +90,8 @@ namespace doge::gui
         text.SetLocalLayer(1);
         text.SetCursorDetectable(false);
         text.SetString(U"Button");
-        text.SetAlign(doge::Text::Align::Center);
-        text.SetVerticalAlign(Text::VerticalAlign::Center);
+        text.SetTextAlign(doge::Text::Align::Center);
+        text.SetAlign(Align::Center);
         text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
 
         on_state_transition(*this);

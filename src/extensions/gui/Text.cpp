@@ -60,26 +60,15 @@ namespace doge::gui
         return GetEntity().GetComponent<doge::Text>().line_spacing_factor;
     }
 
-    void Text::SetAlign(doge::Text::Align align)
+    void Text::SetTextAlign(doge::Text::Align align)
     {
         GetEntity().GetComponent<doge::Text>().align = align;
         OnOriginUpdated();
     }
 
-    doge::Text::Align Text::GetAlign() const
+    doge::Text::Align Text::GetTextAlign() const
     {
         return GetEntity().GetComponent<doge::Text>().align;
-    }
-
-    void Text::SetVerticalAlign(Text::VerticalAlign vertical_align)
-    {
-        this->vertical_align = vertical_align;
-        OnOriginUpdated();
-    }
-
-    Text::VerticalAlign Text::GetVerticalAlign() const
-    {
-        return vertical_align;
     }
 
     void Text::SetAppearance(const doge::Text::Appearance& appear, std::size_t pos)
@@ -98,7 +87,7 @@ namespace doge::gui
 
     void Text::OnOriginUpdated()
     {
-        if (vertical_align == VerticalAlign::Top)
+        if (GetVerticalAlign() == Align::Top)
         {
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin();
             return;
@@ -114,7 +103,7 @@ namespace doge::gui
         auto height = GetGUI().GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
         auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
 
-        if (vertical_align == VerticalAlign::Center)
+        if (GetVerticalAlign() == Align::Center)
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height / 2.f * doge::Vec2f::j;
         else
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height * doge::Vec2f::j;

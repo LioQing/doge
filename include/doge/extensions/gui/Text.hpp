@@ -7,11 +7,6 @@ namespace doge::gui
 {
     struct Text : Element
     {
-        enum VerticalAlign
-        {
-            Top, Center, Bottom,
-        };
-
         virtual ~Text();
 
         virtual void Initialize() override;
@@ -28,11 +23,8 @@ namespace doge::gui
         void SetLineSpacingFactor(float factor);
         float GetLineSpacingFactor() const;
 
-        void SetAlign(doge::Text::Align align);
-        doge::Text::Align GetAlign() const;
-
-        void SetVerticalAlign(VerticalAlign vertical_align);
-        VerticalAlign GetVerticalAlign() const;
+        void SetTextAlign(doge::Text::Align align);
+        doge::Text::Align GetTextAlign() const;
 
         void SetAppearance(const doge::Text::Appearance& appear, std::size_t pos = 0);
         const doge::Text::Appearance& GetAppearance(std::size_t pos = 0) const;
@@ -41,9 +33,5 @@ namespace doge::gui
 
         virtual void OnOriginUpdated() override;
         virtual void OnColorUpdated() override;
-
-    private:
-
-        VerticalAlign vertical_align = VerticalAlign::Top;
     };
 }

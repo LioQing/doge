@@ -147,14 +147,13 @@ namespace main3
                 if (this->circle_comp->color == doge::Color::Red)
                 {
                     this->circle_comp->color = doge::Color::Green;
-                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Top);
+                    this->text->SetAlign(doge::gui::Align::Top);
                     this->image->SetTextureRectangle(doge::Recti(32, 0, 32, 32));
                 }
                 else
                 {
                     this->circle_comp->color = doge::Color::Red;
-                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
-                    this->text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+                    this->text->SetAlign(doge::gui::Align::Bottom);
                     this->image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
                 }
             };
@@ -178,8 +177,8 @@ namespace main3
             text = &gui.AddElement<doge::gui::Text>("my_text", "my_cam");
             text->SetFont("arial");
             text->SetPosition(doge::Vec2f(0, -150));
-            text->SetAlign(doge::Text::Align::Center);
-            text->SetVerticalAlign(doge::gui::Text::VerticalAlign::Bottom);
+            text->SetTextAlign(doge::Text::Align::Center);
+            text->SetAlign(doge::gui::Align::Bottom);
 
             // image
             image = &gui.AddElement<doge::gui::Image>("my_image", "my_cam");
@@ -221,8 +220,7 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            if (gui.GetElementBelowCursor())
-                std::cout << gui.GetElementBelowCursor()->GetID() << std::endl;
+            std::cout << (this->text->GetVerticalAlign() == doge::gui::Align::Top) << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

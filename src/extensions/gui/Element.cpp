@@ -123,4 +123,25 @@ namespace doge::gui
     {
         return Rectf(GetPosition() - GetOrigin() - GetSize() / 2.f, GetSize());
     }
+
+    void Element::SetAlign(Align align)
+    {
+        this->align = align;
+        OnOriginUpdated();
+    }
+
+    Align Element::GetAlign() const
+    {
+        return align;
+    }
+
+    Align Element::GetHorizontalAlign() const
+    {
+        return static_cast<Align>(align % Align::Base);
+    }
+
+    Align Element::GetVerticalAlign() const
+    {
+        return static_cast<Align>(align / Align::Base * Align::Base);
+    }
 }
