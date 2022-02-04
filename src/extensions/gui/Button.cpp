@@ -116,7 +116,7 @@ namespace doge::gui
         
         auto& image_element = GetImageElement();
         image_element.SetSize(GetSize());
-        image_element.SetOrigin(GetOrigin());
+        image_element.SetOrigin(GetActualOrigin());
         image_element.SetColor(GetColor());
     }
 
@@ -199,8 +199,8 @@ namespace doge::gui
 
     void Button::OnOriginUpdated()
     {
-        GetImageElement().SetOrigin(GetOrigin());
-        GetText().SetOrigin(GetOrigin());
+        GetImageElement().SetOrigin(GetActualOrigin());
+        GetText().SetOrigin(GetActualOrigin());
     }
 
     void Button::OnColorUpdated()

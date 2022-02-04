@@ -220,7 +220,7 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            std::cout << (this->text->GetVerticalAlign() == doge::gui::Align::Top) << std::endl;
+            std::cout << this->text->GetAlign() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

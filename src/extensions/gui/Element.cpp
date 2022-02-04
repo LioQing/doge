@@ -119,29 +119,39 @@ namespace doge::gui
         return color;
     }
 
-    Rectf Element::GetRectangle() const
+    void Element::SetAlign(Align align)
     {
-        return Rectf(GetPosition() - GetOrigin() - GetSize() / 2.f, GetSize());
+        if (align % Align::Base == Align::Left)
+            this->align.x = -1.f;
+        else if (align % Align::Base == Align::Right)
+            this->align.x = 1.f;
+        
+        if (align / Align::Base * Align::Base == Align::Top)
+            this->align.y = -1.f;
+        else if (align / Align::Base * Align::Base == Align::Bottom)
+            this->align.y = 1.f;
+        
+        OnOriginUpdated();
     }
 
-    void Element::SetAlign(Align align)
+    void Element::SetAlign(const Vec2f& align)
     {
         this->align = align;
         OnOriginUpdated();
     }
 
-    Align Element::GetAlign() const
+    const Vec2f& Element::GetAlign() const
     {
         return align;
     }
 
-    Align Element::GetHorizontalAlign() const
+    Rectf Element::GetRectangle() const
     {
-        return static_cast<Align>(align % Align::Base);
+        return Rectf(GetPosition() - GetOrigin() - GetSize() / 2.f, GetSize());
     }
 
-    Align Element::GetVerticalAlign() const
+    Vec2f Element::GetActualOrigin() const
     {
-        return static_cast<Align>(align / Align::Base * Align::Base);
+        return GetOrigin() + GetAlign() * GetSize();
     }
 }

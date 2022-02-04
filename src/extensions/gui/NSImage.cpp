@@ -56,10 +56,7 @@ namespace doge::gui
 
     void NSImage::OnOriginUpdated()
     {
-        GetGUI().GetNineSlice().SetSpriteOrigin(
-            GetEntity().GetComponent<CompoundSprite>(), 
-            GetOrigin() + GetGUI().GetNineSlice().GetSpriteActualSize(GetEntity().GetComponent<CompoundSprite>(), GetGUI().GetEngine().assets) / 2.f
-        );
+        GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetActualOrigin());
     }
 
     void NSImage::OnColorUpdated()

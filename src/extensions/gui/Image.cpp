@@ -55,7 +55,7 @@ namespace doge::gui
 
     void Image::OnOriginUpdated()
     {
-        GetEntity().GetComponent<Sprite>().origin = GetOrigin() + GetEntity().GetComponent<Sprite>().GetActualSize(GetGUI().GetEngine().assets) / 2.f;
+        GetEntity().GetComponent<Sprite>().origin = GetActualOrigin();
     }
 
     void Image::OnColorUpdated()

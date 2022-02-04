@@ -26,9 +26,6 @@ namespace doge::gui
 
         std::string GetWindowCameraID() const;
 
-        void SetWindowCameraRenderOrder(std::int32_t render_order);
-        std::int32_t GetWindowCameraRenderOrder() const;
-
         void SetBorderThickness(const Rectf& border_thickness);
         const Rectf& GetBorderThickness() const;
 

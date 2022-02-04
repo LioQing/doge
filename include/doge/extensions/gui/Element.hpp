@@ -62,11 +62,11 @@ namespace doge
             const Color& GetColor() const;
 
             void SetAlign(Align align);
-            Align GetAlign() const;
-            Align GetHorizontalAlign() const;
-            Align GetVerticalAlign() const;
+            void SetAlign(const Vec2f& align);
+            const Vec2f& GetAlign() const;
 
             Rectf GetRectangle() const;
+            Vec2f GetActualOrigin() const;
 
         protected:
 
@@ -85,7 +85,7 @@ namespace doge
             Vec2f size = Vec2f::Zero;
             Vec2f origin = Vec2f::Zero;
             Color color = 0xFFFFFFFF;
-            Align align = Align::Center;
+            Vec2f align = Vec2f(.5f, .5f);
 
             GUI* gui = nullptr;
 

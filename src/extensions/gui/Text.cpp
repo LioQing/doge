@@ -87,7 +87,7 @@ namespace doge::gui
 
     void Text::OnOriginUpdated()
     {
-        if (GetVerticalAlign() == Align::Top)
+        if (GetAlign().y == -1.f)
         {
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin();
             return;
@@ -103,10 +103,7 @@ namespace doge::gui
         auto height = GetGUI().GetEngine().assets.GetFont(text.font_id).GetLineSpacing(text.font_size) * text.line_spacing_factor;
         auto line = std::count(text.string.begin(), text.string.end(), U'\n') + 1;
 
-        if (GetVerticalAlign() == Align::Center)
-            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height / 2.f * doge::Vec2f::j;
-        else
-            GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height * doge::Vec2f::j;
+        GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height * GetAlign().y * doge::Vec2f::j;
     }
 
     void Text::OnColorUpdated()

@@ -57,16 +57,6 @@ namespace doge::gui
         return "doge_gui_window_" + GetID();
     }
 
-    void Window::SetWindowCameraRenderOrder(std::int32_t render_order)
-    {
-        GetGUI().GetCameraComponent(GetWindowCameraID()).render_order = GetGUI().GetCameraRenderOrder(GetCameraID()) + 1;
-    }
-
-    std::int32_t Window::GetWindowCameraRenderOrder() const
-    {
-        return GetGUI().GetCameraComponent(GetWindowCameraID()).render_order;
-    }
-
     void Window::SetBorderThickness(const Rectf& border_thickness)
     {
         this->border_thickness = border_thickness;
@@ -102,7 +92,7 @@ namespace doge::gui
 
     void Window::OnOriginUpdated()
     {
-        GetImage().SetOrigin(GetOrigin());
+        GetImage().SetOrigin(GetActualOrigin());
         UpdateContainerArea();
     }
 
