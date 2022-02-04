@@ -9,9 +9,12 @@ namespace doge::gui
     {
     }
 
-    std::int32_t Element::GetLayer() const
+    void Element::ElementInitialize()
     {
-        return GetGUI().GetCameraLayer(GetCameraID());
+        GetEntity().AddComponent(Layer::Create(GetGUI().GetCameraLayer(GetCameraID())));
+        GetEntity().AddComponent<Position>(0, 0);
+
+        Initialize();
     }
 
     GUI& Element::GetGUI() const
@@ -22,6 +25,39 @@ namespace doge::gui
     Entity Element::GetEntity() const
     {
         return GetGUI().GetElementEntity(GetID());
+    }
+
+    void Element::SetLocalLayer(std::int32_t layer)
+    {
+        SetLayer(GetGUI().GetCameraLayer(GetCameraID()) + layer);
+        OnLayerUpdated();
+    }
+
+    void Element::SetLayer(std::int32_t layer)
+    {
+        GetEntity().GetComponent<Layer>().layers = std::set<std::int32_t>{ layer };
+        OnLayerUpdated();
+    }
+
+    std::int32_t Element::GetLocalLayer() const
+    {
+        return GetLayer() - GetGUI().GetCameraLayer(GetCameraID());
+    }
+
+    std::int32_t Element::GetLayer() const
+    {
+        return GetEntity().GetComponent<Layer>().layers.begin().operator*();
+    }
+
+    void Element::SetCursorDetectable(bool is_cursor_detectable)
+    {
+        this->is_cursor_detectable = is_cursor_detectable;
+        OnCursorDetectableUpdated();
+    }
+
+    bool Element::IsCursorDetectable() const
+    {
+        return is_cursor_detectable;
     }
 
     const std::string& Element::GetID() const
@@ -52,13 +88,13 @@ namespace doge::gui
 
     void Element::SetPosition(const Vec2f& position)
     {
-        this->position = position;
+        GetEntity().GetComponent<Position>().position = position;
         OnPositionUpdated();
     }
 
     const Vec2f& Element::GetPosition() const
     {
-        return position;
+        return GetEntity().GetComponent<Position>().position;
     }
 
     void Element::SetOrigin(const Vec2f& origin)
@@ -72,8 +108,19 @@ namespace doge::gui
         return origin;
     }
 
+    void Element::SetColor(const Color& color)
+    {
+        this->color = color;
+        OnColorUpdated();
+    }
+
+    const Color& Element::GetColor() const
+    {
+        return color;
+    }
+
     Rectf Element::GetRectangle() const
     {
-        return Rectf(position - origin - size / 2.f, size);
+        return Rectf(GetPosition() - GetOrigin() - GetSize() / 2.f, GetSize());
     }
 }

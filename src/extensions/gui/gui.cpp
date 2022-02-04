@@ -2,6 +2,7 @@
 
 #include <doge/core/Engine.hpp>
 #include <doge/extensions/nine_slice.hpp>
+#include <algorithm>
 
 namespace doge::gui
 {
@@ -122,9 +123,11 @@ namespace doge::gui
         return GetCameraEntity(id).GetComponent<Layer>().layers.begin().operator*();
     }
 
-    const std::set<std::int32_t>& GUI::GetCameraLayers(const std::string& id) const
+    std::int32_t GUI::GetCameraLayerWidth(const std::string& id) const
     {
-        return GetCameraEntity(id).GetComponent<Layer>().layers;
+        auto& layers = GetCameraEntity(id).GetComponent<Layer>().layers;
+        auto [min, max] = std::minmax_element(layers.begin(), layers.end());
+        return *max - *min;
     }
 
     std::int32_t GUI::GetCameraRenderOrder(const std::string& id) const
@@ -193,6 +196,10 @@ namespace doge::gui
         for (auto& [id, element] : elements)
         {
             auto& ptr = element.GetComponent<Component>().element;
+
+            if (!ptr->IsCursorDetectable())
+                continue;
+
             Vec2f cursor_pos = GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent());
             Recti cam_rect = Recti(
                 ptr->GetCameraComponent().port.GetPosition() * GetEngine().window.window_io.GetSize(),

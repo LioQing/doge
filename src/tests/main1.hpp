@@ -335,6 +335,9 @@ namespace main1
             }
         }
 
+        if (gui->GetElementBelowCursor())
+            std::cout << gui->GetElementBelowCursor()->GetID() << std::endl;
+
         //std::cout << 1000.f / dt << std::endl;
     }
 

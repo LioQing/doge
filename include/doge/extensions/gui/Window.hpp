@@ -9,15 +9,13 @@
 
 namespace doge::gui
 {
+    struct NSImage;
+
     struct Window : Element
     {
-        static const Vec2f DefaultSize;
-
         virtual ~Window();
 
         virtual void Initialize() override;
-
-        virtual std::int32_t GetLayer() const override;
 
         template <std::derived_from<Element> E>
         E& AddElement(const std::string& id)
@@ -28,21 +26,17 @@ namespace doge::gui
 
         std::string GetWindowCameraID() const;
 
-        void SetTextureID(const std::string& texture_id);
-        std::string GetTextureID() const;
-
-        void SetContainerBorderThickness(const Rectf& border_thickness);
-        const Rectf& GetContainerBorderThickness() const;
-
-        void SetCenterTextureSize(const Vec2i& center_texture_size);
-        Vec2i GetCenterTextureSize() const;
+        void SetWindowCameraRenderOrder(std::int32_t render_order);
+        std::int32_t GetWindowCameraRenderOrder() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
-        Rectf GetBorderThickness() const;
+        const Rectf& GetBorderThickness() const;
 
-        void SetColor(const Color& color);
-        const Color& GetColor() const;
-    
+        std::string GetImageElementID() const;
+        NSImage& GetImage() const;
+        
+        static const Vec2f DefaultSize;
+
     protected:
 
         virtual void OnSizeUpdated() override;
@@ -56,7 +50,5 @@ namespace doge::gui
         Rectf border_thickness = Rectf();
 
         std::unordered_set<std::string> contained_element_ids;
-
-        Entity camera_entity;
     };
 }

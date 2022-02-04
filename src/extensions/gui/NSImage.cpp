@@ -12,9 +12,9 @@ namespace doge::gui
 
     void NSImage::Initialize()
     {
-        GetEntity().AddComponent(Layer::Create(GetLayer()));
-        GetEntity().AddComponent<Position>(0, 0);
         GetGUI().GetNineSlice().Add9SliceSpriteBySize(GetEntity());
+
+        OnOriginUpdated();
     }
 
     void NSImage::SetTextureID(const std::string& id)
@@ -48,25 +48,10 @@ namespace doge::gui
         return GetGUI().GetNineSlice().GetSpriteBorderThickness(GetEntity().GetComponent<CompoundSprite>());
     }
 
-    void NSImage::SetColor(const Color& color)
-    {
-        GetGUI().GetNineSlice().SetSpriteColor(GetEntity().GetComponent<CompoundSprite>(), color);
-    }
-
-    const Color& NSImage::GetColor() const
-    {
-        return GetGUI().GetNineSlice().GetSpriteColor(GetEntity().GetComponent<CompoundSprite>());
-    }
-
     void NSImage::OnSizeUpdated()
     {
         GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
         OnOriginUpdated();
-    }
-
-    void NSImage::OnPositionUpdated()
-    {
-        GetEntity().GetComponent<Position>().position = GetPosition();
     }
 
     void NSImage::OnOriginUpdated()
@@ -75,5 +60,10 @@ namespace doge::gui
             GetEntity().GetComponent<CompoundSprite>(), 
             GetOrigin() + GetGUI().GetNineSlice().GetSpriteActualSize(GetEntity().GetComponent<CompoundSprite>(), GetGUI().GetEngine().assets) / 2.f
         );
+    }
+
+    void NSImage::OnColorUpdated()
+    {
+        GetGUI().GetNineSlice().SetSpriteColor(GetEntity().GetComponent<CompoundSprite>(), GetColor());
     }
 }

@@ -1,6 +1,7 @@
 #include <doge/extensions/gui/Window.hpp>
 
 #include <doge/extensions/gui/GUI.hpp>
+#include <doge/extensions/gui/NSImage.hpp>
 #include <algorithm>
 
 namespace doge::gui
@@ -14,16 +15,17 @@ namespace doge::gui
     void Window::Initialize()
     {
         // camera
-        camera_entity = GetGUI().AddCamera(GetWindowCameraID());
+        auto camera_entity = GetGUI().AddCamera(
+            GetWindowCameraID(),
+            Rectf(0, 0, 1, 1),
+            GetGUI().GetCameraRenderOrder(GetCameraID()) + 1,
+            GetGUI().GetCameraLayer(GetCameraID()) + GetGUI().GetCameraLayerWidth(GetCameraID())
+        );
 
-        GetEntity().OnComponentRemoval<EntityInfo>([&]()
+        GetEntity().OnComponentRemoval<EntityInfo>([&, camera_entity]()
         {
             GetGUI().GetEngine().DestroyEntity(camera_entity);
         });
-
-        // camera
-        auto& cam_comp = camera_entity.GetComponent<Camera>();
-        cam_comp.render_order = GetGUI().GetCameraRenderOrder(GetCameraID()) + 1;
 
         GetGUI().GetEngine().events.on_window_resized.AddListener(
             std::string("doge_gui_window_") + GetID(),
@@ -33,123 +35,82 @@ namespace doge::gui
             }
         );
 
-        cam_comp.OnRemoval([&]()
+        camera_entity.GetComponent<Camera>().OnRemoval([&]()
         {
             GetGUI().GetEngine().events.on_window_resized.RemoveListener(std::string("doge_gui_window_") + GetID());
             GetGUI().RemoveElements(GetWindowCameraID());
         });
 
-        // cam layer
-        auto& parent_cam_layers = GetGUI().GetCameraLayers(GetCameraID());
-        auto [min_itr, max_itr] = std::minmax_element(parent_cam_layers.begin(), parent_cam_layers.end());
-        std::set<std::int32_t> layers;
-        for (auto& layer : parent_cam_layers)
-            layers.emplace(layer + *max_itr - *min_itr + 1);
-        
-        camera_entity.AddComponent<Layer>(layers);
+        // image
+        auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
+        image.GetEntity().SetParent(GetEntity());
+        image.SetLocalLayer(2);
+        image.SetCursorDetectable(false);
+        image.SetTextureID("doge_gui_window");
 
-        // sprite
-        GetEntity().AddComponent<Position>(0, 0);
-
-        GetGUI().GetNineSlice().Add9SliceSpriteBySize(
-            GetEntity(),
-            "doge_gui_window",
-            GetSize(),
-            Vec2i::Zero,
-            Rectf(),
-            GetSize() / 2.f,
-            0xECECECFF
-        );
-
+        SetLocalLayer(2);
         SetSize(DefaultSize);
-    }
-
-    std::int32_t Window::GetLayer() const
-    {
-        return GetGUI().GetCameraLayer(GetCameraID()) + 2;
     }
 
     std::string Window::GetWindowCameraID() const
     {
-        return std::string("doge_gui_window_") + GetID();
+        return "doge_gui_window_" + GetID();
     }
 
-    void Window::SetTextureID(const std::string& texture_id)
+    void Window::SetWindowCameraRenderOrder(std::int32_t render_order)
     {
-        GetGUI().GetNineSlice().SetSpriteTextureID(GetEntity().GetComponent<CompoundSprite>(), texture_id);
+        GetGUI().GetCameraComponent(GetWindowCameraID()).render_order = GetGUI().GetCameraRenderOrder(GetCameraID()) + 1;
     }
 
-    std::string Window::GetTextureID() const
+    std::int32_t Window::GetWindowCameraRenderOrder() const
     {
-        return GetGUI().GetNineSlice().GetSpriteTextureID(GetEntity().GetComponent<CompoundSprite>());
-    }
-
-    void Window::SetContainerBorderThickness(const Rectf& border_thickness)
-    {
-        this->border_thickness = border_thickness;
-;
-        UpdateContainerArea();
-    }
-
-    const Rectf& Window::GetContainerBorderThickness() const
-    {
-        return border_thickness;
-    }
-
-    void Window::SetCenterTextureSize(const Vec2i& center_texture_size)
-    {
-        GetGUI().GetNineSlice().SetSpriteCenterTextureSize(GetEntity().GetComponent<CompoundSprite>(), center_texture_size);
-    }
-
-    Vec2i Window::GetCenterTextureSize() const
-    {
-        return GetGUI().GetNineSlice().GetSpriteCenterTextureSize(GetEntity().GetComponent<CompoundSprite>());
+        return GetGUI().GetCameraComponent(GetWindowCameraID()).render_order;
     }
 
     void Window::SetBorderThickness(const Rectf& border_thickness)
     {
-        GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), border_thickness);
+        this->border_thickness = border_thickness;
+
+        UpdateContainerArea();
     }
 
-    Rectf Window::GetBorderThickness() const
+    const Rectf& Window::GetBorderThickness() const
     {
-        return GetGUI().GetNineSlice().GetSpriteBorderThickness(GetEntity().GetComponent<CompoundSprite>());
+        return border_thickness;
     }
 
-    void Window::SetColor(const Color& color)
+    std::string Window::GetImageElementID() const
     {
-        GetGUI().GetNineSlice().SetSpriteColor(GetEntity().GetComponent<CompoundSprite>(), color);
+        return "doge_gui_window_" + GetID() + "_image";
     }
 
-    const Color& Window::GetColor() const
+    NSImage& Window::GetImage() const
     {
-        return GetGUI().GetNineSlice().GetSpriteColor(GetEntity().GetComponent<CompoundSprite>());
+        return static_cast<NSImage&>(GetGUI().GetElement(GetImageElementID()));
     }
 
     void Window::OnSizeUpdated()
     {
-        GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
-        GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
+        GetImage().SetSize(GetSize());
         UpdateContainerArea();
     }
 
     void Window::OnPositionUpdated()
     {
-        GetEntity().GetComponent<doge::Position>().position = GetPosition();
         UpdateContainerArea();
     }
 
     void Window::OnOriginUpdated()
     {
-        GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
+        GetImage().SetOrigin(GetOrigin());
         UpdateContainerArea();
     }
 
     void Window::UpdateContainerArea()
     {
-        auto& cam_comp = camera_entity.GetComponent<Camera>();
-        cam_comp.size = GetSize() - GetContainerBorderThickness().GetPosition() - GetContainerBorderThickness().GetSize();
-        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetSize() / 2.f - GetContainerBorderThickness().GetPosition() - GetPosition()) / GetCameraComponent().size);
+        auto& cam_comp = GetGUI().GetCameraComponent(GetWindowCameraID());
+        cam_comp.size = GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize();
+        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetSize() / 2.f - GetBorderThickness().GetPosition() - GetPosition()) / GetCameraComponent().size);
         cam_comp.port.SetSize(cam_comp.size / GetCameraComponent().size);
     }
 }

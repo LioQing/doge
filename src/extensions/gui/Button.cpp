@@ -1,6 +1,8 @@
 #include <doge/extensions/gui/Button.hpp>
 
 #include <doge/extensions/gui/GUI.hpp>
+#include <doge/extensions/gui/NSImage.hpp>
+#include <doge/extensions/gui/Image.hpp>
 #include <doge/extensions/nine_slice.hpp>
 #include <doge/core/Engine.hpp>
 #include <doge/utils/math.hpp>
@@ -77,14 +79,16 @@ namespace doge::gui
             GetGUI().GetEngine().events.on_mouse_moved.RemoveListener(std::string("doge_gui_button_" + GetID()));
         });
 
-        GetEntity().AddComponent<doge::Position>(0, 0);
+        auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
+        image.GetEntity().SetParent(GetEntity());
+        image.SetLocalLayer(0);
+        image.SetCursorDetectable(false);
+        image.SetTextureID("doge_gui_button");
         
-        UpdateSprite();
-
-        text_id = "doge_gui_button_" + GetID() + "_text";
-        
-        auto& text = GetGUI().AddElement<gui::Text>(text_id, GetCameraID());
+        auto& text = GetGUI().AddElement<gui::Text>(GetTextElementID(), GetCameraID());
         text.GetEntity().SetParent(GetEntity());
+        text.SetLocalLayer(1);
+        text.SetCursorDetectable(false);
         text.SetString(U"Button");
         text.SetAlign(doge::Text::Align::Center);
         text.SetVerticalAlign(Text::VerticalAlign::Center);
@@ -95,103 +99,61 @@ namespace doge::gui
         SetSize(DefaultSize);
     }
 
-    void Button::SetTextureID(const std::string& texture_id)
+    void Button::Set9Slice(bool is_9_slice)
     {
-        this->texture_id = texture_id;
+        bool changed = this->is_9_slice != is_9_slice;
 
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteTextureID(GetEntity().GetComponent<CompoundSprite>(), GetTextureID());
-        else
-            GetEntity().GetComponent<Sprite>().texture_id = GetTextureID();
-    }
-
-    const std::string& Button::GetTextureID() const
-    {
-        return texture_id;
-    }
-
-    void Button::SetIs9Slice(bool is_9_slice)
-    {
         this->is_9_slice = is_9_slice;
 
-        UpdateSprite();
+        if (!changed)
+            return;
+
+        GetGUI().RemoveElement(GetImageElementID());
+        if (this->is_9_slice)
+            GetGUI().AddElement<NSImage>(GetImageElementID(), GetCameraID());
+        else
+            GetGUI().AddElement<Image>(GetImageElementID(), GetCameraID());
+        
+        auto& image_element = GetImageElement();
+        image_element.SetSize(GetSize());
+        image_element.SetOrigin(GetOrigin());
+        image_element.SetColor(GetColor());
     }
 
     bool Button::Is9Slice() const
     {
         return is_9_slice;
     }
-
-    void Button::SetAtlasRectangleID(const std::string& id)
+    
+    std::string Button::GetImageElementID() const
     {
-        this->atlas_rectangle_id = id;
+        return "doge_gui_button_" + GetID() + "_image";
+    }
+    
+    Element& Button::GetImageElement() const
+    {
+        return GetGUI().GetElement(GetImageElementID());
+    }
 
+    Image& Button::GetImage() const
+    {
+        if (Is9Slice())
+            throw std::invalid_argument("Button is 9 slice, call GetNSImage() instead");
+
+        return static_cast<Image&>(GetImageElement());
+    }
+
+    NSImage& Button::GetNSImage() const
+    {
         if (!Is9Slice())
-            GetEntity().GetComponent<Sprite>().atlas_rectangle_id = GetAtlasRectangleID();
+            throw std::invalid_argument("Button is not 9 slice, call GetImage() instead");
+
+        return static_cast<NSImage&>(GetImageElement());
     }
 
-    const std::string& Button::GetAtlasRectangleID() const
+    std::string Button::GetTextElementID() const
     {
-        return atlas_rectangle_id;
-    }
-
-    void Button::SetTextureRectangle(const Recti& texture_rectangle)
-    {
-        this->texture_rectangle = texture_rectangle;
-
-        if (!Is9Slice())
-            GetEntity().GetComponent<Sprite>().texture_rectangle = GetTextureRectangle();
-    }
-
-    const Recti& Button::GetTextureRectangle() const
-    {
-        return texture_rectangle;
-    }
-
-    void Button::SetCenterTextureSize(const Vec2i& center_texture_size)
-    {
-        this->center_texture_size = center_texture_size;
-
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteCenterTextureSize(GetEntity().GetComponent<CompoundSprite>(), GetCenterTextureSize());
-    }
-
-    const Vec2i& Button::GetCenterTextureSize() const
-    {
-        return center_texture_size;
-    }
-
-    void Button::SetBorderThickness(const Rectf& border_thickness)
-    {
-        this->border_thickness = border_thickness;
-
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
-    }
-
-    const Rectf& Button::GetBorderThickness() const
-    {
-        return border_thickness;
-    }
-
-    void Button::SetColor(const Color& color)
-    {
-        this->color = color;
-
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteColor(GetEntity().GetComponent<CompoundSprite>(), GetColor());
-        else
-            GetEntity().GetComponent<Sprite>().color = GetColor();
-    }
-
-    const Color& Button::GetColor() const
-    {
-        return color;
-    }
-
-    const std::string& Button::GetTextElementID() const
-    {
-        return text_id;
+        return "doge_gui_button_" + GetID() + "_text";
     }
 
     Text& Button::GetText() const
@@ -227,12 +189,7 @@ namespace doge::gui
 
     void Button::OnSizeUpdated()
     {
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
-        else
-            GetEntity().GetComponent<Sprite>().size = GetSize();
-        
-        SetOrigin(GetOrigin());
+        GetImageElement().SetSize(GetSize());
     }
 
     void Button::OnPositionUpdated()
@@ -242,37 +199,12 @@ namespace doge::gui
 
     void Button::OnOriginUpdated()
     {
-        if (Is9Slice())
-            GetGUI().GetNineSlice().SetSpriteOrigin(GetEntity().GetComponent<CompoundSprite>(), GetOrigin() + GetSize() / 2.f);
-        else
-            GetEntity().GetComponent<Sprite>().origin = GetOrigin() + GetSize() / 2.f;
+        GetImageElement().SetOrigin(GetOrigin());
+        GetText().SetOrigin(GetOrigin());
     }
 
-    void Button::UpdateSprite()
+    void Button::OnColorUpdated()
     {
-        if (Is9Slice())
-        {
-            GetGUI().GetNineSlice().Add9SliceSpriteBySize(
-                GetEntity(),
-                GetTextureID(),
-                GetSize(),
-                GetCenterTextureSize(),
-                GetBorderThickness(),
-                GetOrigin() + GetSize() / 2.f,
-                GetColor()
-            );
-        }
-        else
-        {
-            GetEntity().AddComponent(Sprite
-            {
-                .texture_id = GetTextureID(),
-                .atlas_rectangle_id = GetAtlasRectangleID(),
-                .texture_rectangle = GetTextureRectangle(),
-                .size = GetSize(),
-                .origin = GetOrigin() + GetSize() / 2.f,
-                .color = GetColor()
-            });
-        }
+        GetImageElement().SetColor(GetColor());
     }
 }

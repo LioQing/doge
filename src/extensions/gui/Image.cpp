@@ -11,11 +11,9 @@ namespace doge::gui
 
     void Image::Initialize()
     {
-        GetEntity().AddComponent(Layer::Create(GetLayer()));
-        GetEntity().AddComponent<Position>(0, 0);
         GetEntity().AddComponent<Sprite>();
 
-        SetTextureID("missing_texture");
+        OnOriginUpdated();
     }
 
     void Image::SetTextureID(const std::string& id)
@@ -49,29 +47,19 @@ namespace doge::gui
         return GetEntity().GetComponent<Sprite>().texture_rectangle;
     }
 
-    void Image::SetColor(const Color& color)
-    {
-        GetEntity().GetComponent<Sprite>().color = color;
-    }
-
-    const Color& Image::GetColor() const
-    {
-        return GetEntity().GetComponent<Sprite>().color;
-    }
-
     void Image::OnSizeUpdated()
     {
         GetEntity().GetComponent<Sprite>().size = GetSize();
         OnOriginUpdated();
     }
 
-    void Image::OnPositionUpdated()
-    {
-        GetEntity().GetComponent<Position>().position = GetPosition();
-    }
-
     void Image::OnOriginUpdated()
     {
         GetEntity().GetComponent<Sprite>().origin = GetOrigin() + GetEntity().GetComponent<Sprite>().GetActualSize(GetGUI().GetEngine().assets) / 2.f;
+    }
+
+    void Image::OnColorUpdated()
+    {
+        GetEntity().GetComponent<Sprite>().color = GetColor();
     }
 }

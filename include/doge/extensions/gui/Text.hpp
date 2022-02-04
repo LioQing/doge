@@ -12,9 +12,9 @@ namespace doge::gui
             Top, Center, Bottom,
         };
 
-        virtual void Initialize() override;
+        virtual ~Text();
 
-        virtual std::int32_t GetLayer() const override;
+        virtual void Initialize() override;
 
         void SetString(const std::u32string& str);
         const std::u32string& GetString() const;
@@ -39,8 +39,8 @@ namespace doge::gui
 
     protected:
 
-        virtual void OnPositionUpdated() override;
         virtual void OnOriginUpdated() override;
+        virtual void OnColorUpdated() override;
 
     private:
 

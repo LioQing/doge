@@ -130,7 +130,7 @@ namespace main3
 
         void AddWindow(const doge::Vec2f& position)
         {
-            auto& window = gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
+            auto& window = gui.AddElement<doge::gui::Window>("my_window" + std::to_string(window_count), "my_cam");
             window.SetSize(doge::Vec2f(400, 200));
             window.SetPosition(doge::Vec2f(0, 0));
 
@@ -192,7 +192,7 @@ namespace main3
             ns_image.SetTextureID("test2");
             ns_image.SetSize(doge::Vec2f(200, 200));
             ns_image.SetCenterTextureSize(doge::Vec2i(46, 46));
-            ns_image.SetPosition(doge::Vec2f(-300, 0));
+            ns_image.SetPosition(doge::Vec2f(-150, 0));
 
             // circle in gui
             doge::Entity circle_entity = engine.AddEntity();
@@ -221,7 +221,8 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-
+            if (gui.GetElementBelowCursor())
+                std::cout << gui.GetElementBelowCursor()->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

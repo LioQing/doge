@@ -21,13 +21,10 @@ namespace doge::gui
         void SetTextureRectangle(const Recti& rectangle);
         const Recti& GetTextureRectangle() const;
 
-        void SetColor(const Color& color);
-        const Color& GetColor() const;
-
     protected:
 
         virtual void OnSizeUpdated() override;
-        virtual void OnPositionUpdated() override;
         virtual void OnOriginUpdated() override;
+        virtual void OnColorUpdated() override;
     };
 }

@@ -16,6 +16,9 @@ namespace doge
 
     namespace gui
     {
+        struct Text;
+        struct Window;
+
         struct GUI
         {
             GUI(Engine& engine);
@@ -44,7 +47,7 @@ namespace doge
             doge::Component<Camera>& GetCameraComponent(const std::string& id) const;
             Entity GetCameraEntity(const std::string& id) const;
             std::int32_t GetCameraLayer(const std::string& id) const;
-            const std::set<std::int32_t>& GetCameraLayers(const std::string& id) const;
+            std::int32_t GetCameraLayerWidth(const std::string& id) const;
             std::int32_t GetCameraRenderOrder(const std::string& id) const;
 
             bool HasCamera(const std::string& id) const;
@@ -70,9 +73,7 @@ namespace doge
                 });
 
                 elements.emplace(comp.element->GetID(), entity);
-                
-                entity.AddComponent(Layer::Create(comp.element->GetLayer()));
-                comp.element->Initialize();
+                comp.element->ElementInitialize();
 
                 return static_cast<E&>(*comp.element);
             }

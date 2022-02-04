@@ -4,18 +4,16 @@
 
 namespace doge::gui
 {
-    void Text::Initialize()
+    Text::~Text()
     {
-        GetEntity().AddComponent(Layer::Create(GetLayer()));
-        GetEntity().AddComponent<Position>(0, 0);
-        GetEntity().AddComponent<doge::Text>();
-
-        SetString(U"Text");
     }
 
-    std::int32_t Text::GetLayer() const
+    void Text::Initialize()
     {
-        return Element::GetLayer() + 1;
+        GetEntity().AddComponent<doge::Text>();
+
+        SetLocalLayer(1);
+        SetString(U"Text");
     }
 
     void Text::SetString(const std::u32string& str)
@@ -98,11 +96,6 @@ namespace doge::gui
         return std::prev(GetEntity().GetComponent<doge::Text>().character_appearances.lower_bound(pos))->second;
     }
 
-    void Text::OnPositionUpdated()
-    {
-        GetEntity().GetComponent<Position>().position = GetPosition();
-    }
-
     void Text::OnOriginUpdated()
     {
         if (vertical_align == VerticalAlign::Top)
@@ -125,5 +118,13 @@ namespace doge::gui
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height / 2.f * doge::Vec2f::j;
         else
             GetEntity().GetComponent<doge::Text>().origin = GetOrigin() + line * height * doge::Vec2f::j;
+    }
+
+    void Text::OnColorUpdated()
+    {
+        for (auto& [pos, appear] : GetEntity().GetComponent<doge::Text>().character_appearances)
+        {
+            appear.fill_color = GetColor();
+        }
     }
 }
