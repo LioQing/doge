@@ -79,6 +79,7 @@ namespace doge::gui
     {
         this->size = size;
         OnSizeUpdated();
+        OnOriginUpdated();
     }
 
     const Vec2f& Element::GetSize() const
@@ -119,16 +120,18 @@ namespace doge::gui
         return color;
     }
 
-    void Element::SetAlign(Align align)
+    void Element::SetAlign(std::uint8_t align)
     {
-        if (align % Align::Base == Align::Left)
-            this->align.x = -1.f;
-        else if (align % Align::Base == Align::Right)
+        this->align = Vec2f(.5f, .5f);
+
+        if ((align & Align::Left) == Align::Left)
+            this->align.x = 0.f;
+        else if ((align & Align::Right) == Align::Right)
             this->align.x = 1.f;
         
-        if (align / Align::Base * Align::Base == Align::Top)
-            this->align.y = -1.f;
-        else if (align / Align::Base * Align::Base == Align::Bottom)
+        if ((align & Align::Top) == Align::Top)
+            this->align.y = 0.f;
+        else if ((align & Align::Bottom) == Align::Bottom)
             this->align.y = 1.f;
         
         OnOriginUpdated();
@@ -147,7 +150,7 @@ namespace doge::gui
 
     Rectf Element::GetRectangle() const
     {
-        return Rectf(GetPosition() - GetOrigin() - GetSize() / 2.f, GetSize());
+        return Rectf(GetPosition() - GetActualOrigin(), GetSize());
     }
 
     Vec2f Element::GetActualOrigin() const

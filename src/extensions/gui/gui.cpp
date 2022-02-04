@@ -127,7 +127,7 @@ namespace doge::gui
     {
         auto& layers = GetCameraEntity(id).GetComponent<Layer>().layers;
         auto [min, max] = std::minmax_element(layers.begin(), layers.end());
-        return *max - *min;
+        return *max - *min + 1;
     }
 
     std::int32_t GUI::GetCameraRenderOrder(const std::string& id) const

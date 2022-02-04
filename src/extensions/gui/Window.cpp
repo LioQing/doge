@@ -45,6 +45,7 @@ namespace doge::gui
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
         image.SetLocalLayer(2);
+        image.SetAlign(Align::Top | Align::Left);
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_window");
 
@@ -100,7 +101,7 @@ namespace doge::gui
     {
         auto& cam_comp = GetGUI().GetCameraComponent(GetWindowCameraID());
         cam_comp.size = GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize();
-        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetSize() / 2.f - GetBorderThickness().GetPosition() - GetPosition()) / GetCameraComponent().size);
+        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetActualOrigin() - GetBorderThickness().GetPosition() - GetPosition()) / GetCameraComponent().size);
         cam_comp.port.SetSize(cam_comp.size / GetCameraComponent().size);
     }
 }

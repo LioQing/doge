@@ -5,6 +5,8 @@
 
 namespace doge::gui
 {
+    struct Text;
+
     struct WindowEx : Window
     {
         enum Trait
@@ -32,6 +34,15 @@ namespace doge::gui
 
         void SetScrollable(bool enabled);
         bool IsScrollable() const;
+
+        std::string GetTitleBarElementID() const;
+        Text& GetTitleBar() const;
+
+    protected:
+
+        virtual void OnSizeUpdated() override;
+        virtual void OnPositionUpdated() override;
+        virtual void OnOriginUpdated() override;
 
     private:
 

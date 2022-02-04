@@ -130,12 +130,15 @@ namespace main3
 
         void AddWindow(const doge::Vec2f& position)
         {
-            auto& window = gui.AddElement<doge::gui::Window>("my_window" + std::to_string(window_count), "my_cam");
+            auto& window = gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
+            window.SetAlign(doge::Vec2f(0.5, 0.5));
             window.SetSize(doge::Vec2f(400, 200));
-            window.SetPosition(doge::Vec2f(0, 0));
+            window.SetPosition(doge::Vec2f(-100, -100));
 
             auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
-            button.SetPosition(doge::Vec2f(0, 0));
+            button.SetPosition(-window.GetSize() / 2.f);
+            button.SetAlign(doge::Vec2f::Zero);
+            button.SetOrigin(-doge::Vec2f(16, 16));
 
             auto& text = button.GetText();
             text.SetFont("arial");
@@ -172,6 +175,10 @@ namespace main3
             // gui cam
             gui.AddCamera("my_cam");
             AddWindow(doge::Vec2f::Zero);
+
+            // button
+            // auto& button = gui.AddElement<doge::gui::Button>("my_button", "my_cam");
+            // button.SetPosition(doge::Vec2f(0, 300));
 
             // text
             text = &gui.AddElement<doge::gui::Text>("my_text", "my_cam");
@@ -220,7 +227,8 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            std::cout << this->text->GetAlign() << std::endl;
+            // if (gui.GetElementBelowCursor())
+            //     std::cout << gui.GetElementBelowCursor()->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

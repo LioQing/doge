@@ -51,7 +51,6 @@ namespace doge::gui
     void NSImage::OnSizeUpdated()
     {
         GetGUI().GetNineSlice().SetSpriteSizeAndBorder(GetEntity().GetComponent<CompoundSprite>(), GetSize(), GetBorderThickness());
-        OnOriginUpdated();
     }
 
     void NSImage::OnOriginUpdated()

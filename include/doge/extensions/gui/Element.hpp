@@ -61,7 +61,7 @@ namespace doge
             void SetColor(const Color& color);
             const Color& GetColor() const;
 
-            void SetAlign(Align align);
+            void SetAlign(std::uint8_t align);
             void SetAlign(const Vec2f& align);
             const Vec2f& GetAlign() const;
 

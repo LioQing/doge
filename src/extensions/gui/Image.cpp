@@ -50,7 +50,6 @@ namespace doge::gui
     void Image::OnSizeUpdated()
     {
         GetEntity().GetComponent<Sprite>().size = GetSize();
-        OnOriginUpdated();
     }
 
     void Image::OnOriginUpdated()

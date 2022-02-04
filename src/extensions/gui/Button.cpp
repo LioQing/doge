@@ -82,6 +82,7 @@ namespace doge::gui
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
         image.SetLocalLayer(0);
+        image.SetAlign(Align::Top | Align::Left);
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_button");
         
@@ -90,8 +91,7 @@ namespace doge::gui
         text.SetLocalLayer(1);
         text.SetCursorDetectable(false);
         text.SetString(U"Button");
-        text.SetTextAlign(doge::Text::Align::Center);
-        text.SetAlign(Align::Center);
+        text.SetTextAlign(doge::Text::Center);
         text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
 
         on_state_transition(*this);
@@ -118,6 +118,9 @@ namespace doge::gui
         image_element.SetSize(GetSize());
         image_element.SetOrigin(GetActualOrigin());
         image_element.SetColor(GetColor());
+        image_element.SetLocalLayer(0);
+        image_element.SetAlign(Align::Top | Align::Left);
+        image_element.SetCursorDetectable(false);
     }
 
     bool Button::Is9Slice() const
@@ -200,7 +203,7 @@ namespace doge::gui
     void Button::OnOriginUpdated()
     {
         GetImageElement().SetOrigin(GetActualOrigin());
-        GetText().SetOrigin(GetActualOrigin());
+        GetText().SetOrigin(GetActualOrigin() - GetSize() / 2.f);
     }
 
     void Button::OnColorUpdated()
