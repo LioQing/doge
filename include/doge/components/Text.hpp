@@ -34,7 +34,7 @@ namespace doge
             float letter_spacing_factor = 1.f;
         };
 
-        std::string font_id = "";
+        std::string font_id = "open_sans";
         std::u32string string = U"";
         std::uint32_t font_size = 18;
         float line_spacing_factor = 1.f;

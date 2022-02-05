@@ -3,9 +3,13 @@
 #include <doge/extensions/gui/GUI.hpp>
 #include <doge/extensions/gui/Text.hpp>
 #include <doge/extensions/gui/Draggable.hpp>
+#include <doge/extensions/gui/NSImage.hpp>
 
 namespace doge::gui
 {
+    const std::int32_t WindowEx::DefaultResizeThickness = 2;
+    const Rectf WindowEx::DefaultBorderThickness = Rectf(16, 32, 16, 16);
+
     WindowEx::~WindowEx()
     {
     }
@@ -14,30 +18,33 @@ namespace doge::gui
     {
         Window::Initialize();
 
-        SetBorderThickness(Rectf(16, 16, 16, 16));
+        SetBorderThickness(DefaultBorderThickness);
+        GetImage().SetTextureID("doge_gui_windowex");
+        GetImage().SetBorderThickness(Rectf());
     }
 
     void WindowEx::SetTitleBar(bool enabled)
     {
-        if (HasTitleBar() && !enabled)
+        auto prev_enabled = trait_enabled.test(Trait::TitleBar);
+        trait_enabled.set(Trait::TitleBar, enabled);
+
+        if (prev_enabled && !enabled)
         {
             GetGUI().RemoveElement(GetTitleBarElementID());
         }
-        else if (!HasTitleBar() && enabled)
+        else if (!prev_enabled && enabled)
         {
             auto& title_bar = GetGUI().AddElement<Text>(GetTitleBarElementID(), GetCameraID());
             title_bar.GetEntity().SetParent(GetEntity());
             title_bar.SetLocalLayer(3);
             title_bar.SetCursorDetectable(false);
-            title_bar.SetAlign(Align::Top | Align::Left);
-            title_bar.SetFont("arial");
-            title_bar.SetFontSize(12);
+            title_bar.SetAlign(Align::Center | Align::Left);
+            title_bar.SetFontSize(14);
             title_bar.SetString(U"WindowEx Title");
             title_bar.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
-            title_bar.SetOrigin(GetActualOrigin() - GetBorderThickness().left * Vec2f::i);
-        }
 
-        trait_enabled.set(Trait::TitleBar, enabled);
+            UpdateTitleBarOrigin();
+        }
     }
 
     bool WindowEx::HasTitleBar() const
@@ -47,23 +54,26 @@ namespace doge::gui
 
     void WindowEx::SetDraggable(bool enabled)
     {
-        if (IsDraggable() && !enabled)
+        auto prev_enabled = trait_enabled.test(Trait::Draggable);
+        trait_enabled.set(Trait::Draggable, enabled);
+
+        if (prev_enabled && !enabled)
         {
             GetGUI().RemoveElement(GetDraggableElementID());
         }
-        else if (!IsDraggable() && enabled)
+        else if (!prev_enabled && enabled)
         {
             auto& draggable = GetGUI().AddElement<gui::Draggable>(GetDraggableElementID(), GetCameraID());
             draggable.GetEntity().SetParent(GetEntity());
             draggable.SetLocalLayer(3);
-            draggable.SetSize(Vec2f(GetSize().x, GetBorderThickness().top - resize_thickness));
+            draggable.SetSize(Vec2f(GetSize().x, GetBorderThickness().top - DefaultResizeThickness));
             draggable.SetAlign(Align::Top | Align::Left);
-            draggable.SetOrigin(GetActualOrigin() - resize_thickness * Vec2f::j);
+
             draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_event = pos; drag_start_pos = GetPosition(); };
             draggable.on_dragged += [&](const Vec2f& pos){ SetPosition(drag_start_pos + pos - drag_start_event); };
-        }
 
-        trait_enabled.set(Trait::Draggable, enabled);
+            UpdateDraggableOrigin();
+        }
     }
 
     bool WindowEx::IsDraggable() const
@@ -123,7 +133,7 @@ namespace doge::gui
 
         if (IsDraggable())
         {
-            GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - resize_thickness));
+            UpdateDraggableSize();
         }
     }
 
@@ -133,13 +143,13 @@ namespace doge::gui
 
         if (HasTitleBar())
         {
-            GetTitleBar().SetOrigin(GetActualOrigin() - GetBorderThickness().left * Vec2f::i);
+            UpdateTitleBarOrigin();
         }
         
         if (IsDraggable())
         {
-            GetDraggable().SetOrigin(GetActualOrigin() - resize_thickness * Vec2f::j);
-            GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - resize_thickness));
+            UpdateDraggableOrigin();
+            UpdateDraggableSize();
         }
     }
     
@@ -154,12 +164,27 @@ namespace doge::gui
 
         if (HasTitleBar())
         {
-            GetTitleBar().SetOrigin(GetActualOrigin() - GetBorderThickness().left * Vec2f::i);
+            UpdateTitleBarOrigin();
         }
         
         if (IsDraggable())
         {
-            GetDraggable().SetOrigin(GetActualOrigin() - resize_thickness * Vec2f::j);
+            UpdateDraggableOrigin();
         }
+    }
+
+    void WindowEx::UpdateTitleBarOrigin()
+    {
+        GetTitleBar().SetOrigin(GetActualOrigin() - Vec2f(GetBorderThickness().left, GetBorderThickness().top / 2.f));
+    }
+
+    void WindowEx::UpdateDraggableOrigin()
+    {
+        GetDraggable().SetOrigin(GetActualOrigin() - DefaultResizeThickness * Vec2f::j);
+    }
+
+    void WindowEx::UpdateDraggableSize()
+    {
+        GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - DefaultResizeThickness));
     }
 }

@@ -20,7 +20,8 @@ namespace doge::gui
             Count
         };
 
-        static const std::int32_t resize_thickness = 2;
+        static const std::int32_t DefaultResizeThickness;
+        static const Rectf DefaultBorderThickness;
 
         virtual ~WindowEx();
 
@@ -51,6 +52,11 @@ namespace doge::gui
         virtual void OnSizeUpdated() override;
         virtual void OnPositionUpdated() override;
         virtual void OnOriginUpdated() override;
+        
+        virtual void UpdateTitleBarOrigin();
+
+        virtual void UpdateDraggableOrigin();
+        virtual void UpdateDraggableSize();
 
     private:
 

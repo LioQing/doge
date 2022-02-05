@@ -21,14 +21,14 @@ namespace doge
         else
             std::cerr << "Failed to load defaut texture missing_texture.png" << std::endl;
 
-        if (!assets.LoadFont("arial", "arial.ttf").second)
-            std::cerr << "Failed to load default font arial.ttf" << std::endl;
+        if (!assets.LoadFont("open_sans", "OpenSans.ttf").second)
+            std::cerr << "Failed to load default font OpenSans.ttf" << std::endl;
     }
 
     void Engine::CloseWindow()
     {
         assets.EraseTexture("missing_texture");
-        assets.EraseFont("arial");
+        assets.EraseFont("open_sans");
         window.CloseWindow();
     }
 

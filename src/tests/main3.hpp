@@ -143,7 +143,6 @@ namespace main3
             button.SetOrigin(-window->GetBorderThickness().GetPosition());
 
             auto& text = button.GetText();
-            text.SetFont("arial");
             text.SetString(U"Cancel");
 
             button.on_clicked +=
@@ -186,7 +185,6 @@ namespace main3
 
             // text
             text = &gui.AddElement<doge::gui::Text>("my_text", "my_cam");
-            text->SetFont("arial");
             text->SetPosition(doge::Vec2f(0, -150));
             text->SetTextAlign(doge::Text::Align::Center);
             text->SetAlign(doge::gui::Align::Bottom);

@@ -12,11 +12,7 @@ namespace doge::gui
 
         if (engine.scenes.is_running)
         {
-            engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
-            nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
-
-            engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
-            nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
+            Start(engine);
         }
     }
 
@@ -226,6 +222,9 @@ namespace doge::gui
 
         engine.assets.LoadTexture("doge_gui_window", "gui/window.png");
         nine_slice.LoadTexture("doge_gui_window", "gui/window.png", Recti(12, 12, 12, 12));
+
+        engine.assets.LoadTexture("doge_gui_windowex", "gui/windowex.png");
+        nine_slice.LoadTexture("doge_gui_windowex", "gui/windowex.png", Recti(12, 32, 12, 12));
     }
 
     void GUI::Update(Engine& engine, DeltaTime dt)
