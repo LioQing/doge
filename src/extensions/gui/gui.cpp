@@ -208,7 +208,7 @@ namespace doge::gui
 
             if (
                 math::TestPoint(GetEngine().window.window_io.GetMousePosition(), cam_rect) &&
-                math::TestPoint(cursor_pos, ptr->GetRectangle()) &&
+                math::TestPoint(cursor_pos, ptr->GetGlobalRectangle()) &&
                 (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer())
             )
             {

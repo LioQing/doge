@@ -18,7 +18,7 @@ namespace doge::gui
 
     void Button::Initialize()
     {
-        GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener(std::string("doge_gui_button_" + GetID()),
+        GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener("doge_gui_button_" + GetID(),
         [&](const event::MouseButton& event)
         {
             if (
@@ -32,7 +32,7 @@ namespace doge::gui
             }
         });
 
-        GetGUI().GetEngine().events.on_mouse_button_released.AddListener(std::string("doge_gui_button_" + GetID()),
+        GetGUI().GetEngine().events.on_mouse_button_released.AddListener("doge_gui_button_" + GetID(),
         [&](const event::MouseButton& event)
         {
             if (event.button == event::MouseButton::Button::Left)
@@ -49,7 +49,7 @@ namespace doge::gui
             }
         });
 
-        GetGUI().GetEngine().events.on_mouse_moved.AddListener(std::string("doge_gui_button_" + GetID()),
+        GetGUI().GetEngine().events.on_mouse_moved.AddListener("doge_gui_button_" + GetID(),
         [&](const event::MouseMove& event)
         {
             if (
@@ -74,9 +74,9 @@ namespace doge::gui
 
         GetEntity().GetComponent<doge::gui::Component>().OnRemoval([&]
         {
-            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener(std::string("doge_gui_button_" + GetID()));
-            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener(std::string("doge_gui_button_" + GetID()));
-            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener(std::string("doge_gui_button_" + GetID()));
+            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener("doge_gui_button_" + GetID());
+            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener("doge_gui_button_" + GetID());
+            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener("doge_gui_button_" + GetID());
         });
 
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());

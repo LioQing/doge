@@ -65,7 +65,8 @@ namespace doge
             void SetAlign(const Vec2f& align);
             const Vec2f& GetAlign() const;
 
-            Rectf GetRectangle() const;
+            Rectf GetLocalRectangle() const;
+            Rectf GetGlobalRectangle() const;
             Vec2f GetActualOrigin() const;
 
         protected:

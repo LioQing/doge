@@ -148,9 +148,14 @@ namespace doge::gui
         return align;
     }
 
-    Rectf Element::GetRectangle() const
+    Rectf Element::GetLocalRectangle() const
     {
         return Rectf(GetPosition() - GetActualOrigin(), GetSize());
+    }
+
+    Rectf Element::GetGlobalRectangle() const
+    {
+        return Rectf(global::GetPosition(GetEntity()) - GetActualOrigin(), GetSize());
     }
 
     Vec2f Element::GetActualOrigin() const

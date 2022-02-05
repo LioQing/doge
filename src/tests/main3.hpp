@@ -121,6 +121,7 @@ namespace main3
         doge::Component<doge::CircleShape>* circle_comp;
         doge::gui::Text* text;
         doge::gui::Image* image;
+        doge::gui::WindowEx* window;
 
         std::size_t window_count;
 
@@ -130,15 +131,16 @@ namespace main3
 
         void AddWindow(const doge::Vec2f& position)
         {
-            auto& window = gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
-            window.SetAlign(doge::Vec2f(0.5, 0.5));
-            window.SetSize(doge::Vec2f(400, 200));
-            window.SetPosition(doge::Vec2f(-100, -100));
+            window = &gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
+            window->SetAlign(doge::Vec2f(0.5, 0.5));
+            window->SetSize(doge::Vec2f(400, 200));
+            window->SetPosition(doge::Vec2f(-100, -100));
+            window->SetTitleBar(true);
 
-            auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
-            button.SetPosition(-window.GetSize() / 2.f);
+            auto& button = window->AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
+            button.SetPosition(-window->GetSize() / 2.f);
             button.SetAlign(doge::Vec2f::Zero);
-            button.SetOrigin(-doge::Vec2f(16, 16));
+            button.SetOrigin(-window->GetBorderThickness().GetPosition());
 
             auto& text = button.GetText();
             text.SetFont("arial");
@@ -152,12 +154,14 @@ namespace main3
                     this->circle_comp->color = doge::Color::Green;
                     this->text->SetAlign(doge::gui::Align::Top);
                     this->image->SetTextureRectangle(doge::Recti(32, 0, 32, 32));
+                    this->window->SetDraggable(true);
                 }
                 else
                 {
                     this->circle_comp->color = doge::Color::Red;
                     this->text->SetAlign(doge::gui::Align::Bottom);
                     this->image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
+                    this->window->SetDraggable(false);
                 }
             };
 

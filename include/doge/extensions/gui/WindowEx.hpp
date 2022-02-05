@@ -6,6 +6,7 @@
 namespace doge::gui
 {
     struct Text;
+    struct Draggable;
 
     struct WindowEx : Window
     {
@@ -18,6 +19,8 @@ namespace doge::gui
 
             Count
         };
+
+        static const std::int32_t resize_thickness = 2;
 
         virtual ~WindowEx();
 
@@ -38,6 +41,11 @@ namespace doge::gui
         std::string GetTitleBarElementID() const;
         Text& GetTitleBar() const;
 
+        std::string GetDraggableElementID() const;
+        gui::Draggable& GetDraggable() const;
+
+        void SetBorderThickness(const Rectf& border_thickness);
+
     protected:
 
         virtual void OnSizeUpdated() override;
@@ -47,5 +55,8 @@ namespace doge::gui
     private:
 
         std::bitset<Trait::Count> trait_enabled;
+
+        Vec2f drag_start_pos = Vec2f::Zero;
+        Vec2f drag_start_event = Vec2f::Zero;
     };
 }
