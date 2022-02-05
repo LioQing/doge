@@ -7,33 +7,31 @@
 
 namespace main1
 {
-    using namespace doge;
-
-    std::unique_ptr<gui::GUI> gui = nullptr;
-    std::unique_ptr<physics::Physics> phy = nullptr;
+    std::unique_ptr<doge::gui::GUI> gui = nullptr;
+    std::unique_ptr<doge::physics::Physics> phy = nullptr;
 
     int shoot_particle = -1;
-    Vec2f shoot_particle_position;
-    Vec2f shoot_mouse_position;
-    Entity shoot_line;
-    Component<Camera>* cam_comp;
+    doge::Vec2f shoot_particle_position;
+    doge::Vec2f shoot_mouse_position;
+    doge::Entity shoot_line;
+    doge::Component<doge::Camera>* cam_comp;
 
-    Entity AddParticle(Engine& engine, const Vec2f& position)
+    doge::Entity AddParticle(doge::Engine& engine, const doge::Vec2f& position)
     {
-        Entity particle = engine.AddEntity();
+        doge::Entity particle = engine.AddEntity();
 
-        particle.AddComponent(Tag::Create("particle"));
+        particle.AddComponent(doge::Tag::Create("particle"));
 
-        particle.AddComponent(CircleShape
+        particle.AddComponent(doge::CircleShape
         {
             .radius = .2f,
             .origin = { .2f, .2f },
             //.texture_id = "icons",
-            .texture_rectangle = Recti(0, 0, 32, 32),
+            .texture_rectangle = doge::Recti(0, 0, 32, 32),
         });
 
-        particle.AddComponent<physics::RigidBody>(physics::RigidBody::Type::Dynamic, true);
-        particle.AddComponent(physics::CircleCollider
+        particle.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Type::Dynamic, true);
+        particle.AddComponent(doge::physics::CircleCollider
         {
             .rigid_body_entity = particle,
             .radius = .2f,
@@ -41,99 +39,99 @@ namespace main1
             .restitution = 0.8f,
         });
 
-        particle.AddComponent<Position>(position);
-        particle.AddComponent<Rotation>();
+        particle.AddComponent<doge::Position>(position);
+        particle.AddComponent<doge::Rotation>();
 
         return particle;
     }
 
-    void Start(Engine& engine)
+    void Start(doge::Engine& engine)
     {
-        gui = std::make_unique<gui::GUI>(engine);
-        phy = std::make_unique<physics::Physics>(engine);
+        gui = std::make_unique<doge::gui::GUI>(engine);
+        phy = std::make_unique<doge::physics::Physics>(engine);
 
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
             if (success)
             {
-                itr->second.atlas_rectangles = std::unordered_map<std::string, Recti>{{ "base", Recti(0, 0, 32, 32) }};
+                itr->second.atlas_rectangles = std::unordered_map<std::string, doge::Recti>{{ "base", doge::Recti(0, 0, 32, 32) }};
             }
         }
 
         engine.assets.LoadTexture("crate", "test2.png");
-        engine.assets.LoadTexture("crate_center", "test2.png", Recti(4, 5, 23, 23));
+        engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23));
 
         // cam
-        Entity cam = engine.AddCamera(Camera{ .size = Vec2f(12.8, 7.2), .render_order = 1 });
-        cam_comp = &cam.GetComponent<Camera>();
-        engine.events.on_window_resized += [&](const event::Size& event){ cam_comp->size = event.size.Cast<float>() / 100.f; };
-        cam.AddComponent(Layer::Create(1, 0, -1));
+        doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .render_order = 1 });
+        cam_comp = &cam.GetComponent<doge::Camera>();
+        engine.events.on_window_resized += [&](const doge::event::Size& event){ cam_comp->size = event.size.Cast<float>() / 100.f; };
+        cam.AddComponent(doge::Layer::Create(1, 0, -1));
 
         // smaller cam
-        Entity subcam = engine.AddCamera(Camera{ .size = Vec2f(12.8, 7.2), .port = Rectf(0, 0, 0.25, 0.25), .render_order = 0 });
-        subcam.AddComponent(Layer::Create(0, -1));
+        doge::Entity subcam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .port = doge::Rectf(0, 0, 0.25, 0.25), .render_order = 0 });
+        subcam.AddComponent(doge::Layer::Create(0, -1));
         
         // square for testing layer rendering
-        Entity foreground = engine.AddEntity();
-        foreground.AddComponent(Layer::Create(1));
-        foreground.AddComponent(Position(-0.5, 0));
-        foreground.AddComponent(RectangleShape
+        doge::Entity foreground = engine.AddEntity();
+        foreground.AddComponent(doge::Layer::Create(1));
+        foreground.AddComponent(doge::Position(-0.5, 0));
+        foreground.AddComponent(doge::RectangleShape
         {
-            .size = Vec2f(0.7, 0.7),
-            .origin = Vec2f(0.35, 0.35),
-            .color = Color::Yellow,
+            .size = doge::Vec2f(0.7, 0.7),
+            .origin = doge::Vec2f(0.35, 0.35),
+            .color = doge::Color::Yellow,
         });
 
-        Entity midground = engine.AddEntity();
-        midground.AddComponent(Position(0, 0));
-        midground.AddComponent(RectangleShape
+        doge::Entity midground = engine.AddEntity();
+        midground.AddComponent(doge::Position(0, 0));
+        midground.AddComponent(doge::RectangleShape
         {
-            .size = Vec2f(0.5, 0.5),
-            .origin = Vec2f(0.25, 0.25),
-            .color = Color::Cyan,
+            .size = doge::Vec2f(0.5, 0.5),
+            .origin = doge::Vec2f(0.25, 0.25),
+            .color = doge::Color::Cyan,
         });
 
-        Entity background = engine.AddEntity();
-        background.AddComponent(Layer::Create(-1));
-        background.AddComponent(Position(0.5, 0));
-        background.AddComponent(RectangleShape
+        doge::Entity background = engine.AddEntity();
+        background.AddComponent(doge::Layer::Create(-1));
+        background.AddComponent(doge::Position(0.5, 0));
+        background.AddComponent(doge::RectangleShape
         {
-            .size = Vec2f(0.9, 0.9),
-            .origin = Vec2f(0.45, 0.45),
-            .color = Color::Magenta,
+            .size = doge::Vec2f(0.9, 0.9),
+            .origin = doge::Vec2f(0.45, 0.45),
+            .color = doge::Color::Magenta,
         });
 
         // rounded rectangle
-        Entity rr = engine.AddEntity();
-        rr.AddComponent(Position(1, 0));
-        rr.AddComponent(ConvexShape
+        doge::Entity rr = engine.AddEntity();
+        rr.AddComponent(doge::Position(1, 0));
+        rr.AddComponent(doge::ConvexShape
         {
-            .points = math::RoundedRectangle(Vec2f(1, 1), 0.08),
-            .origin = Vec2f(0.5, 0.5),
+            .points = doge::math::RoundedRectangle(doge::Vec2f(1, 1), 0.08),
+            .origin = doge::Vec2f(0.5, 0.5),
         });
-        rr.AddComponent(physics::RigidBody
+        rr.AddComponent(doge::physics::RigidBody
         {
-            .type = physics::RigidBody::Type::Static,
+            .type = doge::physics::RigidBody::Type::Static,
         });
-        rr.AddComponent(physics::RectangleCollider
+        rr.AddComponent(doge::physics::RectangleCollider
         {
             .rigid_body_entity = rr,
-            .size = Vec2f(1, 1),
+            .size = doge::Vec2f(1, 1),
         });
 
         // wall
-        Entity wall = engine.AddEntity();
+        doge::Entity wall = engine.AddEntity();
 
-        wall.AddComponent<physics::RigidBody>(physics::RigidBody::Type::Static);
-        wall.AddComponent(physics::EdgeCollider
+        wall.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Type::Static);
+        wall.AddComponent(doge::physics::EdgeCollider
         {
             .rigid_body_entity = wall,
             .points = 
             {
-                Vec2f(-6.4, -3.6),
-                Vec2f(-6.4, 3.6),
-                Vec2f(6.4, 3.6),
-                Vec2f(6.4, -3.6),
+                doge::Vec2f(-6.4, -3.6),
+                doge::Vec2f(-6.4, 3.6),
+                doge::Vec2f(6.4, 3.6),
+                doge::Vec2f(6.4, -3.6),
             },
             .is_loop = true,
             .friction = 0.1f,
@@ -143,42 +141,42 @@ namespace main1
         // particles
         for (std::size_t i = 1; i <= 20; ++i)
         {
-            AddParticle(engine, engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + Vec2f(i * .5f, .5f));
+            AddParticle(engine, engine.window.MapPixelToCoords({ 0, 0 }, *cam_comp) + doge::Vec2f(i * .5f, .5f));
         }
 
         // shoot actions
         shoot_line = engine.AddEntity();
-        shoot_line.AddComponent(Tag::Create("line"));
-        shoot_line.AddComponent<Position>();
-        shoot_line.AddComponent(PolygonShape
+        shoot_line.AddComponent(doge::Tag::Create("line"));
+        shoot_line.AddComponent<doge::Position>();
+        shoot_line.AddComponent(doge::PolygonShape
         { 
-            .type = PolygonShape::Lines, 
+            .type = doge::PolygonShape::Lines, 
             .vertices = 
             { 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent), 
-                PolygonShape::Vertex(Vec2f(0, 0), Color::Transparent), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
+                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
             } 
         });
 
-        engine.events.on_mouse_button_pressed += [&](const event::MouseButton& event)
+        engine.events.on_mouse_button_pressed += [&](const doge::event::MouseButton& event)
         {
-            if (event.button == event::MouseButton::Button::Left)
+            if (event.button == doge::event::MouseButton::Button::Left)
             {
                 // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = false;
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
-                for (auto entity : engine.Select<Tag>()
-                    .Where([](const Entity& _, const Tag& tag)
+                for (auto entity : engine.Select<doge::Tag>()
+                    .Where([](const doge::Entity& _, const doge::Tag& tag)
                     { return *tag.tags.begin() == "particle"; })
                     .Entities())
                 {
                     if (!phy->GetCollider(entity).TestPoint(shoot_mouse_position))
                         continue;
 
-                    shoot_line.GetComponent<Position>().position = shoot_mouse_position;
-                    for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                        vertex.color = Color::White;
+                    shoot_line.GetComponent<doge::Position>().position = shoot_mouse_position;
+                    for (auto& vertex : shoot_line.GetComponent<doge::PolygonShape>().vertices)
+                        vertex.color = doge::Color::White;
                     
-                    shoot_particle_position = entity.GetIfHasComponentElseDefault<Position>().position;
+                    shoot_particle_position = entity.GetIfHasComponentElseDefault<doge::Position>().position;
                     shoot_particle = entity.id;
 
                     engine.window.window_io.SetMouseCursor(engine.assets.GetCursor("grab"));
@@ -188,11 +186,11 @@ namespace main1
 
                 AddParticle(engine, shoot_mouse_position);
             }
-            else if (event.button == event::MouseButton::Button::Right)
+            else if (event.button == doge::event::MouseButton::Button::Right)
             {
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
-                for (auto entity : engine.Select<Tag>()
-                    .Where([](const Entity& _, const Tag& tag)
+                for (auto entity : engine.Select<doge::Tag>()
+                    .Where([](const doge::Entity& _, const doge::Tag& tag)
                     { return *tag.tags.begin() == "particle"; })
                     .Entities())
                 {
@@ -205,9 +203,9 @@ namespace main1
             }
         };
 
-        engine.events.on_mouse_button_released += [&](const event::MouseButton& event)
+        engine.events.on_mouse_button_released += [&](const doge::event::MouseButton& event)
         {
-            if (event.button == event::MouseButton::Button::Left)
+            if (event.button == doge::event::MouseButton::Button::Left)
             {
                 // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = true;
                 if (shoot_particle == -1) return;
@@ -218,8 +216,8 @@ namespace main1
                 auto impulse = (shoot_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp));
                 phy->GetBody(shoot_particle).ApplyImpulse(impulse, shoot_mouse_position);
 
-                for (auto& vertex : shoot_line.GetComponent<PolygonShape>().vertices)
-                    vertex.color = Color::Transparent;
+                for (auto& vertex : shoot_line.GetComponent<doge::PolygonShape>().vertices)
+                    vertex.color = doge::Color::Transparent;
 
                 // engine.GetEntity(shoot_particle).GetComponent<EntityInfo>().enabled = false;
 
@@ -235,96 +233,96 @@ namespace main1
         // gui elements
         gui->AddCamera("gui_cam");
         
-        gui::Button& button0 = gui->AddElement<gui::Button>("button0", "gui_cam");
-        button0.SetPosition(Vec2f(-300, 0));
-        button0.SetSize(gui::Button::DefaultSize * Vec2f(1, 2));
+        doge::gui::Button& button0 = gui->AddElement<doge::gui::Button>("button0", "gui_cam");
+        button0.SetPosition(doge::Vec2f(-300, 0));
+        button0.SetSize(doge::gui::Button::DefaultSize * doge::Vec2f(1, 2));
         button0.GetText().SetString(U"Hello\nthis is me");
 
-        gui::Window& window = gui->AddElement<gui::Window>("window0", "gui_cam");
+        doge::gui::Window& window = gui->AddElement<doge::gui::Window>("window0", "gui_cam");
 
-        gui::Button& button1 = window.AddElement<gui::Button>("button1");
+        doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
         button1.GetText().SetString(U"Button In Window");
 
-        button1.on_pressed += [](){ std::cout << "Pressed" << std::endl; };
-        button1.on_released += [](){ std::cout << "Released" << std::endl; };
-        button1.on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
-        button1.on_mouse_left += [](){ std::cout << "Left" << std::endl; };
-        button1.on_clicked += [](){ std::cout << "Clicked" << std::endl; };
+        button1.GetClickable().on_pressed       += [](doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
+        button1.GetClickable().on_released      += [](doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };
+        button1.GetClickable().on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
+        button1.GetClickable().on_mouse_left    += [](){ std::cout << "Left" << std::endl; };
+        button1.GetClickable().on_clicked       += [](doge::io::Mouse::Button){ std::cout << "Clicked" << std::endl; };
 
         // text
         {
-            Entity text = engine.AddEntity();
-            text.AddComponent(Layer::Create(1));
-            text.AddComponent(Position(0, -1.6));
-            text.AddComponent(Scale(0.01, 0.01));
-            text.AddComponent(Text
+            doge::Entity text = engine.AddEntity();
+            text.AddComponent(doge::Layer::Create(1));
+            text.AddComponent(doge::Position(0, -1.6));
+            text.AddComponent(doge::Scale(0.01, 0.01));
+            text.AddComponent(doge::Text
             {
                 .string = U"mundob\nmundo\nAVAVAVAV",
-                .align = Text::Align::Left,
-                .character_appearances = std::map<std::size_t, Text::Appearance>
+                .align = doge::Text::Align::Left,
+                .character_appearances = std::map<std::size_t, doge::Text::Appearance>
                 {
-                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
-                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
-                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
-                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
-                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
-                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
-                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                    std::pair<std::size_t, doge::Text::Appearance>(0,  doge::Text::Appearance{ .style = doge::Text::Style::Regular }),
+                    std::pair<std::size_t, doge::Text::Appearance>(7,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Red }),
+                    std::pair<std::size_t, doge::Text::Appearance>(8,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Yellow }),
+                    std::pair<std::size_t, doge::Text::Appearance>(9,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Green }),
+                    std::pair<std::size_t, doge::Text::Appearance>(10, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Cyan }),
+                    std::pair<std::size_t, doge::Text::Appearance>(11, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Blue }),
+                    std::pair<std::size_t, doge::Text::Appearance>(12, doge::Text::Appearance{ }),
                 },
             });
         }
         {
-            Entity text = engine.AddEntity();
-            text.AddComponent(Layer::Create(1));
-            text.AddComponent(Position(0, -2.2));
-            text.AddComponent(Scale(0.01, 0.01));
-            text.AddComponent(Text
+            doge::Entity text = engine.AddEntity();
+            text.AddComponent(doge::Layer::Create(1));
+            text.AddComponent(doge::Position(0, -2.2));
+            text.AddComponent(doge::Scale(0.01, 0.01));
+            text.AddComponent(doge::Text
             {
                 .string = U"mundob\nmundo\nAVAVAVAV",
-                .align = Text::Align::Center,
-                .character_appearances = std::map<std::size_t, Text::Appearance>
+                .align = doge::Text::Align::Center,
+                .character_appearances = std::map<std::size_t, doge::Text::Appearance>
                 {
-                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
-                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
-                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
-                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
-                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
-                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
-                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                    std::pair<std::size_t, doge::Text::Appearance>(0,  doge::Text::Appearance{ .style = doge::Text::Style::Regular }),
+                    std::pair<std::size_t, doge::Text::Appearance>(7,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Red }),
+                    std::pair<std::size_t, doge::Text::Appearance>(8,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Yellow }),
+                    std::pair<std::size_t, doge::Text::Appearance>(9,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Green }),
+                    std::pair<std::size_t, doge::Text::Appearance>(10, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Cyan }),
+                    std::pair<std::size_t, doge::Text::Appearance>(11, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Blue }),
+                    std::pair<std::size_t, doge::Text::Appearance>(12, doge::Text::Appearance{ }),
                 },
             });
         }
         {
-            Entity text = engine.AddEntity();
-            text.AddComponent(Layer::Create(1));
-            text.AddComponent(Position(0, -2.8));
-            text.AddComponent(Scale(0.01, 0.01));
-            text.AddComponent(Text
+            doge::Entity text = engine.AddEntity();
+            text.AddComponent(doge::Layer::Create(1));
+            text.AddComponent(doge::Position(0, -2.8));
+            text.AddComponent(doge::Scale(0.01, 0.01));
+            text.AddComponent(doge::Text
             {
                 .string = U"mundob\nmundo\nAVAVAVAV",
-                .align = Text::Align::Right,
-                .character_appearances = std::map<std::size_t, Text::Appearance>
+                .align = doge::Text::Align::Right,
+                .character_appearances = std::map<std::size_t, doge::Text::Appearance>
                 {
-                    std::pair<std::size_t, Text::Appearance>(0,  Text::Appearance{ .style = Text::Style::Regular }),
-                    std::pair<std::size_t, Text::Appearance>(7,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Red }),
-                    std::pair<std::size_t, Text::Appearance>(8,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Yellow }),
-                    std::pair<std::size_t, Text::Appearance>(9,  Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Green }),
-                    std::pair<std::size_t, Text::Appearance>(10, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Cyan }),
-                    std::pair<std::size_t, Text::Appearance>(11, Text::Appearance{ .style = Text::Style::Regular, .fill_color = Color::Blue }),
-                    std::pair<std::size_t, Text::Appearance>(12, Text::Appearance{ }),
+                    std::pair<std::size_t, doge::Text::Appearance>(0,  doge::Text::Appearance{ .style = doge::Text::Style::Regular }),
+                    std::pair<std::size_t, doge::Text::Appearance>(7,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Red }),
+                    std::pair<std::size_t, doge::Text::Appearance>(8,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Yellow }),
+                    std::pair<std::size_t, doge::Text::Appearance>(9,  doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Green }),
+                    std::pair<std::size_t, doge::Text::Appearance>(10, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Cyan }),
+                    std::pair<std::size_t, doge::Text::Appearance>(11, doge::Text::Appearance{ .style = doge::Text::Style::Regular, .fill_color = doge::Color::Blue }),
+                    std::pair<std::size_t, doge::Text::Appearance>(12, doge::Text::Appearance{ }),
                 },
             });
         }
     }
 
-    void Update(Engine& engine, DeltaTime dt)
+    void Update(doge::Engine& engine, doge::DeltaTime dt)
     {
         if (shoot_particle != -1)
         {
-            for (auto [tag, line, pos] : engine.Select<Tag>()
-                .Where([](EntityID entity, const Tag& tag)
+            for (auto [tag, line, pos] : engine.Select<doge::Tag>()
+                .Where([](doge::EntityID entity, const doge::Tag& tag)
                 { return *tag.tags.begin() == "line"; })
-                .Select<PolygonShape, Position>().Components())
+                .Select<doge::PolygonShape, doge::Position>().Components())
             {
                 line.vertices.at(1).position = engine.window.MapPixelToCoords(engine.window.window_io.GetMousePosition(), *cam_comp) - pos.position;
             }
@@ -336,24 +334,24 @@ namespace main1
         //std::cout << 1000.f / dt << std::endl;
     }
 
-    void FixedUpdate(Engine& engine, DeltaTime dt)
+    void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
     {
-        for (auto [entity, tag, position] : engine.Select<Tag>()
-            .Where([](const Entity& _, const Tag& tag)
+        for (auto [entity, tag, position] : engine.Select<doge::Tag>()
+            .Where([](const doge::Entity& _, const doge::Tag& tag)
             { return *tag.tags.begin() == "particle"; })
-            .Select<Position>().EntitiesAndComponents())
+            .Select<doge::Position>().EntitiesAndComponents())
         {
             if (entity != shoot_particle)
                 continue;
             
-            physics::Body body = phy->GetBody(entity);
+            doge::physics::Body body = phy->GetBody(entity);
 
-            Vec2f diff = shoot_particle_position - position.position;
+            doge::Vec2f diff = shoot_particle_position - position.position;
             body.SetVelocity(diff);
         }
     }
 
-    void Finish(Engine& engine)
+    void Finish(doge::Engine& engine)
     {
         gui.release();
         phy.release();
@@ -361,19 +359,19 @@ namespace main1
 
     int Main()
     {
-        Engine engine;
+        doge::Engine engine;
         engine.window.settings.fps = 120;
         engine.window.settings.msaa_level = 4;
-        engine.window.settings.size = Vec2u(1280, 720);
+        engine.window.settings.size = doge::Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";
         engine.window.SetBackgroundColor(0xF0F0F0FF);
 
         engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 
-        engine.assets.LoadCursor("normal", io::Cursor::Type::Arrow);
-        engine.assets.LoadCursor("grab", io::Cursor::Type::Hand);
+        engine.assets.LoadCursor("normal", doge::io::Cursor::Type::Arrow);
+        engine.assets.LoadCursor("grab", doge::io::Cursor::Type::Hand);
 
-        GameLoopFunctions glf;
+        doge::GameLoopFunctions glf;
         glf.start           = Start;
         glf.update          = Update;
         glf.fixed_update    = FixedUpdate;

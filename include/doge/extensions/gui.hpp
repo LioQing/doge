@@ -12,3 +12,4 @@
 #include "gui/NSImage.hpp"
 #include "gui/Align.hpp"
 #include "gui/Draggable.hpp"
+#include "gui/Clickable.hpp"

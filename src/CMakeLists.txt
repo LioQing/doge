@@ -64,6 +64,7 @@ set(SRC_FILES
     extensions/gui/Image.cpp
     extensions/gui/NSImage.cpp
     extensions/gui/Draggable.cpp
+    extensions/gui/Clickable.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp

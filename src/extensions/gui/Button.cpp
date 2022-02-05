@@ -3,6 +3,8 @@
 #include <doge/extensions/gui/GUI.hpp>
 #include <doge/extensions/gui/NSImage.hpp>
 #include <doge/extensions/gui/Image.hpp>
+#include <doge/extensions/gui/Text.hpp>
+#include <doge/extensions/gui/Clickable.hpp>
 #include <doge/extensions/nine_slice.hpp>
 #include <doge/core/Engine.hpp>
 #include <doge/utils/math.hpp>
@@ -18,67 +20,6 @@ namespace doge::gui
 
     void Button::Initialize()
     {
-        GetGUI().GetEngine().events.on_mouse_button_pressed.AddListener("doge_gui_button_" + GetID(),
-        [&](const event::MouseButton& event)
-        {
-            if (
-                event.button == event::MouseButton::Button::Left && 
-                GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this)
-            )
-            {
-                on_pressed();
-                states.set(State::Down, true);
-                on_state_transition(*this);
-            }
-        });
-
-        GetGUI().GetEngine().events.on_mouse_button_released.AddListener("doge_gui_button_" + GetID(),
-        [&](const event::MouseButton& event)
-        {
-            if (event.button == event::MouseButton::Button::Left)
-            {
-                if (states.test(State::Down))
-                {
-                    on_released();
-                    if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
-                        on_clicked();
-                }
-
-                states.set(State::Down, false);
-                on_state_transition(*this);
-            }
-        });
-
-        GetGUI().GetEngine().events.on_mouse_moved.AddListener("doge_gui_button_" + GetID(),
-        [&](const event::MouseMove& event)
-        {
-            if (
-                !states.test(State::MouseOver) &&
-                GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this)
-            )
-            {
-                on_mouse_entered();
-                states.set(State::MouseOver, true);
-                on_state_transition(*this);
-            }
-            else if (
-                states.test(State::MouseOver) &&
-                GetGUI().GetElementBelowCursor().get() != static_cast<Element*>(this)
-            )
-            {
-                on_mouse_left();
-                states.set(State::MouseOver, false);
-                on_state_transition(*this);
-            }
-        });
-
-        GetEntity().GetComponent<doge::gui::Component>().OnRemoval([&]
-        {
-            GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener("doge_gui_button_" + GetID());
-            GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener("doge_gui_button_" + GetID());
-            GetGUI().GetEngine().events.on_mouse_moved.RemoveListener("doge_gui_button_" + GetID());
-        });
-
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
         image.SetLocalLayer(0);
@@ -93,6 +34,16 @@ namespace doge::gui
         text.SetString(U"Button");
         text.SetTextAlign(doge::Text::Center);
         text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
+
+        auto& clickable = GetGUI().AddElement<Clickable>(GetClickableElementID(), GetCameraID());
+        clickable.GetEntity().SetParent(GetEntity());
+        clickable.SetLocalLayer(1);
+        clickable.SetAlign(Align::Top | Align::Left);
+        clickable.on_pressed        += [&](io::Mouse::Button button){ on_state_transition(*this); };
+        clickable.on_released       += [&](io::Mouse::Button button){ on_state_transition(*this); };
+        clickable.on_mouse_entered  += [&](){ on_state_transition(*this); };
+        clickable.on_mouse_left     += [&](){ on_state_transition(*this); };
+        clickable.on_clicked        += [&](io::Mouse::Button button){ on_state_transition(*this); };
 
         on_state_transition(*this);
 
@@ -164,23 +115,23 @@ namespace doge::gui
         return static_cast<Text&>(GetGUI().GetElement(GetTextElementID()));
     }
 
-    bool Button::IsDown() const
+    std::string Button::GetClickableElementID() const
     {
-        return states.test(State::Down);
+        return "doge_gui_button_" + GetID() + "_clickable";
     }
 
-    bool Button::IsMouseOver() const
+    Clickable& Button::GetClickable() const
     {
-        return states.test(State::MouseOver);
+        return static_cast<Clickable&>(GetGUI().GetElement(GetClickableElementID()));
     }
 
     void Button::DefaultOnStateTransition(Button& button)
     {
-        if (button.IsDown())
+        if (button.GetClickable().IsDown(io::Mouse::Button::Left))
         {
             button.SetColor(0xF0F0F0FF);
         }
-        else if (button.IsMouseOver())
+        else if (button.GetClickable().IsMouseOver())
         {
             button.SetColor(0xF6F6F6FF);
         }
@@ -193,6 +144,7 @@ namespace doge::gui
     void Button::OnSizeUpdated()
     {
         GetImageElement().SetSize(GetSize());
+        GetClickable().SetSize(GetSize());
     }
 
     void Button::OnPositionUpdated()
@@ -203,6 +155,7 @@ namespace doge::gui
     void Button::OnOriginUpdated()
     {
         GetImageElement().SetOrigin(GetActualOrigin());
+        GetClickable().SetOrigin(GetActualOrigin());
         GetText().SetOrigin(GetActualOrigin() - GetSize() / 2.f);
     }
 

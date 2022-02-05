@@ -145,8 +145,8 @@ namespace main3
             auto& text = button.GetText();
             text.SetString(U"Cancel");
 
-            button.on_clicked +=
-            [this]
+            button.GetClickable().on_clicked +=
+            [this](doge::io::Mouse::Button button)
             {
                 if (this->circle_comp->color == doge::Color::Red)
                 {
@@ -229,8 +229,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            // if (gui.GetElementBelowCursor())
-            //     std::cout << gui.GetElementBelowCursor()->GetID() << std::endl;
+            // auto e = gui.GetElementBelowCursor();
+            // if (e)
+            //     std::cout << e->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

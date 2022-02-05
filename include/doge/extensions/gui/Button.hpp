@@ -4,7 +4,6 @@
 #include <doge/utils/Color.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/extensions/gui/Element.hpp>
-#include <doge/extensions/gui/Text.hpp>
 #include <functional>
 #include <variant>
 
@@ -12,14 +11,11 @@ namespace doge::gui
 {
     struct Image;
     struct NSImage;
+    struct Clickable;
+    struct Text;
 
     struct Button : Element
     {
-        Event<> on_pressed;
-        Event<> on_released;
-        Event<> on_mouse_entered;
-        Event<> on_mouse_left;
-        Event<> on_clicked;
         std::function<void(Button&)> on_state_transition = Button::DefaultOnStateTransition;
 
         virtual ~Button();
@@ -37,8 +33,8 @@ namespace doge::gui
         std::string GetTextElementID() const;
         Text& GetText() const;
 
-        bool IsDown() const;
-        bool IsMouseOver() const;
+        std::string GetClickableElementID() const;
+        Clickable& GetClickable() const;
 
         static const Vec2f DefaultSize;
         static void DefaultOnStateTransition(Button& button);
@@ -52,14 +48,6 @@ namespace doge::gui
 
     private:
 
-        enum State
-        {
-            Down = 0,
-            MouseOver = 1,
-            Count
-        };
-
-        std::bitset<State::Count> states;
         bool is_9_slice = true;
     };
 }
