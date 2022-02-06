@@ -132,7 +132,7 @@ namespace main3
         void AddWindow(const doge::Vec2f& position)
         {
             window = &gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
-            window->SetAlign(doge::Vec2f(0.5, 0.5));
+            window->SetAlign(doge::Vec2f(0, 0));
             window->SetSize(doge::Vec2f(400, 200));
             window->SetPosition(doge::Vec2f(-100, -100));
             window->SetTitleBar(true);
@@ -143,7 +143,7 @@ namespace main3
             button.SetOrigin(-window->GetBorderThickness().GetPosition());
 
             auto& text = button.GetText();
-            text.SetString(U"Cancel");
+            text.SetString(U"Lock");
 
             button.GetClickable().on_clicked +=
             [this](doge::io::Mouse::Button button)
@@ -229,9 +229,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            // auto e = gui.GetElementBelowCursor();
-            // if (e)
-            //     std::cout << e->GetID() << std::endl;
+            auto e = gui.GetElementBelowCursor();
+            if (e)
+                std::cout << e->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

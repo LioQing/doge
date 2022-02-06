@@ -10,15 +10,19 @@ namespace doge::gui
         Event<Vec2f> on_drag_began;
         Event<Vec2f> on_drag_ended;
         Event<Vec2f> on_dragged;
+        Event<Vec2f> on_dragged_diff;
 
         virtual ~Draggable();
 
         virtual void Initialize() override;
+
 
         bool IsDragging() const;
 
     private:
 
         bool is_dragging = false;
+
+        Vec2f mouse_start;
     };
 }

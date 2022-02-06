@@ -78,12 +78,6 @@ namespace doge::gui
         auto& cam_comp = itr->second.AddComponent(Camera{ .size = rectangle.GetSize(), .render_order = render_order });
         cam_comp.port = Rectf(rectangle.GetPosition() / GetEngine().window.window_io.GetSize(), rectangle.GetSize() / GetEngine().window.window_io.GetSize());
 
-        GetEngine().events.on_window_resized.AddListener(
-            std::string("doge_gui_camera_") + id,
-            [this, val_id = id](const event::Size& event)
-            { GetCameraComponent(val_id).port.SetSize(GetCameraComponent(val_id).size / event.size); }
-        );
-
         cam_comp.OnRemoval([&, val_id = id]()
         {
             cameras.erase(val_id);

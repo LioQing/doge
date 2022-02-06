@@ -7,6 +7,7 @@ namespace doge::gui
 {
     struct Text;
     struct Draggable;
+    struct Resizable;
 
     struct WindowEx : Window
     {
@@ -20,7 +21,7 @@ namespace doge::gui
             Count
         };
 
-        static const std::int32_t DefaultResizeThickness;
+        static const Rectf DefaultResizeThickness;
         static const Rectf DefaultBorderThickness;
 
         virtual ~WindowEx();
@@ -45,6 +46,9 @@ namespace doge::gui
         std::string GetDraggableElementID() const;
         gui::Draggable& GetDraggable() const;
 
+        std::string GetResizableElementID() const;
+        gui::Resizable& GetResizable() const;
+
         void SetBorderThickness(const Rectf& border_thickness);
 
     protected:
@@ -58,11 +62,15 @@ namespace doge::gui
         virtual void UpdateDraggableOrigin();
         virtual void UpdateDraggableSize();
 
+        virtual void UpdateResizableSize();
+        virtual void UpdateResizableOrigin();
+
     private:
 
         std::bitset<Trait::Count> trait_enabled;
 
-        Vec2f drag_start_pos = Vec2f::Zero;
-        Vec2f drag_start_event = Vec2f::Zero;
+        Vec2f drag_start_pos;
+        Vec2f resize_start_pos;
+        bool resize_guard = false;
     };
 }

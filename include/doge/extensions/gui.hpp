@@ -13,3 +13,4 @@
 #include "gui/Align.hpp"
 #include "gui/Draggable.hpp"
 #include "gui/Clickable.hpp"
+#include "gui/Resizable.hpp"

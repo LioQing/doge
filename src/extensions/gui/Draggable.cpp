@@ -19,8 +19,10 @@ namespace doge::gui
                 GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this)
             )
             {
+                mouse_start = GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent());
+
                 is_dragging = true;
-                on_drag_began(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()));
+                on_drag_began(mouse_start);
             }
         });
 
@@ -39,7 +41,10 @@ namespace doge::gui
         {
             if (is_dragging)
             {
-                on_dragged(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()));
+                auto pos = GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent());
+
+                on_dragged(pos);
+                on_dragged_diff(pos - mouse_start);
             }
         });
 

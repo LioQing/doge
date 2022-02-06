@@ -45,7 +45,6 @@ namespace doge::gui
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
         image.SetLocalLayer(2);
-        image.SetAlign(Align::Top | Align::Left);
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_window");
 
@@ -93,7 +92,8 @@ namespace doge::gui
 
     void Window::OnOriginUpdated()
     {
-        GetImage().SetOrigin(GetActualOrigin());
+        GetImage().SetOrigin(GetOrigin());
+        GetImage().SetAlign(GetAlign());
         UpdateContainerArea();
     }
 

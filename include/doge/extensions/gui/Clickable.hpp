@@ -15,7 +15,7 @@ namespace doge::gui
 
         virtual ~Clickable();
 
-        virtual void Initialize();
+        virtual void Initialize() override;
     
         bool IsDown(io::Mouse::Button button) const;
         bool IsMouseOver() const;

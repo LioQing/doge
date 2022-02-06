@@ -4,10 +4,11 @@
 #include <doge/extensions/gui/Text.hpp>
 #include <doge/extensions/gui/Draggable.hpp>
 #include <doge/extensions/gui/NSImage.hpp>
+#include <doge/extensions/gui/Resizable.hpp>
 
 namespace doge::gui
 {
-    const std::int32_t WindowEx::DefaultResizeThickness = 2;
+    const Rectf WindowEx::DefaultResizeThickness = Rectf(5, 5, 5, 5);
     const Rectf WindowEx::DefaultBorderThickness = Rectf(16, 32, 16, 16);
 
     WindowEx::~WindowEx()
@@ -21,6 +22,7 @@ namespace doge::gui
         SetBorderThickness(DefaultBorderThickness);
         GetImage().SetTextureID("doge_gui_windowex");
         GetImage().SetBorderThickness(Rectf());
+        SetResizable(true);
     }
 
     void WindowEx::SetTitleBar(bool enabled)
@@ -66,11 +68,11 @@ namespace doge::gui
             auto& draggable = GetGUI().AddElement<gui::Draggable>(GetDraggableElementID(), GetCameraID());
             draggable.GetEntity().SetParent(GetEntity());
             draggable.SetLocalLayer(3);
-            draggable.SetSize(Vec2f(GetSize().x, GetBorderThickness().top - DefaultResizeThickness));
-            draggable.SetAlign(Align::Top | Align::Left);
+            draggable.SetSize(Vec2f(GetSize().x, GetBorderThickness().top - (IsResizable() ? GetResizable().GetThickness().top : 0.f)));
+            draggable.SetAlign(Align::Top | Align::Center);
 
-            draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_event = pos; drag_start_pos = GetPosition(); };
-            draggable.on_dragged += [&](const Vec2f& pos){ SetPosition(drag_start_pos + pos - drag_start_event); };
+            draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_pos = GetPosition(); };
+            draggable.on_dragged_diff += [&](const Vec2f& diff){ SetPosition(drag_start_pos + diff); };
 
             UpdateDraggableOrigin();
         }
@@ -83,7 +85,35 @@ namespace doge::gui
 
     void WindowEx::SetResizable(bool enabled)
     {
+        auto prev_enabled = trait_enabled.test(Trait::Resizable);
         trait_enabled.set(Trait::Resizable, enabled);
+
+        if (prev_enabled && !enabled)
+        {
+            GetGUI().RemoveElement(GetResizableElementID());
+        }
+        else if (!prev_enabled && enabled)
+        {
+            auto& resizable = GetGUI().AddElement<gui::Resizable>(GetResizableElementID(), GetCameraID());
+            resizable.GetEntity().SetParent(GetEntity());
+            resizable.SetLocalLayer(3);
+            resizable.SetCursorDetectable(true);
+            resizable.SetThickness(DefaultResizeThickness);
+            resizable.on_resize_began += [&](){ resize_start_pos = GetPosition(); };
+            resizable.on_resized += 
+            [&](const Vec2f& d_pos)
+            {
+                resize_guard = true;
+                SetPosition(resize_start_pos + d_pos);
+                SetSize(resizable.GetSize());
+                resize_guard = false;
+            };
+
+            UpdateResizableOrigin();
+        }
+
+        OnSizeUpdated();
+        OnOriginUpdated();
     }
 
     bool WindowEx::IsResizable() const
@@ -127,6 +157,19 @@ namespace doge::gui
         return static_cast<gui::Draggable&>(GetGUI().GetElement(GetDraggableElementID()));
     }
 
+    std::string WindowEx::GetResizableElementID() const
+    {
+        return "window_gui_windowex_" + GetID() + "_resizable";
+    }
+
+    gui::Resizable& WindowEx::GetResizable() const
+    {
+        if (!IsResizable())
+            throw std::invalid_argument("Resizable is not enabled");
+
+        return static_cast<gui::Resizable&>(GetGUI().GetElement(GetResizableElementID()));
+    }
+
     void WindowEx::SetBorderThickness(const Rectf& border_thickness)
     {
         Window::SetBorderThickness(border_thickness);
@@ -151,6 +194,11 @@ namespace doge::gui
             UpdateDraggableOrigin();
             UpdateDraggableSize();
         }
+        
+        if (IsResizable() && !resize_guard)
+        {
+            UpdateResizableSize();
+        }
     }
     
     void WindowEx::OnPositionUpdated()
@@ -171,6 +219,11 @@ namespace doge::gui
         {
             UpdateDraggableOrigin();
         }
+
+        if (IsResizable() && !resize_guard)
+        {
+            UpdateResizableOrigin();
+        }
     }
 
     void WindowEx::UpdateTitleBarOrigin()
@@ -180,11 +233,22 @@ namespace doge::gui
 
     void WindowEx::UpdateDraggableOrigin()
     {
-        GetDraggable().SetOrigin(GetActualOrigin() - DefaultResizeThickness * Vec2f::j);
+        GetDraggable().SetOrigin(GetActualOrigin() - Vec2f(GetSize().x / 2.f, IsResizable() ? GetResizable().GetThickness().top : 0.f));
     }
 
     void WindowEx::UpdateDraggableSize()
     {
-        GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - DefaultResizeThickness));
+        GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - (IsResizable() ? GetResizable().GetThickness().top : 0.f)));
+    }
+
+    void WindowEx::UpdateResizableOrigin()
+    {
+        GetResizable().SetOrigin(GetOrigin());
+        GetResizable().SetAlign(GetAlign());
+    }
+
+    void WindowEx::UpdateResizableSize()
+    {
+        GetResizable().SetSize(GetSize());
     }
 }
