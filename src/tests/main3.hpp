@@ -136,6 +136,7 @@ namespace main3
             window->SetSize(doge::Vec2f(400, 200));
             window->SetPosition(doge::Vec2f(-100, -100));
             window->SetTitleBar(true);
+            window->SetResizable(true);
 
             auto& button = window->AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
             button.SetPosition(-window->GetSize() / 2.f);
@@ -178,6 +179,7 @@ namespace main3
             // gui cam
             gui.AddCamera("my_cam");
             AddWindow(doge::Vec2f::Zero);
+            AddWindow(doge::Vec2f(0, 200));
 
             // button
             // auto& button = gui.AddElement<doge::gui::Button>("my_button", "my_cam");

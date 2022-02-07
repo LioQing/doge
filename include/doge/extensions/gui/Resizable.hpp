@@ -35,6 +35,9 @@ namespace doge::gui
         void SetThickness(const Rectf& thickness);
         const Rectf& GetThickness() const;
 
+        void SetMinSize(const Vec2f& min_size);
+        const Vec2f& GetMinSize() const;
+
         void SetLocalLayer(std::int32_t layer);
         void SetLayer(std::int32_t layer);
         std::int32_t GetLocalLayer() const;
@@ -56,8 +59,11 @@ namespace doge::gui
 
     private:
 
-        Border border_dragged;
+        Vec2f SetSizeChecked(const Vec2f& size);
+
+        Vec2f min_size = Vec2f::Zero;
         Rectf thickness;
+        Border border_dragged;
         Vec2f start_pos;
         Vec2f start_size;
     };

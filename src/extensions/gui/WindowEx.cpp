@@ -22,7 +22,6 @@ namespace doge::gui
         SetBorderThickness(DefaultBorderThickness);
         GetImage().SetTextureID("doge_gui_windowex");
         GetImage().SetBorderThickness(Rectf());
-        SetResizable(true);
     }
 
     void WindowEx::SetTitleBar(bool enabled)
@@ -99,6 +98,8 @@ namespace doge::gui
             resizable.SetLocalLayer(3);
             resizable.SetCursorDetectable(true);
             resizable.SetThickness(DefaultResizeThickness);
+            resizable.SetMinSize(Vec2f(100, 100));
+
             resizable.on_resize_began += [&](){ resize_start_pos = GetPosition(); };
             resizable.on_resized += 
             [&](const Vec2f& d_pos)

@@ -21,6 +21,8 @@ namespace doge::gui
 
     private:
 
+        Vec2f MapPixelToCoordsChecked(const Vec2i& pixel) const;
+
         bool is_dragging = false;
 
         Vec2f mouse_start;

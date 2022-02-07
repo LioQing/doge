@@ -247,5 +247,8 @@ namespace doge::gui
 
         engine.assets.EraseTexture("doge_gui_window");
         nine_slice.EraseTexture("doge_gui_window");
+
+        engine.assets.EraseTexture("doge_gui_windowex");
+        nine_slice.EraseTexture("doge_gui_windowex");
     }
 }

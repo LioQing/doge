@@ -19,7 +19,7 @@ namespace doge::gui
                 GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this)
             )
             {
-                mouse_start = GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent());
+                mouse_start = MapPixelToCoordsChecked(event.position);
 
                 is_dragging = true;
                 on_drag_began(mouse_start);
@@ -32,7 +32,7 @@ namespace doge::gui
             if (event.button == event::MouseButton::Button::Left)
             {
                 is_dragging = false;
-                on_drag_ended(GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent()));
+                on_drag_ended(MapPixelToCoordsChecked(event.position));
             }
         });
 
@@ -41,7 +41,7 @@ namespace doge::gui
         {
             if (is_dragging)
             {
-                auto pos = GetGUI().GetEngine().window.MapPixelToCoords(event.position, GetCameraComponent());
+                auto pos = MapPixelToCoordsChecked(event.position);
 
                 on_dragged(pos);
                 on_dragged_diff(pos - mouse_start);
@@ -59,5 +59,22 @@ namespace doge::gui
     bool Draggable::IsDragging() const
     {
         return is_dragging;
+    }
+
+    Vec2f Draggable::MapPixelToCoordsChecked(const Vec2i& pixel) const
+    {
+        auto coords = GetGUI().GetEngine().window.MapPixelToCoords(pixel, GetCameraComponent());
+
+        if (coords.x > GetCameraComponent().size.x / 2.f)
+            coords.x = GetCameraComponent().size.x / 2.f - 1;
+        else if (coords.x < -GetCameraComponent().size.x / 2.f)
+            coords.x = -GetCameraComponent().size.x / 2.f + 1;
+
+        if (coords.y > GetCameraComponent().size.y / 2.f)
+            coords.y = GetCameraComponent().size.y / 2.f - 1;
+        else if (coords.y < -GetCameraComponent().size.y / 2.f)
+            coords.y = -GetCameraComponent().size.y / 2.f + 1;
+        
+        return coords;
     }
 }

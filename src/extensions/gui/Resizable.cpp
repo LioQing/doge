@@ -56,14 +56,14 @@ namespace doge::gui
         bl.on_drag_ended += [&](const Vec2f& pos){ border_dragged = Border::Count; on_resize_ended(); };
         l .on_drag_ended += [&](const Vec2f& pos){ border_dragged = Border::Count; on_resize_ended(); };
 
-        tl.on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f(-1, -1)); on_resized(diff * Vec2f(1, 1)); };
-        t .on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f( 0, -1)); on_resized(diff * Vec2f(0, 1)); };
-        tr.on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f( 1, -1)); on_resized(diff * Vec2f(0, 1)); };
-        r .on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f( 1,  0)); on_resized(diff * Vec2f(0, 0)); };
-        br.on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f( 1,  1)); on_resized(diff * Vec2f(0, 0)); };
-        b .on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f( 0,  1)); on_resized(diff * Vec2f(0, 0)); };
-        bl.on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f(-1,  1)); on_resized(diff * Vec2f(1, 0)); };
-        l .on_dragged_diff += [&](const Vec2f& diff){ SetSize(start_size + diff * Vec2f(-1,  0)); on_resized(diff * Vec2f(1, 0)); };
+        tl.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1, -1)); on_resized((start_size - act_size) * Vec2f(1, 1)); };
+        t .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 0, -1)); on_resized((start_size - act_size) * Vec2f(0, 1)); };
+        tr.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1, -1)); on_resized((start_size - act_size) * Vec2f(0, 1)); };
+        r .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1,  0)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
+        br.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1,  1)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
+        b .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 0,  1)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
+        bl.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1,  1)); on_resized((start_size - act_size) * Vec2f(1, 0)); };
+        l .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1,  0)); on_resized((start_size - act_size) * Vec2f(1, 0)); };
 
         Element::SetLocalLayer(0);
         Element::SetCursorDetectable(false);
@@ -77,6 +77,16 @@ namespace doge::gui
     const Rectf& Resizable::GetThickness() const
     {
         return thickness;
+    }
+
+    void Resizable::SetMinSize(const Vec2f& min_size)
+    {
+        this->min_size = min_size;
+    }
+
+    const Vec2f& Resizable::GetMinSize() const
+    {
+        return min_size;
     }
 
     void Resizable::SetLocalLayer(std::int32_t layer)
@@ -161,5 +171,20 @@ namespace doge::gui
         GetDraggable(Border::Bottom     ).SetOrigin(GetOrigin() - Vec2f(GetSize().x / 2.f, GetSize().y));
         GetDraggable(Border::BottomLeft ).SetOrigin(GetOrigin() - Vec2f(0.f, GetSize().y));
         GetDraggable(Border::Left       ).SetOrigin(GetOrigin() - Vec2f(0.f, GetSize().y / 2.f));
+    }
+
+    Vec2f Resizable::SetSizeChecked(const Vec2f& size) 
+    {
+        auto act_size = size;
+
+        if (act_size.x < min_size.x)
+            act_size.x = min_size.x;
+
+        if (act_size.y < min_size.y)
+            act_size.y = min_size.y;
+        
+        SetSize(act_size);
+
+        return act_size;
     }
 }
