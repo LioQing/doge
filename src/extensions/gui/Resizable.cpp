@@ -56,14 +56,14 @@ namespace doge::gui
         bl.on_drag_ended += [&](const Vec2f& pos){ border_dragged = Border::Count; on_resize_ended(); };
         l .on_drag_ended += [&](const Vec2f& pos){ border_dragged = Border::Count; on_resize_ended(); };
 
-        tl.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1, -1)); on_resized((start_size - act_size) * Vec2f(1, 1)); };
-        t .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 0, -1)); on_resized((start_size - act_size) * Vec2f(0, 1)); };
-        tr.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1, -1)); on_resized((start_size - act_size) * Vec2f(0, 1)); };
-        r .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1,  0)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
-        br.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 1,  1)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
-        b .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f( 0,  1)); on_resized((start_size - act_size) * Vec2f(0, 0)); };
-        bl.on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1,  1)); on_resized((start_size - act_size) * Vec2f(1, 0)); };
-        l .on_dragged_diff += [&](const Vec2f& diff){ auto act_size = SetSizeChecked(start_size + diff * Vec2f(-1,  0)); on_resized((start_size - act_size) * Vec2f(1, 0)); };
+        tl.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1, -1)); on_resized((final_size - start_size) * (Vec2f(-1, -1) + GetAlign() * Vec2f( 1,  1))); };
+        t .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 0, -1)); on_resized((final_size - start_size) * (Vec2f( 0, -1) + GetAlign() * Vec2f( 0,  1))); };
+        tr.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 1, -1)); on_resized((final_size - start_size) * (Vec2f( 0, -1) + GetAlign() * Vec2f( 1,  1))); };
+        r .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 1,  0)); on_resized((final_size - start_size) * (Vec2f( 0,  0) + GetAlign() * Vec2f( 1,  0))); };
+        br.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 1,  1)); on_resized((final_size - start_size) * (Vec2f( 0,  0) + GetAlign() * Vec2f( 1,  1))); };
+        b .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 0,  1)); on_resized((final_size - start_size) * (Vec2f( 0,  0) + GetAlign() * Vec2f( 0,  1))); };
+        bl.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  1)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  1))); };
+        l .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  0)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  0))); };
 
         Element::SetLocalLayer(0);
         Element::SetCursorDetectable(false);
@@ -163,14 +163,14 @@ namespace doge::gui
 
     void Resizable::OnOriginUpdated()
     {
-        GetDraggable(Border::TopLeft    ).SetOrigin(GetOrigin());
-        GetDraggable(Border::Top        ).SetOrigin(GetOrigin() - Vec2f(GetSize().x / 2.f, 0.f));
-        GetDraggable(Border::TopRight   ).SetOrigin(GetOrigin() - Vec2f(GetSize().x, 0.f));
-        GetDraggable(Border::Right      ).SetOrigin(GetOrigin() - Vec2f(GetSize().x, GetSize().y / 2.f));
-        GetDraggable(Border::BottomRight).SetOrigin(GetOrigin() - GetSize());
-        GetDraggable(Border::Bottom     ).SetOrigin(GetOrigin() - Vec2f(GetSize().x / 2.f, GetSize().y));
-        GetDraggable(Border::BottomLeft ).SetOrigin(GetOrigin() - Vec2f(0.f, GetSize().y));
-        GetDraggable(Border::Left       ).SetOrigin(GetOrigin() - Vec2f(0.f, GetSize().y / 2.f));
+        GetDraggable(Border::TopLeft    ).SetOrigin(GetActualOrigin());
+        GetDraggable(Border::Top        ).SetOrigin(GetActualOrigin() - Vec2f(GetSize().x / 2.f, 0.f));
+        GetDraggable(Border::TopRight   ).SetOrigin(GetActualOrigin() - Vec2f(GetSize().x, 0.f));
+        GetDraggable(Border::Right      ).SetOrigin(GetActualOrigin() - Vec2f(GetSize().x, GetSize().y / 2.f));
+        GetDraggable(Border::BottomRight).SetOrigin(GetActualOrigin() - GetSize());
+        GetDraggable(Border::Bottom     ).SetOrigin(GetActualOrigin() - Vec2f(GetSize().x / 2.f, GetSize().y));
+        GetDraggable(Border::BottomLeft ).SetOrigin(GetActualOrigin() - Vec2f(0.f, GetSize().y));
+        GetDraggable(Border::Left       ).SetOrigin(GetActualOrigin() - Vec2f(0.f, GetSize().y / 2.f));
     }
 
     Vec2f Resizable::SetSizeChecked(const Vec2f& size) 

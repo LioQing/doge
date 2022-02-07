@@ -238,7 +238,8 @@ namespace main1
         button0.SetSize(doge::gui::Button::DefaultSize * doge::Vec2f(1, 2));
         button0.GetText().SetString(U"Hello\nthis is me");
 
-        doge::gui::Window& window = gui->AddElement<doge::gui::Window>("window0", "gui_cam");
+        doge::gui::WindowEx& window = gui->AddElement<doge::gui::WindowEx>("window0", "gui_cam");
+        window.SetResizable(true);
 
         doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
         button1.GetText().SetString(U"Button In Window");
@@ -328,8 +329,9 @@ namespace main1
             }
         }
 
-        if (gui->GetElementBelowCursor())
-            std::cout << gui->GetElementBelowCursor()->GetID() << std::endl;
+        auto e = gui->GetElementBelowCursor();
+        if (e)
+            std::cout << e->GetID() << std::endl;
 
         //std::cout << 1000.f / dt << std::endl;
     }
@@ -364,7 +366,6 @@ namespace main1
         engine.window.settings.msaa_level = 4;
         engine.window.settings.size = doge::Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";
-        engine.window.SetBackgroundColor(0xF0F0F0FF);
 
         engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 
