@@ -27,6 +27,7 @@ namespace doge::gui
     Entity GUI::AddCamera(
         const std::string& id,
         const Rectf& port,
+        std::int32_t render_order,
         std::int32_t layer,
         std::size_t layer_width,
         bool destroy_on_finish
@@ -37,18 +38,17 @@ namespace doge::gui
         if (!success)
             throw std::invalid_argument("Failed to add camera to gui");
 
-        auto& cam_comp = itr->second.AddComponent(Camera{ .port = port, .render_order = 32 });
+        auto& cam_comp = itr->second.AddComponent(Camera{ .port = port, .render_order = render_order });
         cam_comp.size = GetEngine().window.window_io.GetSize() * port.GetSize();
 
         GetEngine().events.on_window_resized.AddListener(
-            "doge_gui_camera_" + id,
+            std::string("doge_gui_camera_") + id,
             [this, val_id = id](const event::Size& event)
             { GetCameraComponent(val_id).size = event.size * GetCameraComponent(val_id).port.GetSize(); }
         );
 
         cam_comp.OnRemoval([&, val_id = id]()
         {
-            GetEngine().events.on_window_resized.RemoveListener("doge_gui_camera_" + val_id);
             cameras.erase(val_id);
         });
 
@@ -64,6 +64,7 @@ namespace doge::gui
     Entity GUI::AddAbsoluteSizeCamera(
         const std::string& id,
         const Rectf& rectangle,
+        std::int32_t render_order,
         std::int32_t layer,
         std::size_t layer_width,
         bool destroy_on_finish
@@ -74,7 +75,7 @@ namespace doge::gui
         if (!success)
             throw std::invalid_argument("Failed to add camera to gui");
 
-        auto& cam_comp = itr->second.AddComponent(Camera{ .size = rectangle.GetSize(), .render_order = 32 });
+        auto& cam_comp = itr->second.AddComponent(Camera{ .size = rectangle.GetSize(), .render_order = render_order });
         cam_comp.port = Rectf(rectangle.GetPosition() / GetEngine().window.window_io.GetSize(), rectangle.GetSize() / GetEngine().window.window_io.GetSize());
 
         cam_comp.OnRemoval([&, val_id = id]()
@@ -117,6 +118,11 @@ namespace doge::gui
         auto& layers = GetCameraEntity(id).GetComponent<Layer>().layers;
         auto [min, max] = std::minmax_element(layers.begin(), layers.end());
         return *max - *min + 1;
+    }
+
+    std::int32_t GUI::GetCameraRenderOrder(const std::string& id) const
+    {
+        return GetCameraComponent(id).render_order;
     }
 
     bool GUI::HasCamera(const std::string& id) const

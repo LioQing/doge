@@ -16,6 +16,7 @@ namespace doge::gui
 
         virtual void Initialize() override;
 
+
         bool IsDragging() const;
 
     private:
