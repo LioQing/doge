@@ -18,7 +18,7 @@ namespace doge::gui
         auto camera_entity = GetGUI().AddCamera(
             GetWindowCameraID(),
             Rectf(0, 0, 1, 1),
-            GetGUI().GetCameraRenderOrder(GetCameraID()) + 1,
+            GetGUI().GetCameraComponent(GetCameraID()).render_order + 1,
             GetGUI().GetCameraLayer(GetCameraID()) + GetGUI().GetCameraLayerWidth(GetCameraID())
         );
 

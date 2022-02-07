@@ -15,24 +15,25 @@ namespace doge::gui
         {
             if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
             {
-                on_pressed(event.button);
                 buttons_down.set(event.button, true);
+                on_pressed(event.button);
             }
         });
 
         GetGUI().GetEngine().events.on_mouse_button_released.AddListener("doge_gui_clickable_" + GetID(),
         [&](const event::MouseButton& event)
         {
-            if (buttons_down.any())
+            if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
             {
-                if (buttons_down.test(event.button))
-                {
-                    on_released(event.button);
-                    if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
-                        on_clicked(event.button);
-                }
+                auto was_down = buttons_down.test(event.button);
 
                 buttons_down.set(event.button, false);
+                on_released(event.button);
+
+                if (was_down)
+                {
+                    on_clicked(event.button);
+                }
             }
         });
 
@@ -44,16 +45,16 @@ namespace doge::gui
                 GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this)
             )
             {
-                on_mouse_entered();
                 is_mouse_over = true;
+                on_mouse_entered();
             }
             else if (
                 is_mouse_over &&
                 GetGUI().GetElementBelowCursor().get() != static_cast<Element*>(this)
             )
             {
-                on_mouse_left();
                 is_mouse_over = false;
+                on_mouse_left();
             }
         });
 

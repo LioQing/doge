@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../utils/Vec2.hpp"
-#include "../utils/Rect.hpp"
+#include <doge/utils/Vec2.hpp>
+#include <doge/utils/Rect.hpp>
+#include <doge/utils/aliases.hpp>
+#include <unordered_set>
 
 namespace doge
 {

@@ -27,7 +27,6 @@ namespace doge
             Entity AddCamera(
                 const std::string& id,
                 const Rectf& port = Rectf(0, 0, 1, 1),
-                std::int32_t render_order = 32,
                 std::int32_t layer = 32,
                 std::size_t layer_width = 4,
                 bool destroy_on_finish = true
@@ -36,7 +35,6 @@ namespace doge
             Entity AddAbsoluteSizeCamera(
                 const std::string& id,
                 const Rectf& rectangle,
-                std::int32_t render_order = 32,
                 std::int32_t layer = 32,
                 std::size_t layer_width = 4,
                 bool destroy_on_finish = true
@@ -48,7 +46,6 @@ namespace doge
             Entity GetCameraEntity(const std::string& id) const;
             std::int32_t GetCameraLayer(const std::string& id) const;
             std::int32_t GetCameraLayerWidth(const std::string& id) const;
-            std::int32_t GetCameraRenderOrder(const std::string& id) const;
 
             bool HasCamera(const std::string& id) const;
 

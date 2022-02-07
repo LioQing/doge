@@ -62,13 +62,13 @@ namespace main1
         engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23));
 
         // cam
-        doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .render_order = 1 });
+        doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2) });
         cam_comp = &cam.GetComponent<doge::Camera>();
         engine.events.on_window_resized += [&](const doge::event::Size& event){ cam_comp->size = event.size.Cast<float>() / 100.f; };
         cam.AddComponent(doge::Layer::Create(1, 0, -1));
 
         // smaller cam
-        doge::Entity subcam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .port = doge::Rectf(0, 0, 0.25, 0.25), .render_order = 0 });
+        doge::Entity subcam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .port = doge::Rectf(0, 0, 0.25, 0.25) });
         subcam.AddComponent(doge::Layer::Create(0, -1));
         
         // square for testing layer rendering
@@ -238,7 +238,10 @@ namespace main1
         button0.SetSize(doge::gui::Button::DefaultSize * doge::Vec2f(1, 2));
         button0.GetText().SetString(U"Hello\nthis is me");
 
-        doge::gui::Window& window = gui->AddElement<doge::gui::Window>("window0", "gui_cam");
+        doge::gui::WindowEx& window = gui->AddElement<doge::gui::WindowEx>("window0", "gui_cam");
+        window.SetSize(doge::Vec2f(400, 200));
+        window.SetTitleBar(true);
+        window.SetResizable(true);
 
         doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
         button1.GetText().SetString(U"Button In Window");
@@ -328,10 +331,9 @@ namespace main1
             }
         }
 
-        if (gui->GetElementBelowCursor())
-            std::cout << gui->GetElementBelowCursor()->GetID() << std::endl;
-
-        //std::cout << 1000.f / dt << std::endl;
+        auto e = gui->GetElementBelowCursor();
+        if (e)
+            std::cout << e->GetID() << std::endl;
     }
 
     void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
@@ -364,7 +366,6 @@ namespace main1
         engine.window.settings.msaa_level = 4;
         engine.window.settings.size = doge::Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";
-        engine.window.SetBackgroundColor(0xF0F0F0FF);
 
         engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 

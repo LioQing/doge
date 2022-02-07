@@ -109,8 +109,6 @@ namespace doge::gui
                 SetSize(resizable.GetSize());
                 resize_guard = false;
             };
-
-            UpdateResizableOrigin();
         }
 
         OnSizeUpdated();
@@ -184,15 +182,9 @@ namespace doge::gui
     void WindowEx::OnSizeUpdated()
     {
         Window::OnSizeUpdated();
-
-        if (HasTitleBar())
-        {
-            UpdateTitleBarOrigin();
-        }
         
         if (IsDraggable())
         {
-            UpdateDraggableOrigin();
             UpdateDraggableSize();
         }
         
