@@ -89,7 +89,7 @@ namespace doge::io
         auto EmplaceDrawables = [&]<typename TDrawable, typename TComp, typename... Args>(const DrawableKey& key, Component<TComp>& comp, Args&&... args)
         {
             // draws_layers
-            auto layer_comp = comp.GetEntity().GetIfHasComponentElseDefault<Layer>();
+            auto layer_comp = comp.GetEntity().template GetIfHasComponentElseDefault<Layer>();
             if (layer_comp.layers.size() < 1)
                 throw std::invalid_argument("Layer component of Entity have no layer information");
             int layer = *layer_comp.layers.rbegin();

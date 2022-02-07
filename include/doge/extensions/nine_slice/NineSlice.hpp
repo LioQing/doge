@@ -16,8 +16,6 @@ namespace doge
     {
         struct NineSlice
         {
-            using Texture = Texture;
-
             enum BorderThickness
             {
                 Unchange,

@@ -4,6 +4,7 @@
 #include <doge/utils/Rect.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/extensions/gui/Element.hpp>
+#include <doge/extensions/gui/GUI.hpp>
 #include <vector>
 #include <string>
 

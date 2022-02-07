@@ -3,7 +3,7 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Vec2.hpp>
-#include <doge/core/io/Cursor.hpp>
+#include <doge/core/io.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -14,17 +14,6 @@ namespace doge
     struct Engine;
     struct Entity;
     struct Texture;
-
-    namespace io
-    {
-        struct Image;
-        struct Texture;
-        struct Cursor;
-        struct SoundBuffer;
-        struct Sound;
-        struct Music;
-        struct Font;
-    }
 
     struct Assets
     {

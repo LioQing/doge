@@ -76,7 +76,7 @@ namespace doge
         template <typename... TSelectComps>
         Range<TComps..., TSelectComps...> Select() const
         {
-            return Range<TComps..., TSelectComps...>(lic::Range<TComps...>::Select<TSelectComps...>());
+            return Range<TComps..., TSelectComps...>(lic::Range<TComps...>::template Select<TSelectComps...>());
         }
 
         template <std::predicate<Entity, TComps...> TPred>

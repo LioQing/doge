@@ -10,11 +10,17 @@ include_directories(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/include)
 include_directories(${PROJECT_NAME}-static ${CMAKE_SOURCE_DIR}/include)
 include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
-set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
-set(SFML_STATIC_LIBRARIES TRUE)
-find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
+if (MSVC)
+    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
+    set(SFML_STATIC_LIBRARIES TRUE)
+    find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
+endif()
 
-set(BOX2D_DIR C:/Code_Libraries/box2d/box2d-2.4.1/build/bin/Debug)
+if (MSVC)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VS2019-64bit/bin/Debug)
+else()
+    set(BOX2D_DIR /mnt/c/Code_Libraries/box2d-2.4.1/GCC11/bin)
+endif()
 
 set(SRC_FILES
     utils/lic.cpp
@@ -75,14 +81,28 @@ set(SRC_FILES
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
 
-set(SFML_LIBS
-    sfml-graphics
-    sfml-window
-    sfml-system
-    sfml-audio
-)
 
-set(BOX2D_LIB ${BOX2D_DIR}/box2d.lib)
+if (MSVC)
+
+    set(SFML_LIBS
+        sfml-graphics
+        sfml-window
+        sfml-system
+        sfml-audio
+    )
+
+    set(BOX2D_LIB ${BOX2D_DIR}/box2d.lib)
+else()
+
+    set(SFML_LIBS
+        -lsfml-system
+        -lsfml-graphics
+        -lsfml-window
+        -lsfml-audio
+    )
+
+    set(BOX2D_LIB ${BOX2D_DIR}/libbox2d.a)
+endif()
 
 target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
 target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
@@ -93,6 +113,4 @@ add_executable(test
 
 target_link_libraries(test ${PROJECT_NAME}-static)
 
-add_custom_command(TARGET test PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:test>/assets)
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)

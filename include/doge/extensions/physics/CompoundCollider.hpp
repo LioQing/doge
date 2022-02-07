@@ -34,7 +34,7 @@ namespace doge::physics
                 else if constexpr (std::is_constructible_v<RectangleCollider, C>)
                     comp_coll.rectangle_colliders.emplace_back(coll);
                 else
-                    static_assert(false, "Invalid collider type");
+                    []<bool flag = false>(){ static_assert(flag, "Invalid collider Type"); }();
             };
 
             (emplace_coll(colliders), ...);

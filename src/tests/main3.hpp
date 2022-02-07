@@ -229,9 +229,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            auto e = gui.GetElementBelowCursor();
-            if (e)
-                std::cout << e->GetID() << std::endl;
+            // auto e = gui.GetElementBelowCursor();
+            // if (e)
+            //     std::cout << e->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
