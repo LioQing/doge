@@ -27,15 +27,28 @@ namespace doge::gui
         void SetSize(const Vec2f& size);
         const Vec2f& GetSize() const;
 
+        void SetOrigin(const Vec2f& origin);
+        const Vec2f& GetOrigin() const;
+
+        void SetAlign(std::uint8_t align);
+        void SetAlign(const Vec2f& align);
+        const Vec2f& GetAlign() const;
+
         void SetAbsolutePort(bool is_absolute_port);
         bool IsAbsolutePort() const;
+
+        Vec2f GetActualOrigin() const;
 
     private:
 
         void Initialize();
+        void UpdatePort();
 
         std::string id;
         bool is_absolute_port = false;
+        Vec2f position = Vec2f::Zero;
+        Vec2f origin = Vec2f::Zero;
+        Vec2f align = Vec2f(.5f, .5f);
 
         GUI* gui = nullptr;
 

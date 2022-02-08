@@ -140,9 +140,7 @@ namespace main3
             window->SetResizable(true);
 
             auto& button = window->AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
-            button.SetPosition(-window->GetSize() / 2.f + doge::Vec2f(window_count * 5, 0));
-            button.SetAlign(doge::Vec2f::Zero);
-            button.SetOrigin(-window->GetBorderThickness().GetPosition());
+            button.SetPosition(doge::Vec2f(0, 0));
 
             auto& text = button.GetText();
             text.SetString(U"Lock");

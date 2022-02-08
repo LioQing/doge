@@ -17,22 +17,18 @@ namespace doge::gui
     {
         // camera
         auto& camera = GetGUI().AddCamera(GetWindowCameraID());
-
-        GetEntity().OnComponentRemoval<EntityInfo>([&, camera_entity = camera.GetEntity()]()
-        {
-            GetGUI().GetEngine().DestroyEntity(camera_entity);
-        });
-
-        GetGUI().GetEngine().events.on_window_resized.AddListener("doge_gui_window_" + GetID(),
-        [&](const event::Size& event)
-        {
-            UpdateContainerArea();
-        });
+        camera.SetAbsolutePort(true);
+        camera.SetAlign(Vec2f::Zero);
 
         camera.GetEntity().OnComponentRemoval<doge::Camera>([&]()
         {
             GetGUI().GetEngine().events.on_window_resized.RemoveListener("doge_gui_window_" + GetID());
             GetGUI().RemoveElements(GetWindowCameraID());
+        });
+
+        GetEntity().OnComponentRemoval<ElementComponent>([&, camera_entity = camera.GetEntity()]()
+        {
+            GetGUI().GetEngine().DestroyEntity(camera_entity);
         });
 
         // image
@@ -49,11 +45,15 @@ namespace doge::gui
         return "doge_gui_window_" + GetID();
     }
 
+    Camera& Window::GetWindowCamera() const
+    {
+        return GetGUI().GetCamera(GetWindowCameraID());
+    }
+
     void Window::SetBorderThickness(const Rectf& border_thickness)
     {
         this->border_thickness = border_thickness;
-
-        UpdateContainerArea();
+        OnSizeUpdated();
     }
 
     const Rectf& Window::GetBorderThickness() const
@@ -74,32 +74,25 @@ namespace doge::gui
     void Window::OnLayerUpdated()
     {
         GetImage().SetLayer(GetLayer());
-        GetGUI().GetCamera(GetWindowCameraID()).SetLayer(Layer::CreateRange(GetLayer() + 2, GetLayer() + 4));
+        GetWindowCamera().SetLayer(Layer::CreateRange(GetLayer() + 2, GetLayer() + 4));
     }
 
     void Window::OnSizeUpdated()
     {
         GetImage().SetSize(GetSize());
-        UpdateContainerArea();
+        GetWindowCamera().SetSize(GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize());
     }
 
     void Window::OnPositionUpdated()
     {
-        UpdateContainerArea();
+        GetWindowCamera().SetPosition(GetPosition());
     }
 
     void Window::OnOriginUpdated()
     {
         GetImage().SetOrigin(GetOrigin());
         GetImage().SetAlign(GetAlign());
-        UpdateContainerArea();
-    }
 
-    void Window::UpdateContainerArea()
-    {
-        auto& cam_comp = GetGUI().GetCameraComponent(GetWindowCameraID());
-        cam_comp.size = GetSize() - GetBorderThickness().GetPosition() - GetBorderThickness().GetSize();
-        cam_comp.port.SetPosition(Vec2f(0.5, 0.5) - (GetActualOrigin() - GetBorderThickness().GetPosition() - GetPosition()) / GetCameraComponent().size);
-        cam_comp.port.SetSize(cam_comp.size / GetCameraComponent().size);
+        GetWindowCamera().SetOrigin(GetActualOrigin() - GetBorderThickness().GetPosition());
     }
 }

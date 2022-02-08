@@ -26,6 +26,7 @@ namespace doge::gui
         }
 
         std::string GetWindowCameraID() const;
+        Camera& GetWindowCamera() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
         const Rectf& GetBorderThickness() const;
@@ -43,8 +44,6 @@ namespace doge::gui
         virtual void OnOriginUpdated() override;
 
     private:
-
-        void UpdateContainerArea();
 
         Rectf border_thickness = Rectf();
 

@@ -19,9 +19,9 @@ namespace doge::gui
     {
         Window::Initialize();
 
-        SetBorderThickness(DefaultBorderThickness);
         GetImage().SetTextureID("doge_gui_windowex");
         GetImage().SetBorderThickness(Rectf());
+        SetBorderThickness(DefaultBorderThickness);
     }
 
     void WindowEx::SetTitleBar(bool enabled)

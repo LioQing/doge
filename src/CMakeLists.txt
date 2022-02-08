@@ -11,15 +11,17 @@ include_directories(${PROJECT_NAME}-static ${CMAKE_SOURCE_DIR}/include)
 include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
 if (MSVC)
+
     set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
     set(SFML_STATIC_LIBRARIES TRUE)
     find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
-endif()
 
-if (MSVC)
     set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VS2019-64bit/bin/Debug)
+
 else()
+
     set(BOX2D_DIR /mnt/c/Code_Libraries/box2d-2.4.1/GCC11/bin)
+
 endif()
 
 set(SRC_FILES
@@ -93,6 +95,7 @@ if (MSVC)
     )
 
     set(BOX2D_LIB ${BOX2D_DIR}/box2d.lib)
+
 else()
 
     set(SFML_LIBS
@@ -103,6 +106,11 @@ else()
     )
 
     set(BOX2D_LIB ${BOX2D_DIR}/libbox2d.a)
+
+    set(CMAKE_CXX_FLAGS "-O3")
+
+    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+
 endif()
 
 target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
@@ -114,4 +122,4 @@ add_executable(test
 
 target_link_libraries(test ${PROJECT_NAME}-static)
 
-file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets)
+file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
