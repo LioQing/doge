@@ -65,7 +65,6 @@ namespace doge::gui
         bl.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  1)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  1))); };
         l .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  0)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  0))); };
 
-        Element::SetLocalLayer(0);
         Element::SetCursorDetectable(false);
     }
 
@@ -89,21 +88,10 @@ namespace doge::gui
         return min_size;
     }
 
-    void Resizable::SetLocalLayer(std::int32_t layer)
-    {
-        for (auto i = 0; i < Border::Count; ++i)
-            GetDraggable(i).SetLocalLayer(layer);
-    }
-
     void Resizable::SetLayer(std::int32_t layer)
     {
         for (auto i = 0; i < Border::Count; ++i)
             GetDraggable(i).SetLayer(layer);
-    }
-
-    std::int32_t Resizable::GetLocalLayer() const
-    {
-        return GetDraggable(0).GetLocalLayer();
     }
 
     std::int32_t Resizable::GetLayer() const

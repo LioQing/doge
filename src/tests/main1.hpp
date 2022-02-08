@@ -62,13 +62,13 @@ namespace main1
         engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23));
 
         // cam
-        doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .render_order = 1 });
+        doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2) });
         cam_comp = &cam.GetComponent<doge::Camera>();
         engine.events.on_window_resized += [&](const doge::event::Size& event){ cam_comp->size = event.size.Cast<float>() / 100.f; };
         cam.AddComponent(doge::Layer::Create(1, 0, -1));
 
         // smaller cam
-        doge::Entity subcam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .port = doge::Rectf(0, 0, 0.25, 0.25), .render_order = 0 });
+        doge::Entity subcam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2), .port = doge::Rectf(0, 0, 0.25, 0.25) });
         subcam.AddComponent(doge::Layer::Create(0, -1));
         
         // square for testing layer rendering
@@ -231,7 +231,8 @@ namespace main1
         };
 
         // gui elements
-        gui->AddCamera("gui_cam");
+        doge::gui::Camera& x = gui->AddCamera("gui_cam");
+        x.SetLayer(doge::Layer::CreateRange(32, 36));
         
         doge::gui::Button& button0 = gui->AddElement<doge::gui::Button>("button0", "gui_cam");
         button0.SetPosition(doge::Vec2f(-300, 0));
@@ -239,10 +240,14 @@ namespace main1
         button0.GetText().SetString(U"Hello\nthis is me");
 
         doge::gui::WindowEx& window = gui->AddElement<doge::gui::WindowEx>("window0", "gui_cam");
+        window.SetLayer(34);
+        window.SetTitleBar(true);
         window.SetResizable(true);
 
         doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
         button1.GetText().SetString(U"Button In Window");
+
+        std::cout << window.GetLayer() << std::endl;
 
         button1.GetClickable().on_pressed       += [](doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
         button1.GetClickable().on_released      += [](doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };

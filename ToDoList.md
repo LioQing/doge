@@ -18,21 +18,19 @@
       - [ ] button
       - [ ] toggle switch
       - [ ] slider
-      - [ ] color picker
       - [ ] combo box
       - [ ] text box
     - [ ] containers
       - [ ] window (elements are free to move)
-      - [ ] scrollable (elements are free to move)
       - [ ] grid
       - [ ] list
     - [ ] outputs
       - [ ] text
       - [ ] image
-  - [ ] widget traits
-    - [ ] focusable
-    - [ ] padding
-    - [ ] draggable
+    - [ ] traits
+      - [ ] draggable
+      - [ ] resizable
+      - [ ] clickable
   - [ ] assets
 - [ ] extension: nine_slice
   - [x] nine slice

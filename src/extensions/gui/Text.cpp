@@ -12,7 +12,6 @@ namespace doge::gui
     {
         GetEntity().AddComponent<doge::Text>();
 
-        SetLocalLayer(1);
         SetString(U"Text");
     }
 

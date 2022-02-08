@@ -14,8 +14,21 @@ This library uses [SFML](https://www.sfml-dev.org/) for cross-platform IO functi
 
 ## Built-in Extensions
 
-physics: provide rigid body physics simulation (with [Box2D](https://box2d.org/))
+### physics
 
-nine_slice: provide interface for 9-slice sprites using CompoundSprite
+provide rigid body physics simulation (with [Box2D](https://box2d.org/))
 
-gui: provide a graphical user interface system that is more object oriented
+### nine_slice
+
+provide interface for 9-slice sprites using CompoundSprite
+
+### gui
+
+provide a graphical user interface system that is more object oriented
+
+
+
+# Dependencies
+
+- [SFML](https://www.sfml-dev.org/)
+- [Box2D](https://box2d.org/)

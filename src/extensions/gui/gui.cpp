@@ -2,6 +2,9 @@
 
 #include <doge/core/Engine.hpp>
 #include <doge/extensions/nine_slice.hpp>
+#include <doge/extensions/gui/CameraComponent.hpp>
+#include <doge/extensions/gui/Camera.hpp>
+#include <doge/components/Camera.hpp>
 #include <algorithm>
 
 namespace doge::gui
@@ -24,105 +27,43 @@ namespace doge::gui
         engine.scenes.extensions.erase("doge_gui");
     }
 
-    Entity GUI::AddCamera(
-        const std::string& id,
-        const Rectf& port,
-        std::int32_t render_order,
-        std::int32_t layer,
-        std::size_t layer_width,
-        bool destroy_on_finish
-    )
+    Camera& GUI::AddCamera(const std::string& id)
     {
-        auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
+        auto entity = engine.AddEntity();
 
-        if (!success)
-            throw std::invalid_argument("Failed to add camera to gui");
+        auto& comp = entity.AddComponent<CameraComponent>(std::shared_ptr<Camera>(new Camera()));
+        comp.camera->id = id;
+        comp.camera->gui = this;
 
-        auto& cam_comp = itr->second.AddComponent(Camera{ .port = port, .render_order = render_order });
-        cam_comp.size = GetEngine().window.window_io.GetSize() * port.GetSize();
-
-        GetEngine().events.on_window_resized.AddListener(
-            std::string("doge_gui_camera_") + id,
-            [this, val_id = id](const event::Size& event)
-            { GetCameraComponent(val_id).size = event.size * GetCameraComponent(val_id).port.GetSize(); }
-        );
-
-        cam_comp.OnRemoval([&, val_id = id]()
+        comp.OnRemoval([&, val_id = id]()
         {
             cameras.erase(val_id);
         });
 
-        std::set<std::int32_t> layers;
-        for (std::int32_t i = 0; i < layer_width; ++i)
-            layers.emplace(layer + i);
+        cameras.emplace(comp.camera->GetID(), entity);
+        comp.camera->Initialize();
 
-        itr->second.AddComponent<Layer>(layers);
-
-        return itr->second;
-    }
-
-    Entity GUI::AddAbsoluteSizeCamera(
-        const std::string& id,
-        const Rectf& rectangle,
-        std::int32_t render_order,
-        std::int32_t layer,
-        std::size_t layer_width,
-        bool destroy_on_finish
-    )
-    {
-        auto [itr, success] = cameras.emplace(id, engine.AddEntity(destroy_on_finish));
-
-        if (!success)
-            throw std::invalid_argument("Failed to add camera to gui");
-
-        auto& cam_comp = itr->second.AddComponent(Camera{ .size = rectangle.GetSize(), .render_order = render_order });
-        cam_comp.port = Rectf(rectangle.GetPosition() / GetEngine().window.window_io.GetSize(), rectangle.GetSize() / GetEngine().window.window_io.GetSize());
-
-        cam_comp.OnRemoval([&, val_id = id]()
-        {
-            cameras.erase(val_id);
-        });
-
-        std::set<std::int32_t> layers;
-        for (std::int32_t i = 0; i < layer_width; ++i)
-            layers.emplace(layer + i);
-
-        itr->second.AddComponent<Layer>(layers);
-
-        return itr->second;
+        return *comp.camera;
     }
 
     void GUI::RemoveCamera(const std::string& id)
     {
-        GetEngine().events.on_window_resized.RemoveListener(std::string("doge_gui_camera_") + id);
         GetEngine().DestroyEntity(GetCameraEntity(id));
     }
 
-    doge::Component<Camera>& GUI::GetCameraComponent(const std::string& id) const
+    Camera& GUI::GetCamera(const std::string& id) const
     {
-        return cameras.at(id).GetComponent<Camera>();
+        return *cameras.at(id).GetComponent<CameraComponent>().camera;
+    }
+
+    doge::Component<doge::Camera>& GUI::GetCameraComponent(const std::string& id) const
+    {
+        return cameras.at(id).GetComponent<doge::Camera>();
     }
 
     Entity GUI::GetCameraEntity(const std::string& id) const
     {
         return cameras.at(id);
-    }
-
-    std::int32_t GUI::GetCameraLayer(const std::string& id) const
-    {
-        return GetCameraEntity(id).GetComponent<Layer>().layers.begin().operator*();
-    }
-
-    std::int32_t GUI::GetCameraLayerWidth(const std::string& id) const
-    {
-        auto& layers = GetCameraEntity(id).GetComponent<Layer>().layers;
-        auto [min, max] = std::minmax_element(layers.begin(), layers.end());
-        return *max - *min + 1;
-    }
-
-    std::int32_t GUI::GetCameraRenderOrder(const std::string& id) const
-    {
-        return GetCameraComponent(id).render_order;
     }
 
     bool GUI::HasCamera(const std::string& id) const
@@ -139,7 +80,7 @@ namespace doge::gui
     {
         for (auto& [id, element] : elements)
         {
-            if (element.GetComponent<Component>().element->GetCameraID() == camera_id)
+            if (element.GetComponent<ElementComponent>().element->GetCameraID() == camera_id)
                 engine.DestroyEntity(element);
         }
     }
@@ -149,9 +90,9 @@ namespace doge::gui
         return *GetElementComponent(id).element;
     }
 
-    doge::Component<Component>& GUI::GetElementComponent(const std::string& id) const
+    doge::Component<ElementComponent>& GUI::GetElementComponent(const std::string& id) const
     {
-        return elements.at(id).GetComponent<Component>();
+        return elements.at(id).GetComponent<ElementComponent>();
     }
 
     Entity GUI::GetElementEntity(const std::string& id) const
@@ -185,7 +126,7 @@ namespace doge::gui
 
         for (auto& [id, element] : elements)
         {
-            auto& ptr = element.GetComponent<Component>().element;
+            auto& ptr = element.GetComponent<ElementComponent>().element;
 
             if (!ptr->IsCursorDetectable())
                 continue;
@@ -225,7 +166,7 @@ namespace doge::gui
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<Component>().element->Update(dt);
+            element.GetComponent<ElementComponent>().element->Update(dt);
         }
     }
 
@@ -233,7 +174,7 @@ namespace doge::gui
     {
         for (auto& [id, element] : elements)
         {
-            element.GetComponent<Component>().element->FixedUpdate(dt);
+            element.GetComponent<ElementComponent>().element->FixedUpdate(dt);
         }
     }
 

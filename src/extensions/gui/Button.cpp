@@ -22,14 +22,12 @@ namespace doge::gui
     {
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
-        image.SetLocalLayer(0);
         image.SetAlign(Align::Top | Align::Left);
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_button");
         
         auto& text = GetGUI().AddElement<gui::Text>(GetTextElementID(), GetCameraID());
         text.GetEntity().SetParent(GetEntity());
-        text.SetLocalLayer(1);
         text.SetCursorDetectable(false);
         text.SetString(U"Button");
         text.SetTextAlign(doge::Text::Center);
@@ -37,7 +35,6 @@ namespace doge::gui
 
         auto& clickable = GetGUI().AddElement<Clickable>(GetClickableElementID(), GetCameraID());
         clickable.GetEntity().SetParent(GetEntity());
-        clickable.SetLocalLayer(1);
         clickable.SetAlign(Align::Top | Align::Left);
         clickable.on_pressed        += [&](io::Mouse::Button button){ on_state_transition(*this); };
         clickable.on_released       += [&](io::Mouse::Button button){ on_state_transition(*this); };
@@ -69,7 +66,6 @@ namespace doge::gui
         image_element.SetSize(GetSize());
         image_element.SetOrigin(GetActualOrigin());
         image_element.SetColor(GetColor());
-        image_element.SetLocalLayer(0);
         image_element.SetAlign(Align::Top | Align::Left);
         image_element.SetCursorDetectable(false);
     }
@@ -139,6 +135,13 @@ namespace doge::gui
         {
             button.SetColor(0xF3F3F3FF);
         }
+    }
+
+    void Button::OnLayerUpdated()
+    {
+        GetImageElement().SetLayer(GetLayer());
+        GetText().SetLayer(GetLayer() + 1);
+        GetClickable().SetLayer(GetLayer() + 1);
     }
 
     void Button::OnSizeUpdated()

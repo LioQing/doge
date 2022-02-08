@@ -41,6 +41,7 @@ namespace doge::gui
 
     protected:
 
+        virtual void OnLayerUpdated() override;
         virtual void OnSizeUpdated() override;
         virtual void OnPositionUpdated() override;
         virtual void OnOriginUpdated() override;

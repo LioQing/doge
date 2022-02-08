@@ -57,7 +57,7 @@ namespace doge::gui
             }
         });
 
-        GetEntity().GetComponent<doge::gui::Component>().OnRemoval([&]
+        GetEntity().GetComponent<ElementComponent>().OnRemoval([&]
         {
             GetGUI().GetEngine().events.on_mouse_button_pressed.RemoveListener("doge_gui_clickable_" + GetID());
             GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener("doge_gui_clickable_" + GetID());

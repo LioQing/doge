@@ -13,5 +13,10 @@ namespace doge
         {
             return Entity(this->entity_id, PCNode::root.GetDescendent(this->entity_id).get());
         }
+
+        TComp& Get()
+        {
+            return static_cast<TComp&>(*this);
+        }
     };
 }

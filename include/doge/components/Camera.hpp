@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../utils/Vec2.hpp"
-#include "../utils/Rect.hpp"
+#include <doge/utils/Vec2.hpp>
+#include <doge/utils/Rect.hpp>
 
 namespace doge
 {
@@ -12,7 +12,5 @@ namespace doge
         
         // size of camera in window (in ratio to the window)
         Rectf port = Rectf(0, 0, 1, 1);
-
-        std::int32_t render_order = 0;
     };
 }

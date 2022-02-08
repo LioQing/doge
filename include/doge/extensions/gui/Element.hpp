@@ -22,6 +22,7 @@ namespace doge
     namespace gui
     {
         struct GUI;
+        struct Camera;
         
         struct Element
         {
@@ -36,9 +37,7 @@ namespace doge
             GUI& GetGUI() const;
             Entity GetEntity() const;
 
-            void SetLocalLayer(std::int32_t layer);
             void SetLayer(std::int32_t layer);
-            std::int32_t GetLocalLayer() const;
             std::int32_t GetLayer() const;
 
             void SetCursorDetectable(bool is_cursor_detectable);
@@ -47,7 +46,8 @@ namespace doge
             const std::string& GetID() const;
 
             const std::string& GetCameraID() const;
-            doge::Component<Camera>& GetCameraComponent() const;
+            Camera& GetCamera() const;
+            doge::Component<doge::Camera>& GetCameraComponent() const;
 
             void SetSize(const Vec2f& size);
             const Vec2f& GetSize() const;

@@ -61,6 +61,11 @@ namespace doge::lev
             return RemoveListener(id);
         }
 
+        bool HasListener(const std::string& id) const&
+        {
+            return listeners.contains(id);
+        }
+
         template <typename... UArgs>
         void Raise(UArgs&&... args) const&
         {

@@ -9,9 +9,20 @@ namespace doge
     {
         std::set<std::int32_t> layers = { 0 };
 
-        static Layer Create(std::int32_t layer)
+        std::int32_t GetFirst() const
         {
-            return Layer(std::set{ layer });
+            return layers.begin().operator*();
+        }
+
+        static Layer CreateRange(std::int32_t start, std::int32_t end)
+        {
+            Layer layer;
+            layer.layers.clear();
+            for (std::int32_t i = start; i < end; ++i)
+            {
+                layer.layers.emplace(i);
+            }
+            return layer;
         }
 
         template <std::integral... Layers>

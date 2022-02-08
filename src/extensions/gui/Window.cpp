@@ -1,6 +1,7 @@
 #include <doge/extensions/gui/Window.hpp>
 
 #include <doge/extensions/gui/GUI.hpp>
+#include <doge/extensions/gui/Camera.hpp>
 #include <doge/extensions/gui/NSImage.hpp>
 #include <algorithm>
 
@@ -15,40 +16,31 @@ namespace doge::gui
     void Window::Initialize()
     {
         // camera
-        auto camera_entity = GetGUI().AddCamera(
-            GetWindowCameraID(),
-            Rectf(0, 0, 1, 1),
-            GetGUI().GetCameraRenderOrder(GetCameraID()) + 1,
-            GetGUI().GetCameraLayer(GetCameraID()) + GetGUI().GetCameraLayerWidth(GetCameraID())
-        );
+        auto& camera = GetGUI().AddCamera(GetWindowCameraID());
 
-        GetEntity().OnComponentRemoval<EntityInfo>([&, camera_entity]()
+        GetEntity().OnComponentRemoval<EntityInfo>([&, camera_entity = camera.GetEntity()]()
         {
             GetGUI().GetEngine().DestroyEntity(camera_entity);
         });
 
-        GetGUI().GetEngine().events.on_window_resized.AddListener(
-            std::string("doge_gui_window_") + GetID(),
-            [&](const event::Size& event)
-            {
-                UpdateContainerArea();
-            }
-        );
-
-        camera_entity.GetComponent<Camera>().OnRemoval([&]()
+        GetGUI().GetEngine().events.on_window_resized.AddListener("doge_gui_window_" + GetID(),
+        [&](const event::Size& event)
         {
-            GetGUI().GetEngine().events.on_window_resized.RemoveListener(std::string("doge_gui_window_") + GetID());
+            UpdateContainerArea();
+        });
+
+        camera.GetEntity().OnComponentRemoval<doge::Camera>([&]()
+        {
+            GetGUI().GetEngine().events.on_window_resized.RemoveListener("doge_gui_window_" + GetID());
             GetGUI().RemoveElements(GetWindowCameraID());
         });
 
         // image
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
-        image.SetLocalLayer(2);
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_window");
 
-        SetLocalLayer(2);
         SetSize(DefaultSize);
     }
 
@@ -77,6 +69,12 @@ namespace doge::gui
     NSImage& Window::GetImage() const
     {
         return static_cast<NSImage&>(GetGUI().GetElement(GetImageElementID()));
+    }
+
+    void Window::OnLayerUpdated()
+    {
+        GetImage().SetLayer(GetLayer());
+        GetGUI().GetCamera(GetWindowCameraID()).SetLayer(Layer::CreateRange(GetLayer() + 2, GetLayer() + 4));
     }
 
     void Window::OnSizeUpdated()

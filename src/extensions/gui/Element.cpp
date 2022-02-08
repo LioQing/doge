@@ -1,6 +1,7 @@
 #include <doge/extensions/gui/Element.hpp>
 
 #include <doge/extensions/gui/GUI.hpp>
+#include <doge/extensions/gui/Camera.hpp>
 #include <doge/core/Entity.hpp>
 
 namespace doge::gui
@@ -11,10 +12,12 @@ namespace doge::gui
 
     void Element::ElementInitialize()
     {
-        GetEntity().AddComponent(Layer::Create(GetGUI().GetCameraLayer(GetCameraID())));
-        GetEntity().AddComponent<Position>(0, 0);
+        GetEntity().AddComponent<Layer>();
+        GetEntity().AddComponent<Position>();
 
         Initialize();
+        
+        SetLayer(GetCamera().GetLayer().GetFirst());
     }
 
     GUI& Element::GetGUI() const
@@ -27,21 +30,10 @@ namespace doge::gui
         return GetGUI().GetElementEntity(GetID());
     }
 
-    void Element::SetLocalLayer(std::int32_t layer)
-    {
-        SetLayer(GetGUI().GetCameraLayer(GetCameraID()) + layer);
-        OnLayerUpdated();
-    }
-
     void Element::SetLayer(std::int32_t layer)
     {
         GetEntity().GetComponent<Layer>().layers = std::set<std::int32_t>{ layer };
         OnLayerUpdated();
-    }
-
-    std::int32_t Element::GetLocalLayer() const
-    {
-        return GetLayer() - GetGUI().GetCameraLayer(GetCameraID());
     }
 
     std::int32_t Element::GetLayer() const
@@ -70,7 +62,12 @@ namespace doge::gui
         return camera;
     }
 
-    doge::Component<Camera>& Element::GetCameraComponent() const
+    Camera& Element::GetCamera() const
+    {
+        return GetGUI().GetCamera(camera);
+    }
+
+    doge::Component<doge::Camera>& Element::GetCameraComponent() const
     {
         return GetGUI().GetCameraComponent(camera);
     }

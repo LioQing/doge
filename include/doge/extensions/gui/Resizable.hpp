@@ -38,9 +38,7 @@ namespace doge::gui
         void SetMinSize(const Vec2f& min_size);
         const Vec2f& GetMinSize() const;
 
-        void SetLocalLayer(std::int32_t layer);
         void SetLayer(std::int32_t layer);
-        std::int32_t GetLocalLayer() const;
         std::int32_t GetLayer() const;
 
         void SetCursorDetectable(bool is_cursor_detectable);

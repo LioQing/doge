@@ -48,6 +48,8 @@ namespace doge::io
 
     void Window::Render(const Engine& engine)
     {
+        layers_draws.clear();
+
         // helper functions
         auto SyncTransformable = []<typename TComp>(sf::Transformable& transform, const TComp& comp, const Entity& entity)
         {
@@ -88,26 +90,11 @@ namespace doge::io
 
         auto EmplaceDrawables = [&]<typename TDrawable, typename TComp, typename... Args>(const DrawableKey& key, Component<TComp>& comp, Args&&... args)
         {
-            // draws_layers
+            // layers_draws
             auto layer_comp = comp.GetEntity().template GetIfHasComponentElseDefault<Layer>();
-            if (layer_comp.layers.size() < 1)
-                throw std::invalid_argument("Layer component of Entity have no layer information");
-            int layer = *layer_comp.layers.rbegin();
-
-            auto layer_itr = draws_layers.find(key);
-            if (layer_itr == draws_layers.end())
+            for (auto layer : layer_comp.layers)
             {
-                auto [layer_itr_, success] = draws_layers.emplace(key, layer);
-                if (!success)
-                {
-                    throw std::invalid_argument("Failed to emplace layer info for entity");
-                }
-                layer_itr = std::move(layer_itr_);
-                comp.OnRemoval([&, val_key = key](){ draws_layers.erase(val_key); });
-            }
-            else
-            {
-                layer_itr->second = layer;
+                layers_draws[layer].emplace(key);
             }
 
             // drawables
@@ -127,6 +114,7 @@ namespace doge::io
 
         auto InAnyViewHelperHelper = [&](
             const Rectf& aabb_, 
+            const Entity& entity,
             const DrawableKey& key)
         {
             auto is_in_any_view = false;
@@ -146,7 +134,7 @@ namespace doge::io
 
             for (auto cam_entity : engine.Select<Camera>().Entities())
             {
-                auto& [view_ptr, draw_keys, render_order] = views_draws.at(cam_entity.id);
+                auto& [view_ptr, draw_keys] = views_draws.at(cam_entity.id);
                 
                 bool is_in_view = 
                     aabb.left + aabb.width > view_ptr->getCenter().x - view_ptr->getSize().x / 2.f &&
@@ -170,9 +158,9 @@ namespace doge::io
             return is_in_any_view;
         };
 
-        auto TextInAnyViewHelper = [&](const custom_sf::Text& text, const DrawableKey& key)
+        auto TextInAnyViewHelper = [&](const custom_sf::Text& text, const Entity& entity, const DrawableKey& key)
         {
-            return InAnyViewHelperHelper(text.GetAABB(), key);
+            return InAnyViewHelperHelper(text.GetAABB(), entity, key);
         };
 
         auto InAnyViewHelper = [&]<typename TComp>(
@@ -181,8 +169,8 @@ namespace doge::io
             const DrawableKey& key)
         {
             if constexpr (std::is_same_v<TComp, Sprite>)
-                return InAnyViewHelperHelper(global::GetAABB(comp, entity, engine), key);
-            return InAnyViewHelperHelper(global::GetAABB(comp, entity), key);
+                return InAnyViewHelperHelper(global::GetAABB(comp, entity, engine), entity, key);
+            return InAnyViewHelperHelper(global::GetAABB(comp, entity), entity, key);
         };
 
         // view
@@ -191,7 +179,7 @@ namespace doge::io
             auto view_itr = views_draws.find(entity.id);
             if (view_itr == views_draws.end())
             {
-                view_itr = views_draws.emplace(entity.id, ViewInfo(std::make_unique<sf::View>(), std::set<DrawableKey>(), cam.render_order)).first;
+                view_itr = views_draws.emplace(entity.id, ViewInfo(std::make_unique<sf::View>(), std::set<DrawableKey>())).first;
                 cam.OnRemoval([&, eid = entity.id](){ views_draws.erase(eid); });
             }
 
@@ -387,7 +375,7 @@ namespace doge::io
             auto draw_itr = EmplaceDrawables.template operator()<custom_sf::Text>(key, comp, engine.assets, text_comp);
 
             custom_sf::Text& text = static_cast<custom_sf::Text&>(*draw_itr->second);
-            if (TextInAnyViewHelper(text, key))
+            if (TextInAnyViewHelper(text, entity, key))
             {
                 SyncText(text, text_comp, entity);
             }
@@ -438,55 +426,26 @@ namespace doge::io
             }
         }
 
-        // layers_draws
-        std::map<std::int32_t, std::set<const DrawableKey*>> layers_draws;
-        
-        for (auto& [draw, layer] : draws_layers)
-        {
-            layers_draws[layer].emplace(&draw);
-        }
-
-        // cam orders
-        std::map<std::int32_t, std::unordered_map<EntityID, std::reference_wrapper<ViewInfo>>> orders_views;
-
-        for (auto& [cam_id, view_info] : views_draws)
-        {
-            orders_views[std::get<2>(view_info)].emplace(cam_id, std::ref(view_info));
-        }
-
         // draw
         window.clear(cast::ToSfColor(background_color));
-        for (auto& [order, view_infos] : orders_views)
+
+        for (auto& [layer, draw_keys] : layers_draws)
         {
-            for (auto& [cam_id, view_info] : view_infos)
+            for (auto& draw_key : draw_keys)
             {
-                auto& [view, draw_keys, _] = view_info.get();
-
-                window.setView(*view);
-
-                // draw
-                if (engine.GetEntity(cam_id).HasComponent<Layer>())
+                for (auto& [cam_id, view_info] : views_draws)
                 {
-                    auto& cam_layers = engine.GetEntity(cam_id).GetComponent<Layer>().layers;
+                    auto& [view, view_draws] = view_info;
 
-                    for (auto& [layer, layer_draw_keys] : layers_draws)
+                    if (
+                        view_draws.contains(draw_key) &&
+                        (!engine.GetEntity(cam_id).HasComponent<Layer>() && layer == 0 ||
+                        engine.GetEntity(cam_id).HasComponent<Layer>() &&
+                        engine.GetEntity(cam_id).GetComponent<Layer>().layers.contains(layer))
+                    )
                     {
-                        if (!cam_layers.contains(layer))
-                            continue;
-
-                        for (auto& draw_key : layer_draw_keys)
-                        {
-                            if (draw_keys.contains(*draw_key))
-                                window.draw(*drawables.at(*draw_key));
-                        }
-                    }
-                }
-                else if (!layers_draws.empty())
-                {
-                    for (auto& draw_key : layers_draws.at(0))
-                    {
-                        if (draw_keys.contains(*draw_key))
-                            window.draw(*drawables.at(*draw_key));
+                        window.setView(*view);
+                        window.draw(*drawables.at(draw_key));
                     }
                 }
             }

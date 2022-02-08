@@ -37,7 +37,6 @@ namespace doge::gui
         {
             auto& title_bar = GetGUI().AddElement<Text>(GetTitleBarElementID(), GetCameraID());
             title_bar.GetEntity().SetParent(GetEntity());
-            title_bar.SetLocalLayer(3);
             title_bar.SetCursorDetectable(false);
             title_bar.SetAlign(Align::Center | Align::Left);
             title_bar.SetFontSize(14);
@@ -45,6 +44,7 @@ namespace doge::gui
             title_bar.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
 
             UpdateTitleBarOrigin();
+            UpdateTitleBarLayer();
         }
     }
 
@@ -66,14 +66,15 @@ namespace doge::gui
         {
             auto& draggable = GetGUI().AddElement<gui::Draggable>(GetDraggableElementID(), GetCameraID());
             draggable.GetEntity().SetParent(GetEntity());
-            draggable.SetLocalLayer(3);
-            draggable.SetSize(Vec2f(GetSize().x, GetBorderThickness().top - (IsResizable() ? GetResizable().GetThickness().top : 0.f)));
+            draggable.SetCursorDetectable(true);
             draggable.SetAlign(Align::Top | Align::Center);
 
             draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_pos = GetPosition(); };
             draggable.on_dragged_diff += [&](const Vec2f& diff){ SetPosition(drag_start_pos + diff); };
 
             UpdateDraggableOrigin();
+            UpdateDraggableSize();
+            UpdateDraggableLayer();
         }
     }
 
@@ -95,7 +96,6 @@ namespace doge::gui
         {
             auto& resizable = GetGUI().AddElement<gui::Resizable>(GetResizableElementID(), GetCameraID());
             resizable.GetEntity().SetParent(GetEntity());
-            resizable.SetLocalLayer(3);
             resizable.SetCursorDetectable(true);
             resizable.SetThickness(DefaultResizeThickness);
             resizable.SetMinSize(Vec2f(100, 100));
@@ -111,6 +111,7 @@ namespace doge::gui
             };
 
             UpdateResizableOrigin();
+            UpdateResizableLayer();
         }
 
         OnSizeUpdated();
@@ -181,6 +182,26 @@ namespace doge::gui
         }
     }
 
+    void WindowEx::OnLayerUpdated()
+    {
+        Window::OnLayerUpdated();
+
+        if (HasTitleBar())
+        {
+            GetTitleBar().SetLayer(GetLayer() + 1);
+        }
+
+        if (IsDraggable())
+        {
+            GetDraggable().SetLayer(GetLayer() + 1);
+        }
+
+        if (IsResizable())
+        {
+            GetResizable().SetLayer(GetLayer() + 1);
+        }
+    }
+
     void WindowEx::OnSizeUpdated()
     {
         Window::OnSizeUpdated();
@@ -227,9 +248,19 @@ namespace doge::gui
         }
     }
 
+    void WindowEx::UpdateTitleBarLayer()
+    {
+        GetTitleBar().SetLayer(GetLayer() + 1);
+    }
+    
     void WindowEx::UpdateTitleBarOrigin()
     {
         GetTitleBar().SetOrigin(GetActualOrigin() - Vec2f(GetBorderThickness().left, GetBorderThickness().top / 2.f));
+    }
+
+    void WindowEx::UpdateDraggableLayer()
+    {
+        GetDraggable().SetLayer(GetLayer() + 1);
     }
 
     void WindowEx::UpdateDraggableOrigin()
@@ -240,6 +271,11 @@ namespace doge::gui
     void WindowEx::UpdateDraggableSize()
     {
         GetDraggable().SetSize(Vec2f(GetSize().x, GetBorderThickness().top - (IsResizable() ? GetResizable().GetThickness().top : 0.f)));
+    }
+
+    void WindowEx::UpdateResizableLayer()
+    {
+        GetResizable().SetLayer(GetLayer() + 1);
     }
 
     void WindowEx::UpdateResizableOrigin()

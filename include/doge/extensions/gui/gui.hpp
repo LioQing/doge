@@ -1,12 +1,13 @@
 #pragma once
 
 #include <doge/utils/aliases.hpp>
-#include <doge/extensions/gui/Component.hpp>
-#include <doge/extensions/gui/Element.hpp>
 #include <doge/extensions/nine_slice.hpp>
+#include <doge/extensions/gui/ElementComponent.hpp>
+#include <doge/extensions/gui/Element.hpp>
 #include <doge/core/Engine.hpp>
 #include <unordered_map>
 #include <unordered_set>
+#include <set>
 #include <memory>
 #include <doge/utils/aliases.hpp>
 
@@ -18,37 +19,20 @@ namespace doge
     {
         struct Text;
         struct Window;
+        struct Camera;
 
         struct GUI
         {
             GUI(Engine& engine);
             ~GUI();
 
-            Entity AddCamera(
-                const std::string& id,
-                const Rectf& port = Rectf(0, 0, 1, 1),
-                std::int32_t render_order = 32,
-                std::int32_t layer = 32,
-                std::size_t layer_width = 4,
-                bool destroy_on_finish = true
-            );
-
-            Entity AddAbsoluteSizeCamera(
-                const std::string& id,
-                const Rectf& rectangle,
-                std::int32_t render_order = 32,
-                std::int32_t layer = 32,
-                std::size_t layer_width = 4,
-                bool destroy_on_finish = true
-            );
+            Camera& AddCamera(const std::string& id);
 
             void RemoveCamera(const std::string& id);
 
-            doge::Component<Camera>& GetCameraComponent(const std::string& id) const;
+            Camera& GetCamera(const std::string& id) const;
+            doge::Component<doge::Camera>& GetCameraComponent(const std::string& id) const;
             Entity GetCameraEntity(const std::string& id) const;
-            std::int32_t GetCameraLayer(const std::string& id) const;
-            std::int32_t GetCameraLayerWidth(const std::string& id) const;
-            std::int32_t GetCameraRenderOrder(const std::string& id) const;
 
             bool HasCamera(const std::string& id) const;
 
@@ -62,7 +46,7 @@ namespace doge
                 auto entity = engine.AddEntity();
                 entity.SetParent(cam_itr->second);
 
-                auto& comp = entity.AddComponent(Component::Create(E()));
+                auto& comp = entity.AddComponent(ElementComponent::Create(E()));
                 comp.element->id = id;
                 comp.element->camera = cam_id;
                 comp.element->gui = this;
@@ -82,7 +66,7 @@ namespace doge
             void RemoveElements(const std::string& camera_id);
 
             Element& GetElement(const std::string& id) const;
-            doge::Component<Component>& GetElementComponent(const std::string& id) const;
+            doge::Component<ElementComponent>& GetElementComponent(const std::string& id) const;
             Entity GetElementEntity(const std::string& id) const;
 
             bool HasElement(const std::string& id) const;
