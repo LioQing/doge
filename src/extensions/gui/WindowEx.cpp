@@ -5,6 +5,9 @@
 #include <doge/extensions/gui/Draggable.hpp>
 #include <doge/extensions/gui/NSImage.hpp>
 #include <doge/extensions/gui/Resizable.hpp>
+#include <doge/extensions/gui/Button.hpp>
+#include <doge/extensions/gui/Image.hpp>
+#include <doge/extensions/gui/Clickable.hpp>
 
 namespace doge::gui
 {
@@ -123,6 +126,64 @@ namespace doge::gui
         return trait_enabled.test(Trait::Resizable);
     }
 
+    void WindowEx::SetCloseButton(bool enabled)
+    {
+        auto prev_enabled = trait_enabled.test(Trait::CloseButton);
+        trait_enabled.set(Trait::CloseButton, enabled);
+
+        if (prev_enabled && !enabled)
+        {
+            GetGUI().RemoveElement(GetCloseButtonElementID());
+        }
+        else if (!prev_enabled && enabled)
+        {
+            auto& button = GetGUI().AddElement<Button>(GetCloseButtonElementID(), GetCameraID());
+            button.GetEntity().SetParent(GetEntity());
+            button.SetCursorDetectable(true);
+            button.Set9Slice(false);
+            button.GetImage().SetTextureID("doge_gui_windowex_close_button");
+            button.SetAlign(Align::Center | Align::Right);
+            button.SetSize(Vec2f(24, 24));
+
+            button.GetClickable().on_clicked +=
+            [&](io::Mouse::Button button)
+            {
+                if (button == io::Mouse::Button::Left)
+                    GetGUI().RemoveElement(GetID());
+            };
+            
+            button.on_state_transition = 
+            [](Button& button)
+            {
+                if (button.GetClickable().IsDown(io::Mouse::Button::Left))
+                {
+                    button.SetColor(0xF6F6F6FF);
+                    button.GetImage().SetTextureAtlasRectangle("pressed");
+                }
+                else if (button.GetClickable().IsMouseOver())
+                {
+                    button.SetColor(0xFFFFFFFF);
+                    button.GetImage().SetTextureAtlasRectangle("pressed");
+                }
+                else
+                {
+                    button.SetColor(0xF3F3F3FF);
+                    button.GetImage().SetTextureAtlasRectangle("default");
+                }
+            };
+
+            button.on_state_transition(button);
+
+            UpdateCloseButtonLayer();
+            UpdateCloseButtonOrigin();
+        }
+    }
+
+    bool WindowEx::HasCloseButton() const
+    {
+        return trait_enabled.test(Trait::CloseButton);
+    }
+
     void WindowEx::SetScrollable(bool enabled)
     {
         trait_enabled.set(Trait::Scrollable, enabled);
@@ -172,6 +233,19 @@ namespace doge::gui
         return static_cast<gui::Resizable&>(GetGUI().GetElement(GetResizableElementID()));
     }
 
+    std::string WindowEx::GetCloseButtonElementID() const
+    {
+        return "window_gui_windowex_" + GetID() + "_close_button";
+    }
+
+    Button& WindowEx::GetCloseButton() const
+    {
+        if (!HasCloseButton())
+            throw std::invalid_argument("CloseButton is not enabled");
+
+        return static_cast<Button&>(GetGUI().GetElement(GetCloseButtonElementID()));
+    }
+
     void WindowEx::SetBorderThickness(const Rectf& border_thickness)
     {
         Window::SetBorderThickness(border_thickness);
@@ -179,6 +253,11 @@ namespace doge::gui
         if (IsDraggable())
         {
             UpdateDraggableSize();
+        }
+
+        if (HasCloseButton())
+        {
+            UpdateCloseButtonOrigin();
         }
     }
 
@@ -188,17 +267,22 @@ namespace doge::gui
 
         if (HasTitleBar())
         {
-            GetTitleBar().SetLayer(GetLayer() + 1);
+            UpdateTitleBarLayer();
         }
 
         if (IsDraggable())
         {
-            GetDraggable().SetLayer(GetLayer() + 1);
+            UpdateDraggableLayer();
         }
 
         if (IsResizable())
         {
-            GetResizable().SetLayer(GetLayer() + 1);
+            UpdateResizableLayer();
+        }
+
+        if (HasCloseButton())
+        {
+            UpdateCloseButtonOrigin();
         }
     }
 
@@ -220,6 +304,11 @@ namespace doge::gui
         if (IsResizable() && !resize_guard)
         {
             UpdateResizableSize();
+        }
+
+        if (HasCloseButton())
+        {
+            UpdateCloseButtonOrigin();
         }
     }
     
@@ -245,6 +334,11 @@ namespace doge::gui
         if (IsResizable() && !resize_guard)
         {
             UpdateResizableOrigin();
+        }
+
+        if (HasCloseButton())
+        {
+            UpdateCloseButtonOrigin();
         }
     }
 
@@ -287,5 +381,15 @@ namespace doge::gui
     void WindowEx::UpdateResizableSize()
     {
         GetResizable().SetSize(GetSize());
+    }
+
+    void WindowEx::UpdateCloseButtonLayer()
+    {
+        GetCloseButton().SetLayer(GetLayer() + 1);
+    }
+
+    void WindowEx::UpdateCloseButtonOrigin()
+    {
+        GetCloseButton().SetOrigin(GetActualOrigin() - Vec2f(GetSize().x - 4, GetBorderThickness().top / 2.f));
     }
 }

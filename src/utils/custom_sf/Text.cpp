@@ -20,7 +20,7 @@ namespace doge::custom_sf
             if (!assets.HasFont(text_comp.font_id))
                 return Vec2f::Zero;
 
-            Vec2f offset;
+            Vec2f offset = Vec2f::Zero;
             const io::Font& font = assets.GetFont(text_comp.font_id);
 
             std::size_t line = 0;
@@ -147,7 +147,6 @@ namespace doge::custom_sf
 
         aabb.height -= aabb.top;
         aabb.width -= aabb.left;
-
         return aabb;
     }
 

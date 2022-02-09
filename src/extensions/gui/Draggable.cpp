@@ -65,14 +65,14 @@ namespace doge::gui
     {
         auto coords = GetGUI().GetEngine().window.MapPixelToCoords(pixel, GetCameraComponent());
 
-        if (coords.x > GetCameraComponent().size.x / 2.f)
+        if (coords.x > GetCameraComponent().size.x / 2.f - 1)
             coords.x = GetCameraComponent().size.x / 2.f - 1;
-        else if (coords.x < -GetCameraComponent().size.x / 2.f)
+        else if (coords.x < -GetCameraComponent().size.x / 2.f + 1)
             coords.x = -GetCameraComponent().size.x / 2.f + 1;
 
-        if (coords.y > GetCameraComponent().size.y / 2.f)
+        if (coords.y > GetCameraComponent().size.y / 2.f - 1)
             coords.y = GetCameraComponent().size.y / 2.f - 1;
-        else if (coords.y < -GetCameraComponent().size.y / 2.f)
+        else if (coords.y < -GetCameraComponent().size.y / 2.f + 1)
             coords.y = -GetCameraComponent().size.y / 2.f + 1;
         
         return coords;

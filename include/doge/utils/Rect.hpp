@@ -9,9 +9,14 @@ namespace doge
     template <typename T>
     struct Rect
     {
-        T left, top, width, height;
+        T left   = 0.0;
+        T top    = 0.0;
+        T width  = 0.0;
+        T height = 0.0;
 
-        Rect(T left = 0.0, T top = 0.0, T width = 0.0, T height = 0.0) : left(left), top(top), width(width), height(height) {}
+        Rect() = default;
+        Rect(const Rect&) = default;
+        Rect(T left, T top, T width, T height) : left(left), top(top), width(width), height(height) {}
         Rect(const Vec2<T>& position, const Vec2<T>& size) : left(position.x), top(position.y), width(size.x), height(size.y) {}
 
         template <typename U>

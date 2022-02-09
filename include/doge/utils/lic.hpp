@@ -165,7 +165,22 @@ namespace doge
              * @param callback The function to be called when the compeonent is being removed
              */
             template <typename TComp>
-            void OnComponentRemoval(const std::function<void()>& callback) const;
+            void OnComponentRemoval(const std::function<void()>& callback) const;        
+        
+            /**
+             * @brief Call the on component removal callback function manually
+             * 
+             * @param cid ID of the component
+             */
+            void RaiseComponentRemoval(ComponentID cid) const;
+
+            /**
+             * @brief Call the on component removal callback function manually
+             * 
+             * @param eid ID of the entity where the component belongs
+             */
+            template <typename TComp>
+            void RaiseComponentRemoval() const;
 
             operator EntityID() const { return id; }
         };
@@ -440,6 +455,26 @@ namespace doge
         static void OnComponentRemoval(EntityID eid, const std::function<void()>& callback)
         {
             OnComponentRemoval(eid, GetComponentID<TComp>(), callback);
+        }
+
+        /**
+         * @brief Call the on component removal callback function manually
+         * 
+         * @param eid ID of the entity where the component belongs
+         * @param cid ID of the component
+         */
+        static void RaiseComponentRemoval(EntityID eid, ComponentID cid);
+
+        /**
+         * @brief Call the on component removal callback function manually
+         * 
+         * @tparam TComp type of the component
+         * @param eid ID of the entity where the component belongs
+         */
+        template <typename TComp>
+        static void RaiseComponentRemoval(EntityID eid)
+        {
+            RaiseComponentRemoval(eid, GetComponentID<TComp>());
         }
 
         /**
@@ -737,5 +772,11 @@ namespace doge
     void lic::Entity::OnComponentRemoval(const std::function<void()>& callback) const
     {
         lic::OnComponentRemoval(id, GetComponentID<TComp>(), callback);
+    }
+
+    template <typename TComp>
+    void lic::Entity::RaiseComponentRemoval() const
+    {
+        RaiseComponentRemoval(id, GetComponentID<TComp>());
     }
 }

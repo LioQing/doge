@@ -42,7 +42,7 @@ namespace doge::gui
 
     std::string Window::GetWindowCameraID() const
     {
-        return "doge_gui_window_" + GetID();
+        return "doge_gui_window_" + GetID() + "_camera";
     }
 
     Camera& Window::GetWindowCamera() const
@@ -74,7 +74,7 @@ namespace doge::gui
     void Window::OnLayerUpdated()
     {
         GetImage().SetLayer(GetLayer());
-        GetWindowCamera().SetLayer(Layer::CreateRange(GetLayer() + 2, GetLayer() + 4));
+        GetWindowCamera().SetLayer(Layer::CreateRange(GetLayer() + 4, GetLayer() + 6));
     }
 
     void Window::OnSizeUpdated()

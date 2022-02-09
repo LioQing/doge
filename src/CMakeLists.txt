@@ -121,5 +121,3 @@ add_executable(test
 )
 
 target_link_libraries(test ${PROJECT_NAME}-static)
-
-file(COPY ${CMAKE_SOURCE_DIR}/assets DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

@@ -205,6 +205,13 @@ namespace doge
     void Engine::DestroyEntity(EntityID eid)
     {
         to_be_destroyed.push_back(eid);
+
+        auto entity = GetEntity(eid);
+        for (ComponentID cid = 0u; cid < lic::LIC_MAX_COMPONENT; ++cid)
+        {
+            if (entity.HasComponent(cid))
+                entity.RaiseComponentRemoval(cid);
+        }
     }
 
     const std::shared_ptr<PCNode> Engine::GetPCNode(EntityID eid) const

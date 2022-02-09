@@ -7,6 +7,6 @@ namespace doge::gui
 {
     struct CameraComponent
     {
-        std::shared_ptr<Camera> camera;
+        Camera camera;
     };
 }

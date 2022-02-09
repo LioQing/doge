@@ -8,6 +8,7 @@ namespace doge::gui
     struct Text;
     struct Draggable;
     struct Resizable;
+    struct Button;
 
     struct WindowEx : Window
     {
@@ -16,6 +17,7 @@ namespace doge::gui
             TitleBar = 0,
             Draggable,
             Resizable,
+            CloseButton,
             Scrollable,
 
             Count
@@ -37,6 +39,9 @@ namespace doge::gui
         void SetResizable(bool enabled);
         bool IsResizable() const;
 
+        void SetCloseButton(bool enabled);
+        bool HasCloseButton() const;
+
         void SetScrollable(bool enabled);
         bool IsScrollable() const;
 
@@ -48,6 +53,9 @@ namespace doge::gui
 
         std::string GetResizableElementID() const;
         gui::Resizable& GetResizable() const;
+
+        std::string GetCloseButtonElementID() const;
+        Button& GetCloseButton() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
 
@@ -68,6 +76,9 @@ namespace doge::gui
         virtual void UpdateResizableLayer();
         virtual void UpdateResizableSize();
         virtual void UpdateResizableOrigin();
+
+        virtual void UpdateCloseButtonLayer();
+        virtual void UpdateCloseButtonOrigin();
 
     private:
 

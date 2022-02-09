@@ -10,6 +10,11 @@ namespace doge::gui
     {
     }
 
+    bool Element::TestPoint(const Vec2f& point) const
+    {
+        return math::TestPoint(point, GetGlobalRectangle());
+    }
+
     void Element::ElementInitialize()
     {
         GetEntity().AddComponent<Layer>();

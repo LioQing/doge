@@ -31,19 +31,19 @@ namespace doge::gui
     {
         auto entity = engine.AddEntity();
 
-        auto& comp = entity.AddComponent<CameraComponent>(std::shared_ptr<Camera>(new Camera()));
-        comp.camera->id = id;
-        comp.camera->gui = this;
+        auto& comp = entity.AddComponent<CameraComponent>();
+        comp.camera.id = id;
+        comp.camera.gui = this;
 
         comp.OnRemoval([&, val_id = id]()
         {
             cameras.erase(val_id);
         });
 
-        cameras.emplace(comp.camera->GetID(), entity);
-        comp.camera->Initialize();
+        cameras.emplace(comp.camera.GetID(), entity);
+        comp.camera.Initialize();
 
-        return *comp.camera;
+        return comp.camera;
     }
 
     void GUI::RemoveCamera(const std::string& id)
@@ -53,7 +53,7 @@ namespace doge::gui
 
     Camera& GUI::GetCamera(const std::string& id) const
     {
-        return *cameras.at(id).GetComponent<CameraComponent>().camera;
+        return cameras.at(id).GetComponent<CameraComponent>().camera;
     }
 
     doge::Component<doge::Camera>& GUI::GetCameraComponent(const std::string& id) const
@@ -78,10 +78,16 @@ namespace doge::gui
 
     void GUI::RemoveElements(const std::string& camera_id)
     {
+        std::vector<EntityID> to_be_destroyed;
         for (auto& [id, element] : elements)
         {
             if (element.GetComponent<ElementComponent>().element->GetCameraID() == camera_id)
-                engine.DestroyEntity(element);
+                to_be_destroyed.emplace_back(element);
+        }
+
+        for (auto& element : to_be_destroyed)
+        {
+            engine.DestroyEntity(element);
         }
     }
 
@@ -139,7 +145,7 @@ namespace doge::gui
 
             if (
                 math::TestPoint(GetEngine().window.window_io.GetMousePosition(), cam_rect) &&
-                math::TestPoint(cursor_pos, ptr->GetGlobalRectangle()) &&
+                ptr->TestPoint(cursor_pos) &&
                 (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer())
             )
             {
@@ -160,6 +166,12 @@ namespace doge::gui
 
         engine.assets.LoadTexture("doge_gui_windowex", "gui/windowex.png");
         nine_slice.LoadTexture("doge_gui_windowex", "gui/windowex.png", Recti(12, 32, 12, 12));
+
+        {
+            auto [itr, success] = engine.assets.LoadTexture("doge_gui_windowex_close_button", "gui/windowex_close_button.png");
+            itr->second.atlas_rectangles.emplace("default", Recti(0, 0, 24, 24));
+            itr->second.atlas_rectangles.emplace("pressed", Recti(24, 0, 24, 24));
+        }
     }
 
     void GUI::Update(Engine& engine, DeltaTime dt)

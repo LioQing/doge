@@ -16,6 +16,11 @@ namespace doge::gui
         virtual ~Clickable();
 
         virtual void Initialize() override;
+
+        virtual bool TestPoint(const Vec2f& point) const override;
+
+        void SetCornerRadius(float corner_radius);
+        float GetCornerRadius() const;
     
         bool IsDown(io::Mouse::Button button) const;
         bool IsMouseOver() const;
@@ -23,6 +28,7 @@ namespace doge::gui
     private:
 
         bool is_mouse_over = false;
+        float corner_radius = 0.f;
         std::bitset<io::Mouse::Button::Count> buttons_down;
     };
 }

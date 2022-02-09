@@ -22,6 +22,9 @@ namespace doge::gui
 
         virtual void Initialize() override;
 
+        void SetHasText(bool has_text);
+        bool HasText() const;
+
         void Set9Slice(bool is_9_slice);
         bool Is9Slice() const;
 
@@ -50,5 +53,6 @@ namespace doge::gui
     private:
 
         bool is_9_slice = true;
+        bool has_text = false;
     };
 }

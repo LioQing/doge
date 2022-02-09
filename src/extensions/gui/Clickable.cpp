@@ -23,13 +23,14 @@ namespace doge::gui
         GetGUI().GetEngine().events.on_mouse_button_released.AddListener("doge_gui_clickable_" + GetID(),
         [&](const event::MouseButton& event)
         {
-            if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
+            auto was_down = buttons_down.test(event.button);
+            buttons_down.set(event.button, false);
+            
+            if (was_down)
             {
-                auto was_down = buttons_down.test(event.button);
-                buttons_down.set(event.button, false);
                 on_released(event.button);
 
-                if (was_down)
+                if (GetGUI().GetElementBelowCursor().get() == static_cast<Element*>(this))
                 {
                     on_clicked(event.button);
                 }
@@ -63,6 +64,21 @@ namespace doge::gui
             GetGUI().GetEngine().events.on_mouse_button_released.RemoveListener("doge_gui_clickable_" + GetID());
             GetGUI().GetEngine().events.on_mouse_moved.RemoveListener("doge_gui_clickable_" + GetID());
         });
+    }
+
+    bool Clickable::TestPoint(const Vec2f& point) const
+    {
+        return math::TestPoint(point, GetGlobalRectangle(), corner_radius);
+    }
+
+    void Clickable::SetCornerRadius(float corner_radius)
+    {
+        this->corner_radius = corner_radius;
+    }
+
+    float Clickable::GetCornerRadius() const
+    {
+        return corner_radius;
     }
     
     bool Clickable::IsDown(io::Mouse::Button button) const

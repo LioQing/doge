@@ -120,7 +120,6 @@ namespace main3
 
         doge::Component<doge::CircleShape>* circle_comp;
         doge::gui::Text* text;
-        doge::gui::Image* image;
         doge::gui::WindowEx* window;
 
         std::size_t window_count;
@@ -138,9 +137,13 @@ namespace main3
             window->SetLayer(layer);
             window->SetTitleBar(true);
             window->SetResizable(true);
+            window->SetCloseButton(true);
 
             auto& button = window->AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
+            button.SetSize(doge::Vec2f(100, 100));
+            button.GetClickable().SetCornerRadius(25);
             button.SetPosition(doge::Vec2f(0, 0));
+            button.SetHasText(true);
 
             auto& text = button.GetText();
             text.SetString(U"Lock");
@@ -152,14 +155,12 @@ namespace main3
                 {
                     this->circle_comp->color = doge::Color::Green;
                     this->text->SetAlign(doge::gui::Align::Top);
-                    this->image->SetTextureRectangle(doge::Recti(32, 0, 32, 32));
                     this->window->SetDraggable(true);
                 }
                 else
                 {
                     this->circle_comp->color = doge::Color::Red;
                     this->text->SetAlign(doge::gui::Align::Bottom);
-                    this->image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
                     this->window->SetDraggable(false);
                 }
             };
@@ -179,23 +180,12 @@ namespace main3
             auto& cam = gui.AddCamera("my_cam");
             cam.SetLayer(doge::Layer::CreateRange(32, 34));
 
-            for (auto i = 34; i < 36; ++i) cam.GetLayer().layers.emplace(i);
+            for (auto i = 34; i < 38; ++i) cam.GetLayer().layers.emplace(i);
             AddWindow(doge::Vec2f(0, -100), 34);
 
-            std::cout << window->GetTitleBar().GetLayer() << std::endl;
-
-            for (auto i = 48; i < 50; ++i) cam.GetLayer().layers.emplace(i);
+            for (auto i = 48; i < 52; ++i) cam.GetLayer().layers.emplace(i);
             AddWindow(doge::Vec2f::Zero, 48);
-            
-            std::cout << window->GetTitleBar().GetLayer() << std::endl;
-
-            std::cout << "cam: ";
-            for (auto i : cam.GetLayer().layers)
-            {
-                std::cout << i << " ";
-            }
-            std::cout << std::endl;
-
+        
             // button
             // auto& button = gui.AddElement<doge::gui::Button>("my_button", "my_cam");
             // button.SetPosition(doge::Vec2f(0, 300));
@@ -207,10 +197,12 @@ namespace main3
             text->SetAlign(doge::gui::Align::Bottom);
 
             // image
-            image = &gui.AddElement<doge::gui::Image>("my_image", "my_cam");
-            image->SetTextureID("test");
-            image->SetTextureRectangle(doge::Recti(0, 0, 32, 32));
-            image->SetPosition(doge::Vec2f(300, 0));
+            auto& ba = gui.AddElement<doge::gui::Button>("my_image", "my_cam");
+            ba.Set9Slice(false);
+            ba.GetImage().SetTextureID("test");
+            ba.SetSize(doge::Vec2f(32, 32));
+            ba.GetImage().SetTextureRectangle(doge::Recti(0, 0, 32, 32));
+            ba.SetPosition(doge::Vec2f(300, 0));
 
             // ns image
             auto& ns_image = gui.AddElement<doge::gui::NSImage>("my_ns_image", "my_cam");
@@ -230,7 +222,7 @@ namespace main3
             });
 
             circle_entity.AddComponent<doge::Position>(0, -20);
-            circle_entity.AddComponent(doge::Layer::Create(gui.GetCamera(window->GetWindowCameraID()).GetLayer().GetFirst()));
+            circle_entity.AddComponent(doge::Layer::Create(gui.GetCamera(window->GetWindowCameraID()).GetLayer().GetFirst() + 1));
 
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_b",
@@ -246,9 +238,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            // auto e = gui.GetElementBelowCursor();
-            // if (e)
-            //     std::cout << e->GetID() << std::endl;
+            auto e = gui.GetElementBelowCursor();
+            if (e)
+                std::cout << e->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

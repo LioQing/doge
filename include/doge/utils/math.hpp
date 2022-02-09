@@ -14,6 +14,7 @@ namespace doge
 
         static bool TestPoint(const Vec2f& point, const Vec2f& position, float radius);
         static bool TestPoint(const Vec2f& point, const Rectf& rectangle);
+        static bool TestPoint(const Vec2f& point, const Rectf& rectangle, float corner_radius);
         static bool TestPoint(const Vec2f& point, const std::vector<Vec2f>& convex);
 
         static std::vector<Vec2f> RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count = 6);

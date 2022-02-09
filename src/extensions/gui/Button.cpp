@@ -26,13 +26,6 @@ namespace doge::gui
         image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_button");
         
-        auto& text = GetGUI().AddElement<gui::Text>(GetTextElementID(), GetCameraID());
-        text.GetEntity().SetParent(GetEntity());
-        text.SetCursorDetectable(false);
-        text.SetString(U"Button");
-        text.SetTextAlign(doge::Text::Center);
-        text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
-
         auto& clickable = GetGUI().AddElement<Clickable>(GetClickableElementID(), GetCameraID());
         clickable.GetEntity().SetParent(GetEntity());
         clickable.SetAlign(Align::Top | Align::Left);
@@ -63,16 +56,49 @@ namespace doge::gui
             GetGUI().AddElement<Image>(GetImageElementID(), GetCameraID());
         
         auto& image_element = GetImageElement();
+        image_element.GetEntity().SetParent(GetEntity());
         image_element.SetSize(GetSize());
         image_element.SetOrigin(GetActualOrigin());
         image_element.SetColor(GetColor());
+        image_element.SetLayer(GetLayer());
         image_element.SetAlign(Align::Top | Align::Left);
         image_element.SetCursorDetectable(false);
+
+        on_state_transition(*this);
     }
 
     bool Button::Is9Slice() const
     {
         return is_9_slice;
+    }
+
+    void Button::SetHasText(bool has_text)
+    {
+        bool had_text = this->has_text;
+
+        this->has_text = has_text;
+
+        if (had_text && !has_text)
+        {
+            GetGUI().RemoveElement(GetTextElementID());
+        }
+        else if (!had_text && has_text)
+        {
+            auto& text = GetGUI().AddElement<gui::Text>(GetTextElementID(), GetCameraID());
+            text.GetEntity().SetParent(GetEntity());
+            text.SetCursorDetectable(false);
+            text.SetString(U"Button");
+            text.SetTextAlign(doge::Text::Center);
+            text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });
+        }
+
+        OnLayerUpdated();
+        OnOriginUpdated();
+    }
+
+    bool Button::HasText() const
+    {
+        return has_text;
     }
     
     std::string Button::GetImageElementID() const
@@ -108,6 +134,9 @@ namespace doge::gui
 
     Text& Button::GetText() const
     {
+        if (!HasText())
+            throw std::invalid_argument("Button does not have gui::Text");
+
         return static_cast<Text&>(GetGUI().GetElement(GetTextElementID()));
     }
 
@@ -140,8 +169,8 @@ namespace doge::gui
     void Button::OnLayerUpdated()
     {
         GetImageElement().SetLayer(GetLayer());
-        GetText().SetLayer(GetLayer() + 1);
         GetClickable().SetLayer(GetLayer() + 1);
+        if (HasText()) GetText().SetLayer(GetLayer() + 1);
     }
 
     void Button::OnSizeUpdated()
@@ -159,7 +188,7 @@ namespace doge::gui
     {
         GetImageElement().SetOrigin(GetActualOrigin());
         GetClickable().SetOrigin(GetActualOrigin());
-        GetText().SetOrigin(GetActualOrigin() - GetSize() / 2.f);
+        if (HasText()) GetText().SetOrigin(GetActualOrigin() - GetSize() / 2.f);
     }
 
     void Button::OnColorUpdated()

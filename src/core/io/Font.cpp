@@ -22,7 +22,7 @@ namespace doge::io
     Font::Glyph Font::GetGlyph(std::uint32_t code_point, std::uint32_t character_size, bool bold, float outline_thickness) const
     {
         sf::Glyph glyph = font.getGlyph(code_point, character_size, bold, outline_thickness);
-        return Glyph(glyph.advance, glyph.advance, cast::FromSfRect(glyph.textureRect));
+        return Glyph(glyph.advance, cast::FromSfRect(glyph.bounds), cast::FromSfRect(glyph.textureRect));
     }
 
     float Font::GetKerning(std::uint32_t first, std::uint32_t second, std::uint32_t character_size) const
