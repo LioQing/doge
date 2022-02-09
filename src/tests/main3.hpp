@@ -118,60 +118,80 @@ namespace main3
         doge::Engine& engine;
         doge::gui::GUI gui;
 
-        doge::Component<doge::CircleShape>* circle_comp;
-        doge::gui::Text* text;
-        doge::gui::WindowEx* window;
+        struct Window
+        {
+            bool occupied = false;
+            std::int32_t layer = 0;
+            doge::Vec2f pos;
+        };
 
-        std::size_t window_count;
+        std::array<Window, 20> windows;
 
         SceneB(doge::Engine& engine) : engine(engine), gui(engine)
         {
         }
 
-        void AddWindow(const doge::Vec2f& position, std::int32_t layer)
+        void AddWindow()
         {
-            window = &gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(window_count), "my_cam");
-            window->SetAlign(doge::Vec2f(0, 0));
-            window->SetSize(doge::Vec2f(400, 200));
-            window->SetPosition(position);
-            window->SetLayer(layer);
-            window->SetTitleBar(true);
-            window->SetResizable(true);
-            window->SetCloseButton(true);
+            int win_i = -1;
+            for (auto i = 0; i < windows.size(); ++i)
+            {
+                if (windows[i].occupied)
+                    continue;
 
-            auto& button = window->AddElement<doge::gui::Button>("my_button" + std::to_string(window_count));
+                win_i = i;
+                break;
+            }
+
+            if (win_i == -1)
+            {
+                std::cout << "Max window count reached." << std::endl;
+                return;
+            }
+            
+            windows[win_i].occupied = true;
+
+            auto& window = gui.AddElement<doge::gui::WindowEx>("my_window" + std::to_string(win_i), "my_cam");
+            window.SetAlign(doge::Vec2f(1, 1));
+            window.SetSize(doge::Vec2f(400, 200));
+            window.SetPosition(windows[win_i].pos);
+            window.SetLayer(windows[win_i].layer);
+            window.SetTitleBar(true);
+            window.SetResizable(true);
+            window.SetCloseButton(true);
+            window.SetDraggable(true);
+
+            gui.GetElementComponent("my_window" + std::to_string(win_i)).OnRemoval([this, win_i]()
+            {
+                windows[win_i].occupied = false;
+            });
+
+            auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(win_i));
             button.SetSize(doge::Vec2f(100, 100));
             button.GetClickable().SetCornerRadius(25);
             button.SetPosition(doge::Vec2f(0, 0));
             button.SetHasText(true);
-
-            auto& text = button.GetText();
-            text.SetString(U"Lock");
+            button.GetText().SetString(U"Off");
 
             button.GetClickable().on_clicked +=
-            [this](doge::io::Mouse::Button button)
+            [&](doge::io::Mouse::Button button_clicked)
             {
-                if (this->circle_comp->color == doge::Color::Red)
+                if (button_clicked == doge::io::Mouse::Button::Left)
                 {
-                    this->circle_comp->color = doge::Color::Green;
-                    this->text->SetAlign(doge::gui::Align::Top);
-                    this->window->SetDraggable(true);
-                }
-                else
-                {
-                    this->circle_comp->color = doge::Color::Red;
-                    this->text->SetAlign(doge::gui::Align::Bottom);
-                    this->window->SetDraggable(false);
+                    if (button.GetText().GetString() == U"Off")
+                    {
+                        button.GetText().SetString(U"On");
+                    }
+                    else
+                    {
+                        button.GetText().SetString(U"Off");
+                    }
                 }
             };
-
-            window_count++;
         }
 
         void Start(doge::Engine& engine)
         {
-            window_count = 0;
-
             engine.assets.LoadTexture("test", "test.png");
             gui.GetNineSlice().LoadTexture("test2", "test2.png", doge::Recti(4, 5, 5, 4));
             gui.GetNineSlice().SetRepeated("test2", true);
@@ -180,29 +200,32 @@ namespace main3
             auto& cam = gui.AddCamera("my_cam");
             cam.SetLayer(doge::Layer::CreateRange(32, 34));
 
-            for (auto i = 34; i < 38; ++i) cam.GetLayer().layers.emplace(i);
-            AddWindow(doge::Vec2f(0, -100), 34);
+            for (auto i = 0; i < windows.size(); ++i)
+            {
+                for (auto j = 0; j < 4; ++j)
+                    cam.GetLayer().layers.emplace(34 + j + i * 8);
 
-            for (auto i = 48; i < 52; ++i) cam.GetLayer().layers.emplace(i);
-            AddWindow(doge::Vec2f::Zero, 48);
-        
+                windows[i].occupied = false;
+                windows[i].layer = 34 + i * 8;
+                windows[i].pos = i * 10 * doge::Vec2f::One;
+            }
+
             // button
-            // auto& button = gui.AddElement<doge::gui::Button>("my_button", "my_cam");
-            // button.SetPosition(doge::Vec2f(0, 300));
+            auto& button = gui.AddElement<doge::gui::Button>("my_image", "my_cam");
+            button.Set9Slice(false);
+            button.GetImage().SetTextureID("test");
+            button.SetSize(doge::Vec2f(32, 32));
+            button.GetImage().SetTextureRectangle(doge::Recti(0, 0, 32, 32));
+            button.SetPosition(doge::Vec2f(300, 0));
 
-            // text
-            text = &gui.AddElement<doge::gui::Text>("my_text", "my_cam");
-            text->SetPosition(doge::Vec2f(0, -150));
-            text->SetTextAlign(doge::Text::Align::Center);
-            text->SetAlign(doge::gui::Align::Bottom);
-
-            // image
-            auto& ba = gui.AddElement<doge::gui::Button>("my_image", "my_cam");
-            ba.Set9Slice(false);
-            ba.GetImage().SetTextureID("test");
-            ba.SetSize(doge::Vec2f(32, 32));
-            ba.GetImage().SetTextureRectangle(doge::Recti(0, 0, 32, 32));
-            ba.SetPosition(doge::Vec2f(300, 0));
+            button.GetClickable().on_clicked.AddListener("spawn_window",
+            [&](doge::io::Mouse::Button button_clicked)
+            {
+                if (button_clicked == doge::io::Mouse::Button::Left)
+                {
+                    AddWindow();
+                }
+            });
 
             // ns image
             auto& ns_image = gui.AddElement<doge::gui::NSImage>("my_ns_image", "my_cam");
@@ -210,19 +233,6 @@ namespace main3
             ns_image.SetSize(doge::Vec2f(200, 200));
             ns_image.SetCenterTextureSize(doge::Vec2i(46, 46));
             ns_image.SetPosition(doge::Vec2f(-150, 0));
-
-            // circle in gui
-            doge::Entity circle_entity = engine.AddEntity();
-
-            circle_comp = &circle_entity.AddComponent(doge::CircleShape
-            {
-                .radius = 5.f,
-                .origin = { 5.f, 5.f },
-                .color = doge::Color::Red,
-            });
-
-            circle_entity.AddComponent<doge::Position>(0, -20);
-            circle_entity.AddComponent(doge::Layer::Create(gui.GetCamera(window->GetWindowCameraID()).GetLayer().GetFirst() + 1));
 
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_b",
@@ -238,9 +248,7 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            auto e = gui.GetElementBelowCursor();
-            if (e)
-                std::cout << e->GetID() << std::endl;
+            std::cout << 1000.f / dt << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
@@ -260,7 +268,7 @@ namespace main3
         srand(time(NULL));
 
         doge::Engine engine;
-        engine.window.SetFrameRate(120);
+        engine.window.SetFrameRate(0);
         engine.window.settings.size = (doge::Vec2u(1280, 720));
         engine.window.settings.msaa_level = 4;
         

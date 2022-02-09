@@ -235,6 +235,7 @@ namespace main1
         x.SetLayer(doge::Layer::CreateRange(32, 36));
         
         doge::gui::Button& button0 = gui->AddElement<doge::gui::Button>("button0", "gui_cam");
+        button0.SetHasText(true);
         button0.SetPosition(doge::Vec2f(-300, 0));
         button0.SetSize(doge::gui::Button::DefaultSize * doge::Vec2f(1, 2));
         button0.GetText().SetString(U"Hello\nthis is me");
@@ -245,9 +246,8 @@ namespace main1
         window.SetResizable(true);
 
         doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
+        button1.SetHasText(true);
         button1.GetText().SetString(U"Button In Window");
-
-        std::cout << window.GetLayer() << std::endl;
 
         button1.GetClickable().on_pressed       += [](doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
         button1.GetClickable().on_released      += [](doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };
@@ -334,11 +334,11 @@ namespace main1
             }
         }
 
-        auto e = gui->GetElementBelowCursor();
-        if (e)
-            std::cout << e->GetID() << std::endl;
+        // auto e = gui->GetElementBelowCursor();
+        // if (e)
+        //     std::cout << e->GetID() << std::endl;
 
-        //std::cout << 1000.f / dt << std::endl;
+        std::cout << 1000.f / dt << std::endl;
     }
 
     void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)
@@ -367,7 +367,7 @@ namespace main1
     int Main()
     {
         doge::Engine engine;
-        engine.window.settings.fps = 120;
+        engine.window.settings.fps = 0;
         engine.window.settings.msaa_level = 4;
         engine.window.settings.size = doge::Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";

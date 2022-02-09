@@ -5,37 +5,42 @@
 - [x] visibility component to support drawable to be only on drawn on certain camera
 - [x] remove sprite sheet member of texture and unify all io classes into doge::io
 - [x] texture atlas
+- [ ] auto triangulation alg
 - [x] core text
   - [x] add text component
   - [x] add custom sf text class
   - [x] make text works in window.Render() function
   - [x] align option for text
 - [ ] extension: gui
-  - [ ] main class gui
-  - [ ] gui camera
+  - [x] main class gui
+  - [x] gui camera
+  - [ ] rework element events
   - [ ] widgets
     - [ ] inputs
-      - [ ] button
+      - [x] button
       - [ ] toggle switch
       - [ ] slider
       - [ ] combo box
       - [ ] text box
     - [ ] containers
-      - [ ] window (elements are free to move)
+      - [x] window (elements are free to move)
       - [ ] grid
       - [ ] list
     - [ ] outputs
-      - [ ] text
-      - [ ] image
+      - [x] text
+      - [x] image
     - [ ] traits
-      - [ ] draggable
-      - [ ] resizable
-      - [ ] clickable
+      - [x] draggable
+      - [x] resizable
+      - [x] clickable
   - [ ] assets
 - [ ] extension: nine_slice
   - [x] nine slice
   - [x] even simpler sprite creation process (add options)
   - [ ] potentially more creation options (also the logic is a bit messy for now)
+- [ ] extension: anim
+  - [ ] main class Anim
+
 - [x] rework physics extensions
   - [x] make collider attach to rgbd instead of entity with rgbd
 - [x] rework camera
