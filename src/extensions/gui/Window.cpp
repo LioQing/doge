@@ -34,7 +34,6 @@ namespace doge::gui
         // image
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
-        image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_window");
 
         SetSize(DefaultSize);

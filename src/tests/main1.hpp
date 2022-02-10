@@ -244,16 +244,17 @@ namespace main1
         window.SetLayer(34);
         window.SetTitleBar(true);
         window.SetResizable(true);
+        window.SetDraggable(true);
 
         doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
         button1.SetHasText(true);
         button1.GetText().SetString(U"Button In Window");
 
-        button1.GetClickable().on_pressed       += [](doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
-        button1.GetClickable().on_released      += [](doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };
-        button1.GetClickable().on_mouse_entered += [](){ std::cout << "Entered" << std::endl; };
-        button1.GetClickable().on_mouse_left    += [](){ std::cout << "Left" << std::endl; };
-        button1.GetClickable().on_clicked       += [](doge::io::Mouse::Button){ std::cout << "Clicked" << std::endl; };
+        button1.GetClickable().on_pressed        += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
+        button1.GetClickable().on_released       += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };
+        button1.GetClickable().on_cursor_entered += [](const doge::Vec2f&){ std::cout << "Entered" << std::endl; };
+        button1.GetClickable().on_cursor_left    += [](const doge::Vec2f&){ std::cout << "Left" << std::endl; };
+        button1.GetClickable().on_clicked        += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Clicked" << std::endl; };
 
         // text
         {
@@ -334,11 +335,11 @@ namespace main1
             }
         }
 
-        // auto e = gui->GetElementBelowCursor();
-        // if (e)
-        //     std::cout << e->GetID() << std::endl;
+        auto e = gui->GetElementBelowCursor();
+        if (e)
+            std::cout << e->GetID() << std::endl;
 
-        std::cout << 1000.f / dt << std::endl;
+        // std::cout << 1000.f / dt << std::endl;
     }
 
     void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

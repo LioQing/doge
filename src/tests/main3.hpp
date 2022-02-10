@@ -174,7 +174,7 @@ namespace main3
             button.GetText().SetString(U"Off");
 
             button.GetClickable().on_clicked +=
-            [&](doge::io::Mouse::Button button_clicked)
+            [&](const doge::Vec2f&, doge::io::Mouse::Button button_clicked)
             {
                 if (button_clicked == doge::io::Mouse::Button::Left)
                 {
@@ -219,7 +219,7 @@ namespace main3
             button.SetPosition(doge::Vec2f(300, 0));
 
             button.GetClickable().on_clicked.AddListener("spawn_window",
-            [&](doge::io::Mouse::Button button_clicked)
+            [&](const doge::Vec2f&, doge::io::Mouse::Button button_clicked)
             {
                 if (button_clicked == doge::io::Mouse::Button::Left)
                 {

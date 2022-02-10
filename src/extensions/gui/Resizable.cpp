@@ -64,8 +64,6 @@ namespace doge::gui
         b .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f( 0,  1)); on_resized((final_size - start_size) * (Vec2f( 0,  0) + GetAlign() * Vec2f( 0,  1))); };
         bl.on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  1)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  1))); };
         l .on_dragged_diff += [&](const Vec2f& diff){ auto final_size = SetSizeChecked(start_size + diff * Vec2f(-1,  0)); on_resized((final_size - start_size) * (Vec2f(-1,  0) + GetAlign() * Vec2f( 1,  0))); };
-
-        Element::SetCursorDetectable(false);
     }
 
     void Resizable::SetThickness(const Rectf& thickness)
@@ -97,17 +95,6 @@ namespace doge::gui
     std::int32_t Resizable::GetLayer() const
     {
         return GetDraggable(0).GetLayer();
-    }
-
-    void Resizable::SetCursorDetectable(bool is_cursor_detectable)
-    {
-        for (auto i = 0; i < Border::Count; ++i)
-            GetDraggable(i).SetCursorDetectable(is_cursor_detectable);
-    }
-
-    bool Resizable::IsCursorDetectable() const
-    {
-        return GetDraggable(0).IsCursorDetectable();
     }
 
     std::string Resizable::GetDraggableElementID(std::int8_t border) const

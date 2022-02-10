@@ -23,17 +23,16 @@ namespace doge::gui
         auto& image = GetGUI().AddElement<gui::NSImage>(GetImageElementID(), GetCameraID());
         image.GetEntity().SetParent(GetEntity());
         image.SetAlign(Align::Top | Align::Left);
-        image.SetCursorDetectable(false);
         image.SetTextureID("doge_gui_button");
         
         auto& clickable = GetGUI().AddElement<Clickable>(GetClickableElementID(), GetCameraID());
         clickable.GetEntity().SetParent(GetEntity());
         clickable.SetAlign(Align::Top | Align::Left);
-        clickable.on_pressed        += [&](io::Mouse::Button button){ on_state_transition(*this); };
-        clickable.on_released       += [&](io::Mouse::Button button){ on_state_transition(*this); };
-        clickable.on_mouse_entered  += [&](){ on_state_transition(*this); };
-        clickable.on_mouse_left     += [&](){ on_state_transition(*this); };
-        clickable.on_clicked        += [&](io::Mouse::Button button){ on_state_transition(*this); };
+        clickable.on_pressed        += [&](const Vec2f&, io::Mouse::Button){ on_state_transition(*this); };
+        clickable.on_released       += [&](const Vec2f&, io::Mouse::Button){ on_state_transition(*this); };
+        clickable.on_cursor_entered += [&](const Vec2f&){ on_state_transition(*this); };
+        clickable.on_cursor_left    += [&](const Vec2f&){ on_state_transition(*this); };
+        clickable.on_clicked        += [&](const Vec2f&, io::Mouse::Button){ on_state_transition(*this); };
 
         on_state_transition(*this);
 
@@ -62,7 +61,6 @@ namespace doge::gui
         image_element.SetColor(GetColor());
         image_element.SetLayer(GetLayer());
         image_element.SetAlign(Align::Top | Align::Left);
-        image_element.SetCursorDetectable(false);
 
         on_state_transition(*this);
     }
@@ -86,7 +84,6 @@ namespace doge::gui
         {
             auto& text = GetGUI().AddElement<gui::Text>(GetTextElementID(), GetCameraID());
             text.GetEntity().SetParent(GetEntity());
-            text.SetCursorDetectable(false);
             text.SetString(U"Button");
             text.SetTextAlign(doge::Text::Center);
             text.SetAppearance(doge::Text::Appearance{ .fill_color = Color::Black });

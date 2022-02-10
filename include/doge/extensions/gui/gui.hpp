@@ -4,6 +4,7 @@
 #include <doge/extensions/nine_slice.hpp>
 #include <doge/extensions/gui/ElementComponent.hpp>
 #include <doge/extensions/gui/Element.hpp>
+#include <doge/extensions/gui/CursorDetectableElement.hpp>
 #include <doge/core/Engine.hpp>
 #include <unordered_map>
 #include <unordered_set>
@@ -51,10 +52,25 @@ namespace doge
                 comp.element->camera = cam_id;
                 comp.element->gui = this;
 
-                comp.OnRemoval([&, val_id = id]()
+                if constexpr (std::is_base_of_v<CursorDetectableElement, E>)
                 {
-                    elements.erase(val_id);
-                });
+                    comp.OnRemoval([&, val_id = id]()
+                    {
+                        elements.erase(val_id);
+                        cursor_detectable_elements.erase(val_id);
+                        if (GetElementBelowCursor() && GetElementBelowCursor()->GetID() == val_id)
+                            element_below_cursor = nullptr;
+                    });
+
+                    cursor_detectable_elements.emplace(comp.element->GetID());
+                }
+                else
+                {
+                    comp.OnRemoval([&, val_id = id]()
+                    {
+                        elements.erase(val_id);
+                    });
+                }
 
                 elements.emplace(comp.element->GetID(), entity);
                 comp.element->ElementInitialize();
@@ -75,15 +91,21 @@ namespace doge
             doge::nine_slice::NineSlice& GetNineSlice();
             const doge::nine_slice::NineSlice& GetNineSlice() const;
 
-            std::shared_ptr<Element> GetElementBelowCursor() const;
+            std::shared_ptr<CursorDetectableElement> GetElementBelowCursor() const;
+            void SetElementBelowCursorLocked(bool locked);
+            bool IsElementBelowCursorLocked() const;
 
         private:
 
             Engine& engine;
             doge::nine_slice::NineSlice nine_slice;
 
+            std::shared_ptr<CursorDetectableElement> element_below_cursor = nullptr;
+            bool element_below_cursor_locked = false;
+
             std::unordered_map<std::string, Entity> cameras;
             std::unordered_map<std::string, Entity> elements;
+            std::unordered_set<std::string> cursor_detectable_elements;
 
             void Start(Engine& engine);
             void Update(Engine& engine, DeltaTime dt);

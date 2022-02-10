@@ -41,9 +41,6 @@ namespace doge::gui
         void SetLayer(std::int32_t layer);
         std::int32_t GetLayer() const;
 
-        void SetCursorDetectable(bool is_cursor_detectable);
-        bool IsCursorDetectable() const;
-
         std::string GetDraggableElementID(std::int8_t border) const;
         Draggable& GetDraggable(std::int8_t border) const;
 

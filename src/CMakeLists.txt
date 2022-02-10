@@ -12,11 +12,11 @@ include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
 if (MSVC)
 
-    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VS2019-64bit/lib/cmake/SFML)
+    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VC++15-64bit/lib/cmake/SFML)
     set(SFML_STATIC_LIBRARIES TRUE)
     find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VS2019-64bit/bin/Debug)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++15-64bit/bin/Release)
 
 else()
 

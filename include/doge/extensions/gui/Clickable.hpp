@@ -1,17 +1,13 @@
 #pragma once
 
-#include <doge/extensions/gui/Element.hpp>
+#include <doge/extensions/gui/CursorDetectableElement.hpp>
 #include <doge/core/io/Mouse.hpp>
 
 namespace doge::gui
 {
-    struct Clickable : Element
+    struct Clickable : CursorDetectableElement
     {
-        Event<io::Mouse::Button> on_pressed;
-        Event<io::Mouse::Button> on_released;
-        Event<> on_mouse_entered;
-        Event<> on_mouse_left;
-        Event<io::Mouse::Button> on_clicked;
+        Event<Vec2f, io::Mouse::Button> on_clicked;
 
         virtual ~Clickable();
 
@@ -24,10 +20,15 @@ namespace doge::gui
     
         bool IsDown(io::Mouse::Button button) const;
         bool IsMouseOver() const;
+    
+    protected:
+
+        virtual void OnPressed(const Vec2f& position, io::Mouse::Button button) override;
+        virtual void OnReleased(const Vec2f& position, io::Mouse::Button button) override;
+        virtual void OnCursorLeft(const Vec2f& position) override;
 
     private:
 
-        bool is_mouse_over = false;
         float corner_radius = 0.f;
         std::bitset<io::Mouse::Button::Count> buttons_down;
     };

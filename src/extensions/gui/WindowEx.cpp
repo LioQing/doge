@@ -40,7 +40,6 @@ namespace doge::gui
         {
             auto& title_bar = GetGUI().AddElement<Text>(GetTitleBarElementID(), GetCameraID());
             title_bar.GetEntity().SetParent(GetEntity());
-            title_bar.SetCursorDetectable(false);
             title_bar.SetAlign(Align::Center | Align::Left);
             title_bar.SetFontSize(14);
             title_bar.SetString(U"WindowEx Title");
@@ -69,7 +68,6 @@ namespace doge::gui
         {
             auto& draggable = GetGUI().AddElement<gui::Draggable>(GetDraggableElementID(), GetCameraID());
             draggable.GetEntity().SetParent(GetEntity());
-            draggable.SetCursorDetectable(true);
             draggable.SetAlign(Align::Top | Align::Center);
 
             draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_pos = GetPosition(); };
@@ -99,7 +97,6 @@ namespace doge::gui
         {
             auto& resizable = GetGUI().AddElement<gui::Resizable>(GetResizableElementID(), GetCameraID());
             resizable.GetEntity().SetParent(GetEntity());
-            resizable.SetCursorDetectable(true);
             resizable.SetThickness(DefaultResizeThickness);
             resizable.SetMinSize(Vec2f(100, 100));
 
@@ -139,14 +136,13 @@ namespace doge::gui
         {
             auto& button = GetGUI().AddElement<Button>(GetCloseButtonElementID(), GetCameraID());
             button.GetEntity().SetParent(GetEntity());
-            button.SetCursorDetectable(true);
             button.Set9Slice(false);
             button.GetImage().SetTextureID("doge_gui_windowex_close_button");
             button.SetAlign(Align::Center | Align::Right);
             button.SetSize(Vec2f(24, 24));
 
             button.GetClickable().on_clicked +=
-            [&](io::Mouse::Button button)
+            [&](const Vec2f&, io::Mouse::Button button)
             {
                 if (button == io::Mouse::Button::Left)
                     GetGUI().RemoveElement(GetID());

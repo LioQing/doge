@@ -126,38 +126,25 @@ namespace doge::gui
         return nine_slice;
     }
 
-    std::shared_ptr<Element> GUI::GetElementBelowCursor() const
+    std::shared_ptr<CursorDetectableElement> GUI::GetElementBelowCursor() const
     {
-        std::shared_ptr<Element> ret_ptr = nullptr;
+        return element_below_cursor;
+    }
 
-        for (auto& [id, element] : elements)
-        {
-            auto& ptr = element.GetComponent<ElementComponent>().element;
+    void GUI::SetElementBelowCursorLocked(bool locked)
+    {
+        element_below_cursor_locked = locked;
+    }
 
-            if (!ptr->IsCursorDetectable())
-                continue;
-
-            Vec2f cursor_pos = GetEngine().window.MapPixelToCoords(GetEngine().window.window_io.GetMousePosition(), ptr->GetCameraComponent());
-            Recti cam_rect = Recti(
-                ptr->GetCameraComponent().port.GetPosition() * GetEngine().window.window_io.GetSize(),
-                ptr->GetCameraComponent().port.GetSize() * GetEngine().window.window_io.GetSize()
-            );
-
-            if (
-                math::TestPoint(GetEngine().window.window_io.GetMousePosition(), cam_rect) &&
-                ptr->TestPoint(cursor_pos) &&
-                (!ret_ptr || ptr->GetLayer() > ret_ptr->GetLayer())
-            )
-            {
-                ret_ptr = ptr;
-            }
-        }
-
-        return ret_ptr;
+    bool GUI::IsElementBelowCursorLocked() const
+    {
+        return element_below_cursor_locked;
     }
 
     void GUI::Start(Engine& engine)
     {
+        // default textures
+
         engine.assets.LoadTexture("doge_gui_button", "gui/button.png");
         nine_slice.LoadTexture("doge_gui_button", "gui/button.png", Recti(8, 8, 8, 8));
 
@@ -172,6 +159,108 @@ namespace doge::gui
             itr->second.atlas_rectangles.emplace("default", Recti(0, 0, 24, 24));
             itr->second.atlas_rectangles.emplace("pressed", Recti(24, 0, 24, 24));
         }
+
+        // events
+
+        engine.events.on_mouse_moved.AddListener("doge_gui",
+        [&](const event::MouseMove& event)
+        {
+            // moved
+            if (element_below_cursor)
+            {
+                auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                    event.position,
+                    element_below_cursor->GetCameraComponent()
+                );
+
+                element_below_cursor->OnCursorMoved(cursor_pos);
+                element_below_cursor->on_cursor_moved(cursor_pos);
+            }
+
+            if (IsElementBelowCursorLocked())
+                return;
+
+            // entered / left
+            std::shared_ptr<CursorDetectableElement> top_ptr = nullptr;
+
+            for (auto& id : cursor_detectable_elements)
+            {
+                auto ptr = std::static_pointer_cast<CursorDetectableElement>(GetElementComponent(id).element);
+
+                Vec2f cursor_pos = GetEngine().window.MapPixelToCoords(event.position, ptr->GetCameraComponent());
+                Recti cam_rect = Recti(
+                    ptr->GetCameraComponent().port.GetPosition() * GetEngine().window.window_io.GetSize(),
+                    ptr->GetCameraComponent().port.GetSize() * GetEngine().window.window_io.GetSize()
+                );
+
+                if (
+                    math::TestPoint(event.position, cam_rect) &&
+                    ptr->TestPoint(cursor_pos) &&
+                    (!top_ptr || ptr->GetLayer() > top_ptr->GetLayer())
+                )
+                {
+                    top_ptr = ptr;
+                }
+            }
+
+            if (element_below_cursor != top_ptr)
+            {
+                auto was = element_below_cursor;
+                element_below_cursor = top_ptr;
+
+                if (was)
+                {
+                    auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                        event.position,
+                        was->GetCameraComponent()
+                    );
+
+                    was->OnCursorLeft(cursor_pos);
+                    was->on_cursor_left(cursor_pos);
+                }
+                
+                if (element_below_cursor)
+                {
+                    auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                        event.position,
+                        element_below_cursor->GetCameraComponent()
+                    );
+
+                    element_below_cursor->OnCursorEntered(cursor_pos);
+                    element_below_cursor->on_cursor_entered(cursor_pos);
+                }
+            }
+        });
+
+        engine.events.on_mouse_button_pressed.AddListener("doge_gui",
+        [&](event::MouseButton event)
+        {
+            if (element_below_cursor)
+            {
+                auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                    event.position,
+                    element_below_cursor->GetCameraComponent()
+                );
+
+                element_below_cursor->OnPressed(cursor_pos, event.button);
+                element_below_cursor->on_pressed(cursor_pos, event.button);
+            }
+        });
+
+        engine.events.on_mouse_button_released.AddListener("doge_gui",
+        [&](event::MouseButton event)
+        {
+            if (element_below_cursor)
+            {
+                auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                    event.position,
+                    element_below_cursor->GetCameraComponent()
+                );
+
+                element_below_cursor->OnReleased(cursor_pos, event.button);
+                element_below_cursor->on_released(cursor_pos, event.button);
+            }
+        });
     }
 
     void GUI::Update(Engine& engine, DeltaTime dt)

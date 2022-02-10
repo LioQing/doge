@@ -46,17 +46,6 @@ namespace doge::gui
         return GetEntity().GetComponent<Layer>().layers.begin().operator*();
     }
 
-    void Element::SetCursorDetectable(bool is_cursor_detectable)
-    {
-        this->is_cursor_detectable = is_cursor_detectable;
-        OnCursorDetectableUpdated();
-    }
-
-    bool Element::IsCursorDetectable() const
-    {
-        return is_cursor_detectable;
-    }
-
     const std::string& Element::GetID() const
     {
         return id;

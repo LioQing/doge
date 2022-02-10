@@ -42,9 +42,6 @@ namespace doge
             void SetLayer(std::int32_t layer);
             std::int32_t GetLayer() const;
 
-            void SetCursorDetectable(bool is_cursor_detectable);
-            bool IsCursorDetectable() const;
-
             const std::string& GetID() const;
 
             const std::string& GetCameraID() const;
@@ -74,7 +71,6 @@ namespace doge
         protected:
 
             virtual void OnLayerUpdated() {};
-            virtual void OnCursorDetectableUpdated() {};
             virtual void OnSizeUpdated() {};
             virtual void OnPositionUpdated() {};
             virtual void OnOriginUpdated() {};
@@ -84,7 +80,6 @@ namespace doge
 
             std::string id;
             std::string camera;
-            bool is_cursor_detectable = true;
             Vec2f size = Vec2f::Zero;
             Vec2f origin = Vec2f::Zero;
             Color color = 0xFFFFFFFF;

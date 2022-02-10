@@ -11,7 +11,6 @@ namespace doge::gui
 
     struct Camera
     {
-
         GUI& GetGUI() const;
         Entity GetEntity() const;
 

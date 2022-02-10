@@ -5,6 +5,7 @@
 #include "gui/ElementComponent.hpp"
 #include "gui/Camera.hpp"
 #include "gui/CameraComponent.hpp"
+#include "gui/CursorDetectableElement.hpp"
 
 #include "gui/Button.hpp"
 #include "gui/Window.hpp"

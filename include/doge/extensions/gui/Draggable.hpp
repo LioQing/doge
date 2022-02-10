@@ -1,11 +1,11 @@
 #pragma once
 
-#include <doge/extensions/gui/Element.hpp>
+#include <doge/extensions/gui/CursorDetectableElement.hpp>
 #include <doge/utils/Vec2.hpp>
 
 namespace doge::gui
 {
-    struct Draggable : Element
+    struct Draggable : CursorDetectableElement
     {
         Event<Vec2f> on_drag_began;
         Event<Vec2f> on_drag_ended;
@@ -16,12 +16,17 @@ namespace doge::gui
 
         virtual void Initialize() override;
 
-
         bool IsDragging() const;
+
+    protected:
+
+        virtual void OnPressed(const Vec2f& position, io::Mouse::Button button) override;
+        virtual void OnReleased(const Vec2f& position, io::Mouse::Button button) override;
+        virtual void OnCursorMoved(const Vec2f& position) override;
 
     private:
 
-        Vec2f MapPixelToCoordsChecked(const Vec2i& pixel) const;
+        Vec2f CoordsChecked(const Vec2f& coords_) const;
 
         bool is_dragging = false;
 
