@@ -248,7 +248,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            std::cout << 1000.f / dt << std::endl;
+            auto* e = gui.GetCameraFocused();
+            if (e)
+                std::cout << e->GetID() << std::endl;
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

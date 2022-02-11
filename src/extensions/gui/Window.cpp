@@ -8,6 +8,7 @@
 namespace doge::gui
 {
     const Vec2f Window::DefaultSize = Vec2f(600, 480);
+    const std::int32_t Window::RequiredLayerWidth = 4;
 
     Window::~Window()
     {
@@ -73,7 +74,7 @@ namespace doge::gui
     void Window::OnLayerUpdated()
     {
         GetImage().SetLayer(GetLayer());
-        GetWindowCamera().SetLayer(Layer::CreateRange(GetLayer() + 4, GetLayer() + 6));
+        GetWindowCamera().SetLayer(Layer::CreateRange(GetLayer() + RequiredLayerWidth, GetLayer() + RequiredLayerWidth + 2));
     }
 
     void Window::OnSizeUpdated()

@@ -9,6 +9,7 @@ namespace doge::gui
     struct Draggable;
     struct Resizable;
     struct Button;
+    struct CursorDetectableElement;
 
     struct WindowEx : Window
     {
@@ -56,6 +57,9 @@ namespace doge::gui
 
         std::string GetCloseButtonElementID() const;
         Button& GetCloseButton() const;
+
+        std::string GetCursorDetectableElementID() const;
+        CursorDetectableElement& GetCursorDetectableElement() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
 

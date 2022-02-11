@@ -8,6 +8,7 @@
 #include <doge/extensions/gui/Button.hpp>
 #include <doge/extensions/gui/Image.hpp>
 #include <doge/extensions/gui/Clickable.hpp>
+#include <doge/extensions/gui/CursorDetectableElement.hpp>
 
 namespace doge::gui
 {
@@ -20,6 +21,10 @@ namespace doge::gui
 
     void WindowEx::Initialize()
     {
+        auto& cde = GetGUI().AddElement<CursorDetectableElement>(GetCursorDetectableElementID(), GetCameraID());
+        cde.GetEntity().SetParent(GetEntity());
+        cde.get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
+
         Window::Initialize();
 
         GetImage().SetTextureID("doge_gui_windowex");
@@ -72,6 +77,7 @@ namespace doge::gui
 
             draggable.on_drag_began += [&](const Vec2f& pos){ drag_start_pos = GetPosition(); };
             draggable.on_dragged_diff += [&](const Vec2f& diff){ SetPosition(drag_start_pos + diff); };
+            draggable.get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
 
             UpdateDraggableOrigin();
             UpdateDraggableSize();
@@ -99,6 +105,11 @@ namespace doge::gui
             resizable.GetEntity().SetParent(GetEntity());
             resizable.SetThickness(DefaultResizeThickness);
             resizable.SetMinSize(Vec2f(100, 100));
+
+            for (auto i = 0; i < Resizable::Border::Count; ++i)
+            {
+                resizable.GetDraggable(i).get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
+            }
 
             resizable.on_resize_began += [&](){ resize_start_pos = GetPosition(); };
             resizable.on_resized += 
@@ -140,11 +151,11 @@ namespace doge::gui
             button.GetImage().SetTextureID("doge_gui_windowex_close_button");
             button.SetAlign(Align::Center | Align::Right);
             button.SetSize(Vec2f(24, 24));
+            button.GetClickable().get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
 
             button.GetClickable().on_clicked +=
             [&](const Vec2f&, io::Mouse::Button button)
             {
-                std::cout << "TEST" << std::endl;
                 if (button == io::Mouse::Button::Left)
                     GetGUI().RemoveElement(GetID());
             };
@@ -183,7 +194,15 @@ namespace doge::gui
 
     void WindowEx::SetScrollable(bool enabled)
     {
+        auto prev_enabled = trait_enabled.test(Trait::Scrollable);
         trait_enabled.set(Trait::Scrollable, enabled);
+
+        if (prev_enabled && !enabled)
+        {
+        }
+        else if (!prev_enabled && enabled)
+        {
+        }
     }
 
     bool WindowEx::IsScrollable() const
@@ -243,6 +262,16 @@ namespace doge::gui
         return static_cast<Button&>(GetGUI().GetElement(GetCloseButtonElementID()));
     }
 
+    std::string WindowEx::GetCursorDetectableElementID() const
+    {
+        return "window_gui_windowex_" + GetID() + "_cursor_detectable";
+    }
+
+    CursorDetectableElement& WindowEx::GetCursorDetectableElement() const
+    {
+        return static_cast<CursorDetectableElement&>(GetGUI().GetElement(GetCursorDetectableElementID()));
+    }
+
     void WindowEx::SetBorderThickness(const Rectf& border_thickness)
     {
         Window::SetBorderThickness(border_thickness);
@@ -261,6 +290,8 @@ namespace doge::gui
     void WindowEx::OnLayerUpdated()
     {
         Window::OnLayerUpdated();
+
+        GetCursorDetectableElement().SetLayer(GetLayer());
 
         if (HasTitleBar())
         {
@@ -286,6 +317,8 @@ namespace doge::gui
     void WindowEx::OnSizeUpdated()
     {
         Window::OnSizeUpdated();
+
+        GetCursorDetectableElement().SetSize(GetSize());
 
         if (HasTitleBar())
         {
@@ -317,6 +350,9 @@ namespace doge::gui
     void WindowEx::OnOriginUpdated()
     {
         Window::OnOriginUpdated();
+
+        GetCursorDetectableElement().SetAlign(GetAlign());
+        GetCursorDetectableElement().SetOrigin(GetOrigin());
 
         if (HasTitleBar())
         {

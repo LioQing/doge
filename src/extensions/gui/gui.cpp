@@ -38,6 +38,9 @@ namespace doge::gui
         comp.OnRemoval([&, val_id = id]()
         {
             cameras.erase(val_id);
+
+            if (camera_focused && camera_focused->GetID() == val_id)
+                camera_focused = nullptr;
         });
 
         cameras.emplace(comp.camera.GetID(), entity);
@@ -141,6 +144,11 @@ namespace doge::gui
         return element_below_cursor_locked;
     }
 
+    Camera* GUI::GetCameraFocused() const
+    {
+        return camera_focused;
+    }
+
     void GUI::Start(Engine& engine)
     {
         // default textures
@@ -165,10 +173,6 @@ namespace doge::gui
         engine.events.on_mouse_moved.AddListener("doge_gui",
         [&](const event::MouseMove& event)
         {
-            if (cursor_event_called.test(0))
-                return;
-            cursor_event_called.set(0, true);
-
             // moved
             if (element_below_cursor)
             {
@@ -235,6 +239,27 @@ namespace doge::gui
         engine.events.on_mouse_button_pressed.AddListener("doge_gui",
         [&](event::MouseButton event)
         {
+            if (cursor_event_called.test(0))
+                return;
+            cursor_event_called.set(0, true);
+
+            if (element_below_cursor)
+            {
+                auto cursor_pos = GetEngine().window.MapPixelToCoords(
+                    event.position,
+                    element_below_cursor->GetCameraComponent()
+                );
+
+                camera_focused = &element_below_cursor->get_camera_to_be_focused();
+
+                element_below_cursor->OnPressed(cursor_pos, event.button);
+                element_below_cursor->on_pressed(cursor_pos, event.button);
+            }
+        });
+
+        engine.events.on_mouse_button_released.AddListener("doge_gui",
+        [&](event::MouseButton event)
+        {
             if (cursor_event_called.test(1))
                 return;
             cursor_event_called.set(1, true);
@@ -246,18 +271,14 @@ namespace doge::gui
                     element_below_cursor->GetCameraComponent()
                 );
 
-                element_below_cursor->OnPressed(cursor_pos, event.button);
-                element_below_cursor->on_pressed(cursor_pos, event.button);
+                element_below_cursor->OnReleased(cursor_pos, event.button);
+                element_below_cursor->on_released(cursor_pos, event.button);
             }
         });
 
-        engine.events.on_mouse_button_released.AddListener("doge_gui",
-        [&](event::MouseButton event)
+        engine.events.on_mouse_wheel_scrolled.AddListener("doge_gui",
+        [&](event::MouseWheel event)
         {
-            if (cursor_event_called.test(2))
-                return;
-            cursor_event_called.set(2, true);
-
             if (element_below_cursor)
             {
                 auto cursor_pos = GetEngine().window.MapPixelToCoords(
@@ -265,8 +286,8 @@ namespace doge::gui
                     element_below_cursor->GetCameraComponent()
                 );
 
-                element_below_cursor->OnReleased(cursor_pos, event.button);
-                element_below_cursor->on_released(cursor_pos, event.button);
+                element_below_cursor->OnScrolled(cursor_pos, event.wheel, event.delta);
+                element_below_cursor->on_scrolled(cursor_pos, event.wheel, event.delta);
             }
         });
     }

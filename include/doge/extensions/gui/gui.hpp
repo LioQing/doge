@@ -55,6 +55,8 @@ namespace doge
                 if constexpr (std::is_base_of_v<CursorDetectableElement, E>)
                 {
                     auto [itr, success] = cursor_detectable_elements.insert(std::static_pointer_cast<CursorDetectableElement>(comp.element));
+                    
+                    (*itr)->get_camera_to_be_focused = [ptr = *itr]() -> Camera& { return ptr->GetCamera(); };
 
                     comp.OnRemoval([&, val_id = id, itr]()
                     {
@@ -95,14 +97,17 @@ namespace doge
             void SetElementBelowCursorLocked(bool locked);
             bool IsElementBelowCursorLocked() const;
 
+            Camera* GetCameraFocused() const;
+
         private:
 
             Engine& engine;
             doge::nine_slice::NineSlice nine_slice;
 
             std::shared_ptr<CursorDetectableElement> element_below_cursor = nullptr;
-            std::bitset<3> cursor_event_called;
+            std::bitset<2> cursor_event_called;
             bool element_below_cursor_locked = false;
+            Camera* camera_focused = nullptr;
 
             std::unordered_map<std::string, Entity> cameras;
             std::unordered_map<std::string, Entity> elements;

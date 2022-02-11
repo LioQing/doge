@@ -14,6 +14,11 @@ namespace doge
             return layers.begin().operator*();
         }
 
+        std::int32_t GetLast() const
+        {
+            return layers.rbegin().operator*();
+        }
+
         static Layer CreateRange(std::int32_t start, std::int32_t end)
         {
             Layer layer;

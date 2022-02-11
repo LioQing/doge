@@ -35,6 +35,7 @@ namespace doge::gui
         NSImage& GetImage() const;
         
         static const Vec2f DefaultSize;
+        static const std::int32_t RequiredLayerWidth;
 
     protected:
 
