@@ -45,7 +45,6 @@ namespace doge
                     throw std::invalid_argument("Camera ID of gui::element is not found in GUI::cameras");
 
                 auto entity = engine.AddEntity();
-                entity.SetParent(cam_itr->second);
 
                 auto& comp = entity.AddComponent(ElementComponent::Create(E()));
                 comp.element->id = id;

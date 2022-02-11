@@ -9,6 +9,7 @@
 #include <doge/extensions/gui/Image.hpp>
 #include <doge/extensions/gui/Clickable.hpp>
 #include <doge/extensions/gui/CursorDetectableElement.hpp>
+#include <doge/extensions/gui/Camera.hpp>
 
 namespace doge::gui
 {
@@ -21,10 +22,6 @@ namespace doge::gui
 
     void WindowEx::Initialize()
     {
-        auto& cde = GetGUI().AddElement<CursorDetectableElement>(GetCursorDetectableElementID(), GetCameraID());
-        cde.GetEntity().SetParent(GetEntity());
-        cde.get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
-
         Window::Initialize();
 
         GetImage().SetTextureID("doge_gui_windowex");
@@ -199,10 +196,34 @@ namespace doge::gui
 
         if (prev_enabled && !enabled)
         {
+            GetGUI().RemoveElement(GetScrollableElementID());
+            GetWindowCamera().on_scrolled.RemoveListener(GetScrollableElementID());
         }
         else if (!prev_enabled && enabled)
         {
+            auto& scrollable = GetGUI().AddElement<CursorDetectableElement>(GetScrollableElementID(), GetCameraID());
+            scrollable.GetEntity().SetParent(GetEntity());
+            scrollable.get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
+
+            GetWindowCamera().on_scrolled.AddListener(GetScrollableElementID(), 
+            [&](const Vec2f& position, io::Mouse::Wheel wheel, float delta)
+            {
+                if (wheel == io::Mouse::Wheel::Vertical)
+                {
+                    GetWindowCamera().SetCameraPosition(GetWindowCamera().GetCameraPosition() - delta * Vec2f(0, 8));
+                }
+                else
+                {
+                    GetWindowCamera().SetCameraPosition(GetWindowCamera().GetCameraPosition() - delta * Vec2f(8, 0));
+                }
+
+                BoundScrollableCamera();
+            });
         }
+
+        UpdateScrollableLayer();
+        UpdateScrollableSize();
+        UpdateScrollableOrigin();
     }
 
     bool WindowEx::IsScrollable() const
@@ -262,14 +283,26 @@ namespace doge::gui
         return static_cast<Button&>(GetGUI().GetElement(GetCloseButtonElementID()));
     }
 
-    std::string WindowEx::GetCursorDetectableElementID() const
+    std::string WindowEx::GetScrollableElementID() const
     {
         return "window_gui_windowex_" + GetID() + "_cursor_detectable";
     }
 
-    CursorDetectableElement& WindowEx::GetCursorDetectableElement() const
+    CursorDetectableElement& WindowEx::GetScrollable() const
     {
-        return static_cast<CursorDetectableElement&>(GetGUI().GetElement(GetCursorDetectableElementID()));
+        return static_cast<CursorDetectableElement&>(GetGUI().GetElement(GetScrollableElementID()));
+    }
+
+    void WindowEx::SetScrollableArea(const Rectf& area)
+    {
+        scrollable_area = area;
+
+        BoundScrollableCamera();
+    }
+
+    const Rectf& WindowEx::GetScrollableArea() const
+    {
+        return scrollable_area;
     }
 
     void WindowEx::SetBorderThickness(const Rectf& border_thickness)
@@ -291,8 +324,6 @@ namespace doge::gui
     {
         Window::OnLayerUpdated();
 
-        GetCursorDetectableElement().SetLayer(GetLayer());
-
         if (HasTitleBar())
         {
             UpdateTitleBarLayer();
@@ -310,15 +341,18 @@ namespace doge::gui
 
         if (HasCloseButton())
         {
-            UpdateCloseButtonOrigin();
+            UpdateCloseButtonLayer();
+        }
+
+        if (IsScrollable())
+        {
+            UpdateScrollableLayer();
         }
     }
 
     void WindowEx::OnSizeUpdated()
     {
         Window::OnSizeUpdated();
-
-        GetCursorDetectableElement().SetSize(GetSize());
 
         if (HasTitleBar())
         {
@@ -340,6 +374,12 @@ namespace doge::gui
         {
             UpdateCloseButtonOrigin();
         }
+
+        if (IsScrollable())
+        {
+            UpdateScrollableSize();
+            BoundScrollableCamera();
+        }
     }
     
     void WindowEx::OnPositionUpdated()
@@ -350,9 +390,6 @@ namespace doge::gui
     void WindowEx::OnOriginUpdated()
     {
         Window::OnOriginUpdated();
-
-        GetCursorDetectableElement().SetAlign(GetAlign());
-        GetCursorDetectableElement().SetOrigin(GetOrigin());
 
         if (HasTitleBar())
         {
@@ -372,6 +409,11 @@ namespace doge::gui
         if (HasCloseButton())
         {
             UpdateCloseButtonOrigin();
+        }
+
+        if (IsScrollable())
+        {
+            UpdateScrollableOrigin();
         }
     }
 
@@ -424,5 +466,40 @@ namespace doge::gui
     void WindowEx::UpdateCloseButtonOrigin()
     {
         GetCloseButton().SetOrigin(GetActualOrigin() - Vec2f(GetSize().x - 4, GetBorderThickness().top / 2.f));
+    }
+
+    void WindowEx::UpdateScrollableLayer()
+    {
+        GetScrollable().SetLayer(GetLayer());
+    }
+
+    void WindowEx::UpdateScrollableSize()
+    {
+        GetScrollable().SetSize(GetSize());
+    }
+
+    void WindowEx::UpdateScrollableOrigin()
+    {
+        GetScrollable().SetAlign(GetAlign());
+        GetScrollable().SetOrigin(GetOrigin());
+    }
+
+    void WindowEx::BoundScrollableCamera()
+    {
+        if (scrollable_area.GetSize() == Vec2f::Zero)
+            return;
+
+        auto& cam_pos = GetWindowCamera().GetCameraPosition();
+        auto& cam_size = GetWindowCamera().GetSize();
+
+        if (cam_pos.y - cam_size.y / 2.f < scrollable_area.top)
+            GetWindowCamera().SetCameraPosition(Vec2f(cam_pos.x, scrollable_area.top + cam_size.y / 2.f));
+        else if (cam_pos.y + cam_size.y / 2.f > scrollable_area.top + scrollable_area.height)
+            GetWindowCamera().SetCameraPosition(Vec2f(cam_pos.x, scrollable_area.top + scrollable_area.height - cam_size.y / 2.f));
+
+        if (cam_pos.x - cam_size.x / 2.f < scrollable_area.left)
+            GetWindowCamera().SetCameraPosition(Vec2f(scrollable_area.left + cam_size.x / 2.f, cam_pos.y));
+        else if (cam_pos.x + cam_size.x / 2.f > scrollable_area.left + scrollable_area.width)
+            GetWindowCamera().SetCameraPosition(Vec2f(scrollable_area.left + scrollable_area.width - cam_size.x / 2.f, cam_pos.y));
     }
 }

@@ -4,6 +4,9 @@
 #include <concepts>
 #include <doge/components/Layer.hpp>
 #include <doge/core/Entity.hpp>
+#include <doge/utils/lev.hpp>
+#include <doge/components/Camera.hpp>
+#include <doge/core/Component.hpp>
 
 namespace doge::gui
 {
@@ -11,14 +14,25 @@ namespace doge::gui
 
     struct Camera
     {
+        Event<Vec2f, io::Mouse::Button> on_pressed;
+        Event<Vec2f, io::Mouse::Button> on_released;
+        Event<Vec2f, io::Mouse::Wheel, float> on_scrolled;
+        Event<Vec2f> on_cursor_moved;
+        Event<Vec2f> on_focus_gained;
+        Event<Vec2f> on_focus_lost;
+
         GUI& GetGUI() const;
         Entity GetEntity() const;
+        doge::Component<doge::Camera>& GetComponent() const;
 
         void SetLayer(const Layer& layer);
         bool HasLayer(std::int32_t layer) const;
         Layer& GetLayer() const;
 
         const std::string& GetID() const;
+
+        void SetCameraPosition(const Vec2f& cam_pos);
+        const Vec2f& GetCameraPosition() const;
 
         void SetPosition(const Vec2f& position);
         const Vec2f& GetPosition() const;

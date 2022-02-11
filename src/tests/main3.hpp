@@ -160,6 +160,8 @@ namespace main3
             window.SetResizable(true);
             window.SetCloseButton(true);
             window.SetDraggable(true);
+            window.SetScrollable(true);
+            window.SetScrollableArea(doge::Rectf(0, 0, 500, 500));
 
             gui.GetElementComponent("my_window" + std::to_string(win_i)).OnRemoval([this, win_i]()
             {
@@ -169,7 +171,7 @@ namespace main3
             auto& button = window.AddElement<doge::gui::Button>("my_button" + std::to_string(win_i));
             button.SetSize(doge::Vec2f(100, 100));
             button.GetClickable().SetCornerRadius(25);
-            button.SetPosition(doge::Vec2f(0, 0));
+            button.SetPosition(doge::Vec2f(64, 64));
             button.SetHasText(true);
             button.GetText().SetString(U"Off");
 
@@ -248,9 +250,14 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            auto* e = gui.GetCameraFocused();
-            if (e)
-                std::cout << e->GetID() << std::endl;
+            // auto* e = gui.GetCameraFocused();
+            // if (e)
+            //     std::cout << e->GetID() << std::endl;
+
+            if (gui.HasElement("my_window0"))
+            {
+                std::cout << static_cast<doge::gui::WindowEx&>(gui.GetElement("my_window0")).GetWindowCamera().GetCameraPosition() << std::endl;
+            }
         }
 
         void FixedUpdate(doge::Engine& engine, doge::DeltaTime dt)

@@ -15,6 +15,11 @@ namespace doge::gui
         return GetGUI().GetCameraEntity(GetID());
     }
 
+    doge::Component<doge::Camera>& Camera::GetComponent() const
+    {
+        return GetGUI().GetCameraComponent(GetID());
+    }
+
     void Camera::SetLayer(const Layer& layer)
     {
         GetLayer() = layer;
@@ -35,6 +40,16 @@ namespace doge::gui
         return id;
     }
 
+    void Camera::SetCameraPosition(const Vec2f& cam_pos)
+    {
+        GetEntity().GetComponent<Position>().position = cam_pos;
+    }
+
+    const Vec2f& Camera::GetCameraPosition() const
+    {
+        return GetEntity().GetComponent<Position>().position;
+    }
+
     void Camera::SetPosition(const Vec2f& position)
     {
         this->position = position;
@@ -48,13 +63,13 @@ namespace doge::gui
 
     void Camera::SetSize(const Vec2f& size)
     {
-        GetEntity().GetComponent<doge::Camera>().size = size;
+        GetComponent().size = size;
         UpdatePort();
     }
 
     const Vec2f& Camera::GetSize() const
     {
-        return GetEntity().GetComponent<doge::Camera>().size;
+        return GetComponent().size;
     }
 
     void Camera::SetOrigin(const Vec2f& origin)
@@ -145,7 +160,7 @@ namespace doge::gui
 
     void Camera::UpdatePort()
     {
-        GetEntity().GetComponent<doge::Camera>().port.SetPosition(Vec2f(0.5, 0.5) + (GetPosition() - GetActualOrigin()) / GetGUI().GetEngine().window.window_io.GetSize());
-        GetEntity().GetComponent<doge::Camera>().port.SetSize(GetSize() / GetGUI().GetEngine().window.window_io.GetSize());
+        GetComponent().port.SetPosition(Vec2f(0.5, 0.5) + (GetPosition() - GetActualOrigin()) / GetGUI().GetEngine().window.window_io.GetSize());
+        GetComponent().port.SetSize(GetSize() / GetGUI().GetEngine().window.window_io.GetSize());
     }
 }

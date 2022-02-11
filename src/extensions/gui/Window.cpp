@@ -27,9 +27,9 @@ namespace doge::gui
             GetGUI().RemoveElements(GetWindowCameraID());
         });
 
-        GetEntity().OnComponentRemoval<ElementComponent>([&, camera_entity = camera.GetEntity()]()
+        GetEntity().OnComponentRemoval<ElementComponent>([&]()
         {
-            GetGUI().GetEngine().DestroyEntity(camera_entity);
+            GetGUI().RemoveCamera(GetWindowCameraID());
         });
 
         // image

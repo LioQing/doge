@@ -58,8 +58,11 @@ namespace doge::gui
         std::string GetCloseButtonElementID() const;
         Button& GetCloseButton() const;
 
-        std::string GetCursorDetectableElementID() const;
-        CursorDetectableElement& GetCursorDetectableElement() const;
+        std::string GetScrollableElementID() const;
+        CursorDetectableElement& GetScrollable() const;
+
+        void SetScrollableArea(const Rectf& area);
+        const Rectf& GetScrollableArea() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
 
@@ -84,12 +87,19 @@ namespace doge::gui
         virtual void UpdateCloseButtonLayer();
         virtual void UpdateCloseButtonOrigin();
 
+        virtual void UpdateScrollableLayer();
+        virtual void UpdateScrollableSize();
+        virtual void UpdateScrollableOrigin();
+
     private:
+
+        void BoundScrollableCamera();
 
         std::bitset<Trait::Count> trait_enabled;
 
         Vec2f drag_start_pos;
         Vec2f resize_start_pos;
         bool resize_guard = false;
+        Rectf scrollable_area = Rectf();
     };
 }
