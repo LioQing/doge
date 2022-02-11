@@ -16,7 +16,7 @@ if (MSVC)
     set(SFML_STATIC_LIBRARIES TRUE)
     find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++15-64bit/bin/Release)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++15-64bit/bin/Debug)
 
 else()
 

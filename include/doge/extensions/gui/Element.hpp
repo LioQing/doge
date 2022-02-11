@@ -29,8 +29,6 @@ namespace doge
             virtual ~Element() = 0;
 
             virtual void Initialize() {};
-            virtual void Update(DeltaTime) {};
-            virtual void FixedUpdate(DeltaTime) {};
             
             virtual bool TestPoint(const Vec2f& point) const;
 

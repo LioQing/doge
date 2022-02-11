@@ -144,6 +144,7 @@ namespace doge::gui
             button.GetClickable().on_clicked +=
             [&](const Vec2f&, io::Mouse::Button button)
             {
+                std::cout << "TEST" << std::endl;
                 if (button == io::Mouse::Button::Left)
                     GetGUI().RemoveElement(GetID());
             };

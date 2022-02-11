@@ -64,12 +64,12 @@ namespace main2
 
     void Update(doge::Engine& engine, doge::DeltaTime dt)
     {
+        std::cout << 1000 / dt << std::endl;
     }
 
     int Main()
     {
         doge::Engine engine;
-        engine.window.settings.fps = 120;
         
         doge::GameLoopFunctions glf;
         glf.start           = Start;
@@ -77,7 +77,12 @@ namespace main2
 
         engine.AddScene("test2", glf);
 
-        engine.StartScene("test2", doge::Window::Settings{ .size = doge::Vec2u(1280, 720), .title = "test2" });
+        engine.StartScene("test2", doge::Window::Settings
+        {
+            .size = doge::Vec2u(1280, 720),
+            .title = "test2",
+            .fps = 0,
+        });
 
         return 0;
     }

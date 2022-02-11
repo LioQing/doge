@@ -165,6 +165,10 @@ namespace doge::gui
         engine.events.on_mouse_moved.AddListener("doge_gui",
         [&](const event::MouseMove& event)
         {
+            if (cursor_event_called.test(0))
+                return;
+            cursor_event_called.set(0, true);
+
             // moved
             if (element_below_cursor)
             {
@@ -181,12 +185,11 @@ namespace doge::gui
                 return;
 
             // entered / left
-            std::shared_ptr<CursorDetectableElement> top_ptr = nullptr;
+            auto was = element_below_cursor;
+            element_below_cursor = nullptr;
 
-            for (auto& id : cursor_detectable_elements)
+            for (auto& ptr : cursor_detectable_elements)
             {
-                auto ptr = std::static_pointer_cast<CursorDetectableElement>(GetElementComponent(id).element);
-
                 Vec2f cursor_pos = GetEngine().window.MapPixelToCoords(event.position, ptr->GetCameraComponent());
                 Recti cam_rect = Recti(
                     ptr->GetCameraComponent().port.GetPosition() * GetEngine().window.window_io.GetSize(),
@@ -196,18 +199,15 @@ namespace doge::gui
                 if (
                     math::TestPoint(event.position, cam_rect) &&
                     ptr->TestPoint(cursor_pos) &&
-                    (!top_ptr || ptr->GetLayer() > top_ptr->GetLayer())
+                    (!element_below_cursor || ptr->GetLayer() > element_below_cursor->GetLayer())
                 )
                 {
-                    top_ptr = ptr;
+                    element_below_cursor = ptr;
                 }
             }
 
-            if (element_below_cursor != top_ptr)
+            if (element_below_cursor != was)
             {
-                auto was = element_below_cursor;
-                element_below_cursor = top_ptr;
-
                 if (was)
                 {
                     auto cursor_pos = GetEngine().window.MapPixelToCoords(
@@ -235,6 +235,10 @@ namespace doge::gui
         engine.events.on_mouse_button_pressed.AddListener("doge_gui",
         [&](event::MouseButton event)
         {
+            if (cursor_event_called.test(1))
+                return;
+            cursor_event_called.set(1, true);
+
             if (element_below_cursor)
             {
                 auto cursor_pos = GetEngine().window.MapPixelToCoords(
@@ -250,6 +254,10 @@ namespace doge::gui
         engine.events.on_mouse_button_released.AddListener("doge_gui",
         [&](event::MouseButton event)
         {
+            if (cursor_event_called.test(2))
+                return;
+            cursor_event_called.set(2, true);
+
             if (element_below_cursor)
             {
                 auto cursor_pos = GetEngine().window.MapPixelToCoords(
@@ -265,18 +273,11 @@ namespace doge::gui
 
     void GUI::Update(Engine& engine, DeltaTime dt)
     {
-        for (auto& [id, element] : elements)
-        {
-            element.GetComponent<ElementComponent>().element->Update(dt);
-        }
+        cursor_event_called.reset();
     }
 
     void GUI::FixedUpdate(Engine& engine, DeltaTime dt)
     {
-        for (auto& [id, element] : elements)
-        {
-            element.GetComponent<ElementComponent>().element->FixedUpdate(dt);
-        }
     }
 
     void GUI::Finish(Engine& engine)

@@ -14,7 +14,7 @@
 - [ ] extension: gui
   - [x] main class gui
   - [x] gui camera
-  - [ ] rework element events
+  - [x] rework element events
   - [ ] widgets
     - [ ] inputs
       - [x] button

@@ -54,15 +54,15 @@ namespace doge
 
                 if constexpr (std::is_base_of_v<CursorDetectableElement, E>)
                 {
-                    comp.OnRemoval([&, val_id = id]()
+                    auto [itr, success] = cursor_detectable_elements.insert(std::static_pointer_cast<CursorDetectableElement>(comp.element));
+
+                    comp.OnRemoval([&, val_id = id, itr]()
                     {
                         elements.erase(val_id);
-                        cursor_detectable_elements.erase(val_id);
-                        if (GetElementBelowCursor() && GetElementBelowCursor()->GetID() == val_id)
+                        if (GetElementBelowCursor() == *itr)
                             element_below_cursor = nullptr;
+                        cursor_detectable_elements.erase(itr);
                     });
-
-                    cursor_detectable_elements.emplace(comp.element->GetID());
                 }
                 else
                 {
@@ -101,11 +101,12 @@ namespace doge
             doge::nine_slice::NineSlice nine_slice;
 
             std::shared_ptr<CursorDetectableElement> element_below_cursor = nullptr;
+            std::bitset<3> cursor_event_called;
             bool element_below_cursor_locked = false;
 
             std::unordered_map<std::string, Entity> cameras;
             std::unordered_map<std::string, Entity> elements;
-            std::unordered_set<std::string> cursor_detectable_elements;
+            std::unordered_set<std::shared_ptr<CursorDetectableElement>> cursor_detectable_elements;
 
             void Start(Engine& engine);
             void Update(Engine& engine, DeltaTime dt);
