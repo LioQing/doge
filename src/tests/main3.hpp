@@ -250,10 +250,16 @@ namespace main3
             }
             {
                 auto& slider = gui.AddElement<doge::gui::Slider>("my_slider1", "my_cam");
-                slider.SetPosition(doge::Vec2f(100, 0));
+                slider.SetPosition(doge::Vec2f(-100, 0));
                 slider.SetMinValue(0);
                 slider.SetMaxValue(3);
-                slider.SetAlign(doge::Vec2f::Zero);
+            }
+            {
+                auto& slider = gui.AddElement<doge::gui::Slider>("my_slider2", "my_cam");
+                slider.SetPosition(doge::Vec2f(-100, -100));
+                slider.SetMinValue(0);
+                slider.SetMaxValue(3);
+                slider.SetAlign(doge::Vec2f(.6f, .6f));
             }
 
             
