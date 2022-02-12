@@ -10,6 +10,7 @@
 #include <doge/extensions/gui/Clickable.hpp>
 #include <doge/extensions/gui/CursorDetectableElement.hpp>
 #include <doge/extensions/gui/Camera.hpp>
+#include <doge/extensions/gui/Scrollable.hpp>
 
 namespace doge::gui
 {
@@ -201,24 +202,9 @@ namespace doge::gui
         }
         else if (!prev_enabled && enabled)
         {
-            auto& scrollable = GetGUI().AddElement<CursorDetectableElement>(GetScrollableElementID(), GetCameraID());
+            auto& scrollable = GetGUI().AddElement<gui::Scrollable>(GetScrollableElementID(), GetCameraID());
             scrollable.GetEntity().SetParent(GetEntity());
-            scrollable.get_camera_to_be_focused = [this]() -> Camera& { return this->GetWindowCamera(); };
-
-            GetWindowCamera().on_scrolled.AddListener(GetScrollableElementID(), 
-            [&](const Vec2f& position, io::Mouse::Wheel wheel, float delta)
-            {
-                if (wheel == io::Mouse::Wheel::Vertical)
-                {
-                    GetWindowCamera().SetCameraPosition(GetWindowCamera().GetCameraPosition() - delta * Vec2f(0, 8));
-                }
-                else
-                {
-                    GetWindowCamera().SetCameraPosition(GetWindowCamera().GetCameraPosition() - delta * Vec2f(8, 0));
-                }
-
-                BoundScrollableCamera();
-            });
+            scrollable.SetScrollableCamera(GetWindowCameraID());
         }
 
         UpdateScrollableLayer();
@@ -288,21 +274,9 @@ namespace doge::gui
         return "window_gui_windowex_" + GetID() + "_cursor_detectable";
     }
 
-    CursorDetectableElement& WindowEx::GetScrollable() const
+    Scrollable& WindowEx::GetScrollable() const
     {
-        return static_cast<CursorDetectableElement&>(GetGUI().GetElement(GetScrollableElementID()));
-    }
-
-    void WindowEx::SetScrollableArea(const Rectf& area)
-    {
-        scrollable_area = area;
-
-        BoundScrollableCamera();
-    }
-
-    const Rectf& WindowEx::GetScrollableArea() const
-    {
-        return scrollable_area;
+        return static_cast<gui::Scrollable&>(GetGUI().GetElement(GetScrollableElementID()));
     }
 
     void WindowEx::SetBorderThickness(const Rectf& border_thickness)
@@ -378,7 +352,6 @@ namespace doge::gui
         if (IsScrollable())
         {
             UpdateScrollableSize();
-            BoundScrollableCamera();
         }
     }
     
@@ -482,24 +455,5 @@ namespace doge::gui
     {
         GetScrollable().SetAlign(GetAlign());
         GetScrollable().SetOrigin(GetOrigin());
-    }
-
-    void WindowEx::BoundScrollableCamera()
-    {
-        if (scrollable_area.GetSize() == Vec2f::Zero)
-            return;
-
-        auto& cam_pos = GetWindowCamera().GetCameraPosition();
-        auto& cam_size = GetWindowCamera().GetSize();
-
-        if (cam_pos.y - cam_size.y / 2.f < scrollable_area.top)
-            GetWindowCamera().SetCameraPosition(Vec2f(cam_pos.x, scrollable_area.top + cam_size.y / 2.f));
-        else if (cam_pos.y + cam_size.y / 2.f > scrollable_area.top + scrollable_area.height)
-            GetWindowCamera().SetCameraPosition(Vec2f(cam_pos.x, scrollable_area.top + scrollable_area.height - cam_size.y / 2.f));
-
-        if (cam_pos.x - cam_size.x / 2.f < scrollable_area.left)
-            GetWindowCamera().SetCameraPosition(Vec2f(scrollable_area.left + cam_size.x / 2.f, cam_pos.y));
-        else if (cam_pos.x + cam_size.x / 2.f > scrollable_area.left + scrollable_area.width)
-            GetWindowCamera().SetCameraPosition(Vec2f(scrollable_area.left + scrollable_area.width - cam_size.x / 2.f, cam_pos.y));
     }
 }

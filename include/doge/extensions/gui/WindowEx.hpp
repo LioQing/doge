@@ -9,7 +9,7 @@ namespace doge::gui
     struct Draggable;
     struct Resizable;
     struct Button;
-    struct CursorDetectableElement;
+    struct Scrollable;
 
     struct WindowEx : Window
     {
@@ -59,10 +59,7 @@ namespace doge::gui
         Button& GetCloseButton() const;
 
         std::string GetScrollableElementID() const;
-        CursorDetectableElement& GetScrollable() const;
-
-        void SetScrollableArea(const Rectf& area);
-        const Rectf& GetScrollableArea() const;
+        gui::Scrollable& GetScrollable() const;
 
         void SetBorderThickness(const Rectf& border_thickness);
 
@@ -92,8 +89,6 @@ namespace doge::gui
         virtual void UpdateScrollableOrigin();
 
     private:
-
-        void BoundScrollableCamera();
 
         std::bitset<Trait::Count> trait_enabled;
 

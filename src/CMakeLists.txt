@@ -75,6 +75,7 @@ set(SRC_FILES
     extensions/gui/Clickable.cpp
     extensions/gui/Resizable.cpp
     extensions/gui/Camera.cpp
+    extensions/gui/Scrollable.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp
