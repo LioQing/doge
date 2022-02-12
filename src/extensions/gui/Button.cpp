@@ -32,7 +32,6 @@ namespace doge::gui
         clickable.on_released       += [&](const Vec2f&, io::Mouse::Button){ on_state_transition(*this); };
         clickable.on_cursor_entered += [&](const Vec2f&){ on_state_transition(*this); };
         clickable.on_cursor_left    += [&](const Vec2f&){ on_state_transition(*this); };
-        clickable.on_clicked        += [&](const Vec2f&, io::Mouse::Button){ on_state_transition(*this); };
 
         on_state_transition(*this);
 
@@ -174,11 +173,6 @@ namespace doge::gui
     {
         GetImageElement().SetSize(GetSize());
         GetClickable().SetSize(GetSize());
-    }
-
-    void Button::OnPositionUpdated()
-    {
-        GetEntity().GetComponent<doge::Position>().position = GetPosition();
     }
 
     void Button::OnOriginUpdated()

@@ -6,6 +6,8 @@
 
 namespace doge::gui
 {
+    struct Draggable;
+    
     struct Scrollable : CursorDetectableElement
     {
         virtual ~Scrollable();
@@ -25,6 +27,12 @@ namespace doge::gui
         void SetScrollSpeed(const Vec2f& scroll_speed);
         void SetScrollSpeed(float scroll_speed);
         const Vec2f& GetScrollSpeed() const;
+
+        std::string GetHorizontalScrollBarElementID() const;
+        std::string GetVerticalScrollBarElementID() const;
+
+        Draggable& GetHorizontalScrollBar() const;
+        Draggable& GetVerticalScrollBar() const;
 
     protected:
 

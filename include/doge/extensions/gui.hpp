@@ -18,3 +18,4 @@
 #include "gui/Clickable.hpp"
 #include "gui/Resizable.hpp"
 #include "gui/Scrollable.hpp"
+#include "gui/Slider.hpp"

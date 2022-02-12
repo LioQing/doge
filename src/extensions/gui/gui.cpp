@@ -166,6 +166,11 @@ namespace doge::gui
         engine.assets.LoadTexture("doge_gui_windowex", "gui/windowex.png");
         nine_slice.LoadTexture("doge_gui_windowex", "gui/windowex.png", Recti(12, 32, 12, 12));
 
+        engine.assets.LoadTexture("doge_gui_slider_thumb", "gui/slider_thumb.png");
+
+        engine.assets.LoadTexture("doge_gui_slider_track", "gui/slider_track.png");
+        nine_slice.LoadTexture("doge_gui_slider_track", "gui/slider_track.png", Recti(10, 10, 10, 10));
+
         {
             auto [itr, success] = engine.assets.LoadTexture("doge_gui_windowex_close_button", "gui/windowex_close_button.png");
             itr->second.atlas_rectangles.emplace("default", Recti(0, 0, 24, 24));
@@ -359,5 +364,12 @@ namespace doge::gui
 
         engine.assets.EraseTexture("doge_gui_windowex");
         nine_slice.EraseTexture("doge_gui_windowex");
+
+        engine.assets.EraseTexture("doge_gui_slider_thumb");
+
+        engine.assets.EraseTexture("doge_gui_slider_track");
+        nine_slice.EraseTexture("doge_gui_slider_track");
+        
+        engine.assets.EraseTexture("doge_gui_windowex_close_button");
     }
 }

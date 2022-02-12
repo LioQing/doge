@@ -205,11 +205,11 @@ namespace doge::gui
             auto& scrollable = GetGUI().AddElement<gui::Scrollable>(GetScrollableElementID(), GetCameraID());
             scrollable.GetEntity().SetParent(GetEntity());
             scrollable.SetScrollableCamera(GetWindowCameraID());
-        }
 
-        UpdateScrollableLayer();
-        UpdateScrollableSize();
-        UpdateScrollableOrigin();
+            UpdateScrollableLayer();
+            UpdateScrollableSize();
+            UpdateScrollableOrigin();
+        }
     }
 
     bool WindowEx::IsScrollable() const

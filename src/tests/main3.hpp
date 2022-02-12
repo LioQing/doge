@@ -237,6 +237,12 @@ namespace main3
             ns_image.SetCenterTextureSize(doge::Vec2i(46, 46));
             ns_image.SetPosition(doge::Vec2f(-150, 0));
 
+            // slider
+            auto& slider = gui.AddElement<doge::gui::Slider>("my_slider", "my_cam");
+            slider.SetPosition(doge::Vec2f(100, 0));
+
+            slider.on_value_changed += [](float value){ std::cout << value << std::endl; };
+
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_b",
                 [this](const doge::event::MouseButton& event)
@@ -251,9 +257,9 @@ namespace main3
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
         {
-            auto* e = gui.GetCameraFocused();
-            if (e)
-                std::cout << e->GetID() << std::endl;
+            // auto* e = gui.GetCameraFocused();
+            // if (e)
+            //     std::cout << e->GetID() << std::endl;
 
             // if (gui.HasElement("my_window0"))
             // {
