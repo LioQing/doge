@@ -235,13 +235,28 @@ namespace main3
             ns_image.SetTextureID("test2");
             ns_image.SetSize(doge::Vec2f(200, 200));
             ns_image.SetCenterTextureSize(doge::Vec2i(46, 46));
-            ns_image.SetPosition(doge::Vec2f(-150, 0));
+            //ns_image.SetPosition(doge::Vec2f(-150, 0));
 
             // slider
-            auto& slider = gui.AddElement<doge::gui::Slider>("my_slider", "my_cam");
-            slider.SetPosition(doge::Vec2f(100, 0));
+            {
+                auto& slider = gui.AddElement<doge::gui::Slider>("my_slider0", "my_cam");
+                slider.SetPosition(doge::Vec2f(100, 0));
+                slider.SetMinValue(0);
+                slider.SetMaxValue(3);
+                slider.SetAlign(doge::Vec2f::Zero);
+                slider.SetOrigin(doge::Vec2f(-100, -200));
 
-            slider.on_value_changed += [](float value){ std::cout << value << std::endl; };
+                slider.on_value_changed += [](float val){ std::cout << val << std::endl; };
+            }
+            {
+                auto& slider = gui.AddElement<doge::gui::Slider>("my_slider1", "my_cam");
+                slider.SetPosition(doge::Vec2f(100, 0));
+                slider.SetMinValue(0);
+                slider.SetMaxValue(3);
+                slider.SetAlign(doge::Vec2f::Zero);
+            }
+
+            
 
             engine.events.on_mouse_button_pressed.AddListener(
                 "scene_b",

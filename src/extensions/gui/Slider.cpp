@@ -8,7 +8,8 @@
 namespace doge::gui
 {
     const Vec2f Slider::DefaultSize = Vec2f(200, 32);
-    const Vec2f Slider::DefaultTrackSize = Vec2f(200, 20.0001);
+    const Vec2f Slider::DefaultTrackSize = Vec2f(167, 20.0001);
+    const float Slider::DefaultTrackLength = 150.f;
 
     Slider::~Slider()
     {        
@@ -28,26 +29,27 @@ namespace doge::gui
         thumb_image.GetEntity().SetParent(GetEntity());
         thumb_image.SetTextureID("doge_gui_slider_thumb");
         thumb_image.SetSize(Vec2f(32, 32));
-        thumb_image.SetAlign(Align::Center);
 
         draggable.on_drag_began += [&](const Vec2f& position)
         {
             if (GetDirection() == Direction::Horizontal)
-                SetValue(position.x - GetPosition().x);
+                SetValue(((position.x - GetPosition().x + GetOrigin().x - (GetSize().x - GetTrackLength()) / 2.f) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
             else
-                SetValue(position.y - GetPosition().y);
+                SetValue(((position.y - GetPosition().y + GetOrigin().y - (GetSize().y - GetTrackLength()) / 2.f) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
         };
 
         draggable.on_dragged += [&](const Vec2f& position)
         {
             if (GetDirection() == Direction::Horizontal)
-                SetValue(position.x - GetPosition().x);
+                SetValue(((position.x - GetPosition().x + GetOrigin().x - (GetSize().x - GetTrackLength()) / 2.f) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
             else
-                SetValue(position.y - GetPosition().y);
+                SetValue(((position.y - GetPosition().y + GetOrigin().y - (GetSize().y - GetTrackLength()) / 2.f) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
         };
 
         SetAlign(Align::Center);
         SetSize(DefaultSize);
+        SetTrackLength(DefaultTrackLength);
+        SetValue(0);
     }
 
     void Slider::SetMinValue(float min_value)
@@ -72,28 +74,22 @@ namespace doge::gui
 
     void Slider::SetValue(float value)
     {
-        this->value = value;
+        auto was = this->value;
 
+        if (value > max_value)
+            value = max_value;
+        else if (value < min_value)
+            value = min_value;
+        
+        this->value = IsInt() ? std::round(value) : value;
+        
         if (GetDirection() == Direction::Horizontal)
-        {
-            if (value > GetSize().x / 2.f)
-                value = GetSize().x / 2.f;
-            else if (value < -GetSize().x / 2.f)
-                value = -GetSize().x / 2.f;
-                
-            GetThumbImage().SetPosition(Vec2f(value, 0));
-        }
+            GetThumbImage().SetPosition(Vec2f((GetValue() / (GetMaxValue() - GetMinValue()) - GetAlign().x) * GetTrackLength() - (GetAlign().x - .5f) * (GetSize().x - GetTrackLength()), -GetSize().y * (GetAlign().y - .5f)));
         else
-        {
-            if (value > GetSize().y / 2.f)
-                value = GetSize().y / 2.f;
-            else if (value < -GetSize().y / 2.f)
-                value = -GetSize().y / 2.f;
+            GetThumbImage().SetPosition(Vec2f(-GetSize().x * (GetAlign().x - .5f), (GetValue() / (GetMaxValue() - GetMinValue()) - GetAlign().y) * GetTrackLength() - (GetAlign().y - .5f) * (GetSize().y - GetTrackLength())));
 
-            GetThumbImage().SetPosition(Vec2f(0, value));
-        }
-
-        on_value_changed(value);
+        if (was != GetValue())
+            on_value_changed(GetValue());
     }
 
     float Slider::GetValue() const
@@ -101,9 +97,21 @@ namespace doge::gui
         return value;
     }
 
+    void Slider::SetTrackLength(float track_length)
+    {
+        this->track_length = track_length;
+        SetValue(GetValue());
+    }
+
+    float Slider::GetTrackLength() const
+    {
+        return this->track_length;
+    }
+
     void Slider::SetInt(bool is_int)
     {
         this->is_int = is_int;
+        SetValue(GetValue());
     }
 
     bool Slider::IsInt() const
@@ -114,6 +122,7 @@ namespace doge::gui
     void Slider::SetDirection(Direction direction)
     {
         this->direction = direction;
+        SetValue(GetValue());
     }
 
     Slider::Direction Slider::GetDirection() const
@@ -161,12 +170,17 @@ namespace doge::gui
     void Slider::OnSizeUpdated()
     {
         GetDraggable().SetSize(GetSize());
+        SetValue(GetValue());
     }
 
     void Slider::OnOriginUpdated()
     {
         GetDraggable().SetOrigin(GetOrigin());
         GetDraggable().SetAlign(GetAlign());
+
+        GetTrackImage().SetOrigin(GetOrigin() + (GetAlign() - Vec2f(.5f, .5f)) * GetSize());
+        GetThumbImage().SetOrigin(GetOrigin());
+        SetValue(GetValue());
     }
 
     void Slider::OnColorUpdated()

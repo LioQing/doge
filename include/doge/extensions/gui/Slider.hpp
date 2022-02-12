@@ -32,6 +32,9 @@ namespace doge::gui
         void SetValue(float value);
         float GetValue() const;
 
+        void SetTrackLength(float track_length);
+        float GetTrackLength() const;
+
         void SetInt(bool is_int);
         bool IsInt() const;
 
@@ -49,6 +52,7 @@ namespace doge::gui
 
         static const Vec2f DefaultSize;
         static const Vec2f DefaultTrackSize;
+        static const float DefaultTrackLength;
 
     protected:
 
@@ -64,5 +68,6 @@ namespace doge::gui
         float min_value = 0.f;
         float max_value = 100.f;
         float value = 0.f;
+        float track_length;
     };
 }
