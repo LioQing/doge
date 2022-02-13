@@ -66,7 +66,7 @@ namespace doge::gui
         bool is_int = false;
         Direction direction = Direction::Horizontal;
         float min_value = 0.f;
-        float max_value = 100.f;
+        float max_value = 1.f;
         float value = 0.f;
         float track_length;
     };

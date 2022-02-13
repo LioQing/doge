@@ -9,7 +9,7 @@ namespace doge::gui
 {
     const Vec2f Slider::DefaultSize = Vec2f(200, 32);
     const Vec2f Slider::DefaultTrackSize = Vec2f(167, 20.0001);
-    const float Slider::DefaultTrackLength = 150.f;
+    const float Slider::DefaultTrackLength = 167.f;
 
     Slider::~Slider()
     {        
@@ -33,17 +33,17 @@ namespace doge::gui
         draggable.on_drag_began += [&](const Vec2f& position)
         {
             if (GetDirection() == Direction::Horizontal)
-                SetValue(((position.x - GetPosition().x + GetOrigin().x + (GetAlign().x - .5f) * (GetSize().x - GetTrackLength())) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
+                SetValue(((position.x - global::GetPosition(GetEntity()).x + GetOrigin().x + (GetAlign().x - .5f) * (GetSize().x - GetTrackLength())) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
             else
-                SetValue(((position.y - GetPosition().y + GetOrigin().y + (GetAlign().y - .5f) * (GetSize().y - GetTrackLength())) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
+                SetValue(((position.y - global::GetPosition(GetEntity()).y + GetOrigin().y + (GetAlign().y - .5f) * (GetSize().y - GetTrackLength())) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
         };
 
         draggable.on_dragged += [&](const Vec2f& position)
         {
             if (GetDirection() == Direction::Horizontal)
-                SetValue(((position.x - GetPosition().x + GetOrigin().x + (GetAlign().x - .5f) * (GetSize().x - GetTrackLength())) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
+                SetValue(((position.x - global::GetPosition(GetEntity()).x + GetOrigin().x + (GetAlign().x - .5f) * (GetSize().x - GetTrackLength())) / GetTrackLength() + GetAlign().x) * (GetMaxValue() - GetMinValue()) + GetMinValue());
             else
-                SetValue(((position.y - GetPosition().y + GetOrigin().y + (GetAlign().y - .5f) * (GetSize().y - GetTrackLength())) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
+                SetValue(((position.y - global::GetPosition(GetEntity()).y + GetOrigin().y + (GetAlign().y - .5f) * (GetSize().y - GetTrackLength())) / GetTrackLength() + GetAlign().y) * (GetMaxValue() - GetMinValue()) + GetMinValue());
         };
 
         SetAlign(Align::Center);

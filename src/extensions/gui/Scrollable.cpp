@@ -2,7 +2,6 @@
 
 #include <doge/extensions/gui/GUI.hpp>
 #include <doge/extensions/gui/Camera.hpp>
-#include <doge/extensions/gui/Draggable.hpp>
 
 namespace doge::gui
 {
@@ -77,26 +76,6 @@ namespace doge::gui
     const Vec2f& Scrollable::GetScrollSpeed() const
     {
         return scroll_speed;
-    }
-
-    std::string Scrollable::GetHorizontalScrollBarElementID() const
-    {
-        return "doge_gui_scrollable_" + GetID() + "_draggable_horizontal";
-    }
-
-    std::string Scrollable::GetVerticalScrollBarElementID() const
-    {
-        return "doge_gui_scrollable_" + GetID() + "_draggable_vertical";
-    }
-
-    Draggable& Scrollable::GetHorizontalScrollBar() const
-    {
-        return static_cast<Draggable&>(GetGUI().GetElement(GetHorizontalScrollBarElementID()));
-    }
-
-    Draggable& Scrollable::GetVerticalScrollBar() const
-    {
-        return static_cast<Draggable&>(GetGUI().GetElement(GetVerticalScrollBarElementID()));
     }
 
     void Scrollable::OnSizeUpdated()

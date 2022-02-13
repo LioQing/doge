@@ -163,7 +163,7 @@ namespace main3
             window.SetScrollable(true);
             window.GetScrollable().SetAreaUnlimited(false);
             window.GetScrollable().SetArea(doge::Rectf(0, 0, 0, 50));
-
+            
             gui.GetElementComponent("my_window" + std::to_string(win_i)).OnRemoval([this, win_i]()
             {
                 windows[win_i].occupied = false;
@@ -241,8 +241,6 @@ namespace main3
             {
                 auto& slider = gui.AddElement<doge::gui::Slider>("my_slider0", "my_cam");
                 slider.SetPosition(doge::Vec2f(100, 0));
-                slider.SetMinValue(0);
-                slider.SetMaxValue(3);
                 slider.SetAlign(doge::Vec2f::Zero);
                 slider.SetOrigin(doge::Vec2f(-100, -200));
 
@@ -251,14 +249,10 @@ namespace main3
             {
                 auto& slider = gui.AddElement<doge::gui::Slider>("my_slider1", "my_cam");
                 slider.SetPosition(doge::Vec2f(-100, 0));
-                slider.SetMinValue(0);
-                slider.SetMaxValue(3);
             }
             {
                 auto& slider = gui.AddElement<doge::gui::Slider>("my_slider2", "my_cam");
                 slider.SetPosition(doge::Vec2f(-100, -100));
-                slider.SetMinValue(0);
-                slider.SetMaxValue(3);
                 slider.SetAlign(doge::Vec2f(.6f, .6f));
             }
 
