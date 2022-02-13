@@ -3,12 +3,12 @@
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
-#include <doge/extensions/gui.hpp>
+#include <doge/extensions/anim.hpp>
 
 namespace main1
 {
-    std::unique_ptr<doge::gui::GUI> gui = nullptr;
     std::unique_ptr<doge::physics::Physics> phy = nullptr;
+    std::unique_ptr<doge::anim::Anim> anim = nullptr;
 
     int shoot_particle = -1;
     doge::Vec2f shoot_particle_position;
@@ -47,8 +47,8 @@ namespace main1
 
     void Start(doge::Engine& engine)
     {
-        gui = std::make_unique<doge::gui::GUI>(engine);
         phy = std::make_unique<doge::physics::Physics>(engine);
+        anim = std::make_unique<doge::anim::Anim>(engine);
 
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
@@ -60,6 +60,49 @@ namespace main1
 
         engine.assets.LoadTexture("crate", "test2.png");
         engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23));
+        engine.assets.LoadTexture("player", "player2.png");
+
+        // anim image
+        doge::Entity anim = engine.AddEntity();
+        anim.AddComponent(doge::Sprite
+        {
+            .texture_id = "player",
+            .size = { 2, 2 },
+            .origin = doge::Vec2f(1, 1),
+        });
+
+        anim.AddComponent<doge::Position>(0, 2);
+
+        anim.AddComponent(doge::anim::Animation
+        {
+            .states = 
+            {
+                {
+                    "idle",
+                    doge::anim::State
+                    {
+                        .frame_size = doge::Vec2i(32, 32),
+                        .first_frame_position = doge::Vec2i::Zero,
+                        .frame_count = 2,
+                        .frame_time = 400,
+                        .next_state = "idle",
+                    }
+                },
+                {
+                    "running",
+                    doge::anim::State
+                    {
+                        .frame_size = doge::Vec2i(32, 32),
+                        .first_frame_position = doge::Vec2i(0, 32),
+                        .frame_count = 8,
+                        .frame_time = 200,
+                        .next_state = "running",
+                    }
+                },
+            },
+            .current_state = "running",
+        });
+
 
         // cam
         doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2) });
@@ -158,11 +201,21 @@ namespace main1
             } 
         });
 
-        engine.events.on_mouse_button_pressed += [&](const doge::event::MouseButton& event)
+        engine.events.on_mouse_button_pressed += [&, anim](const doge::event::MouseButton& event)
         {
-            if (event.button == doge::event::MouseButton::Button::Left)
+            if (event.button == doge::event::MouseButton::Button::Right)
             {
-                // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = false;
+                if (anim.GetComponent<doge::anim::Animation>().current_state == "idle")
+                {
+                    anim.GetComponent<doge::anim::Animation>().SetState("running");
+                }
+                else
+                {
+                    anim.GetComponent<doge::anim::Animation>().SetState("idle");
+                }
+            }
+            else if (event.button == doge::event::MouseButton::Button::Left)
+            {
                 shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
                 for (auto entity : engine.Select<doge::Tag>()
                     .Where([](const doge::Entity& _, const doge::Tag& tag)
@@ -207,7 +260,6 @@ namespace main1
         {
             if (event.button == doge::event::MouseButton::Button::Left)
             {
-                // gui->GetElementEntity("button0").GetComponent<EntityInfo>().enabled = true;
                 if (shoot_particle == -1) return;
 
                 if (!engine.HasEntity(shoot_particle) || !phy->HasBody(shoot_particle))
@@ -229,32 +281,6 @@ namespace main1
                 engine.window.window_io.SetMouseCursor(engine.assets.GetCursor("normal"));
             }
         };
-
-        // gui elements
-        doge::gui::Camera& x = gui->AddCamera("gui_cam");
-        x.SetLayer(doge::Layer::CreateRange(32, 36));
-        
-        doge::gui::Button& button0 = gui->AddElement<doge::gui::Button>("button0", "gui_cam");
-        button0.SetHasText(true);
-        button0.SetPosition(doge::Vec2f(-300, 0));
-        button0.SetSize(doge::gui::Button::DefaultSize * doge::Vec2f(1, 2));
-        button0.GetText().SetString(U"Hello\nthis is me");
-
-        doge::gui::WindowEx& window = gui->AddElement<doge::gui::WindowEx>("window0", "gui_cam");
-        window.SetLayer(34);
-        window.SetTitleBar(true);
-        window.SetResizable(true);
-        window.SetDraggable(true);
-
-        doge::gui::Button& button1 = window.AddElement<doge::gui::Button>("button1");
-        button1.SetHasText(true);
-        button1.GetText().SetString(U"Button In Window");
-
-        button1.GetClickable().on_pressed        += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Pressed" << std::endl; };
-        button1.GetClickable().on_released       += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Released" << std::endl; };
-        button1.GetClickable().on_cursor_entered += [](const doge::Vec2f&){ std::cout << "Entered" << std::endl; };
-        button1.GetClickable().on_cursor_left    += [](const doge::Vec2f&){ std::cout << "Left" << std::endl; };
-        button1.GetClickable().on_clicked        += [](const doge::Vec2f&, doge::io::Mouse::Button){ std::cout << "Clicked" << std::endl; };
 
         // text
         {
@@ -335,10 +361,6 @@ namespace main1
             }
         }
 
-        auto e = gui->GetElementBelowCursor();
-        if (e)
-            std::cout << e->GetID() << std::endl;
-
         // std::cout << 1000.f / dt << std::endl;
     }
 
@@ -361,7 +383,6 @@ namespace main1
 
     void Finish(doge::Engine& engine)
     {
-        gui.release();
         phy.release();
     }
 
@@ -372,6 +393,7 @@ namespace main1
         engine.window.settings.msaa_level = 4;
         engine.window.settings.size = doge::Vec2u(1280, 720);
         engine.window.settings.title = "Particle Simulation";
+        engine.window.SetBackgroundColor(0x888888FF);
 
         engine.assets.AddSound("shoot", "shoot", "shoot.wav");
 

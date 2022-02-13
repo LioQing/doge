@@ -11,7 +11,7 @@
   - [x] add custom sf text class
   - [x] make text works in window.Render() function
   - [x] align option for text
-- [ ] extension: gui
+- [ ] extension: gui (halt development)
   - [x] main class gui
   - [x] gui camera
   - [x] rework element events

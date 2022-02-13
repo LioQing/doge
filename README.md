@@ -22,11 +22,9 @@ provide rigid body physics simulation (with [Box2D](https://box2d.org/))
 
 provide interface for 9-slice sprites using CompoundSprite
 
-### gui
+### anim
 
-provide a graphical user interface system that is more object oriented
-
-
+provide simple sprite sheet animation functions
 
 # Dependencies
 

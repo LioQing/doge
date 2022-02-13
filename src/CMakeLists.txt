@@ -62,25 +62,12 @@ set(SRC_FILES
     extensions/physics/Body.cpp
     extensions/physics/Collider.cpp
 
-    # gui
-    extensions/gui/GUI.cpp
-    extensions/gui/Element.cpp
-    extensions/gui/Button.cpp
-    extensions/gui/Window.cpp
-    extensions/gui/WindowEx.cpp
-    extensions/gui/Text.cpp
-    extensions/gui/Image.cpp
-    extensions/gui/NSImage.cpp
-    extensions/gui/Draggable.cpp
-    extensions/gui/Clickable.cpp
-    extensions/gui/Resizable.cpp
-    extensions/gui/Camera.cpp
-    extensions/gui/Scrollable.cpp
-    extensions/gui/Slider.cpp
-
     # nine_slice
     extensions/nine_slice/NineSlice.cpp
     extensions/nine_slice/Texture.cpp
+
+    # anim
+    extensions/anim/Anim.cpp
 )
 
 add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
