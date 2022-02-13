@@ -75,10 +75,6 @@ namespace doge::io
                 {
                     rect = texture.atlas_rectangles.at(comp.atlas_rectangle_id);
                 }
-                else
-                {
-                    rect.SetSize(math::AutoSize(rect.GetSize(), texture.GetSize()));
-                }
 
                 shape.setTextureRect(cast::ToSfRect(rect));
             }
@@ -288,7 +284,6 @@ namespace doge::io
             Recti rect = sprite_comp.GetActualRectangle(engine.assets);
 
             auto scale = sprite_comp.size / rect.GetSize();
-            scale = math::AutoSize(scale, Vec2f::One);
             sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
             sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
 

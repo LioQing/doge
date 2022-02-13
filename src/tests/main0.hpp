@@ -142,6 +142,7 @@ namespace main0
         my_sprite.AddComponent(doge::Sprite
         {
             .texture_rectangle = { 0, 0, 100, 100 },
+            .size = { 100, 100 },
             .origin = { 50, 50 },
         });
         my_sprite.AddComponent(doge::physics::RigidBody{ .type = doge::physics::RigidBody::Type::Dynamic });
