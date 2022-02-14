@@ -25,6 +25,16 @@ namespace doge::physics
         engine.scenes.extensions.erase("doge_physics");
     }
 
+    void Physics::SetPaused(bool paused)
+    {
+        this->paused = paused;
+    }
+
+    bool Physics::IsPaused() const
+    {
+        return paused;
+    }
+
     void Physics::SetGravity(const Vec2f& gravity)
     {
         if (world)
@@ -124,6 +134,9 @@ namespace doge::physics
 
     void Physics::Update(Engine& engine, DeltaTime dt)
     {
+        if (IsPaused())
+            return;
+
         // helper functions
         auto CreateBody = [&](const Entity& entity, const RigidBody& rgbd) -> b2Body*
         {
@@ -482,6 +495,9 @@ namespace doge::physics
 
     void Physics::FixedUpdate(Engine& engine, DeltaTime dt)
     {
+        if (IsPaused())
+            return;
+            
         world->Step(dt / 1000.f, 1, 1);
 
         for (auto [entity, rgbd] : engine.Select<RigidBody>().EntitiesAndComponents())

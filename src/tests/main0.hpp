@@ -400,7 +400,7 @@ namespace main0
         e.window.settings.v_sync = true;
         e.scenes.fixed_time_step = 20;
 
-        e.window.SetIcon("assets/textures/missing_texture.png");
+        e.window.SetIcon("assets/images/missing_texture.png");
 
         doge::GameLoopFunctions test;
         test.start = Start;

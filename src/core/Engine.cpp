@@ -71,6 +71,14 @@ namespace doge
             acc_fixed_dt += dt;
 
             window.window_io.PollEvent();
+
+            for (auto [id, extension] : scenes.extensions)
+            {
+                if(extension.early_update)
+                    extension.early_update(*this, dt);
+            }
+            if (active_scene.early_update)
+                active_scene.early_update(*this, dt);
             
             for (; acc_fixed_dt > scenes.fixed_time_step; acc_fixed_dt -= scenes.fixed_time_step)
             {
@@ -92,6 +100,14 @@ namespace doge
                 active_scene.update(*this, dt);
 
             DestroyEntities();
+
+            for (auto [id, extension] : scenes.extensions)
+            {
+                if(extension.late_update)
+                    extension.late_update(*this, dt);
+            }
+            if (active_scene.late_update)
+                active_scene.late_update(*this, dt);
 
             window.window_io.Render(*this);
             window.window_io.Display();

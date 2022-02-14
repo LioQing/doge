@@ -6,25 +6,28 @@ namespace doge::anim
 {
     Anim::Anim(Engine& engine) : engine(engine)
     {
-        GameLoopFunctions glf;
-        glf.start = [&](Engine& engine){ Start(engine); };
-        glf.update = [&](Engine& engine, DeltaTime dt){ Update(engine, dt); };
-        glf.fixed_update = [&](Engine& engine, DeltaTime dt){ FixedUpdate(engine, dt); };
-        glf.finish = [&](Engine& engine){ Finish(engine); };
-        
-        engine.scenes.extensions.emplace("doge_anim", glf);
+        engine.scenes.extensions.emplace("doge_anim", GameLoopFunctions::Create(*this, nullptr, &Anim::Update));
     }
 
     Anim::~Anim()
-    {        
+    {
     }
 
-    void Anim::Start(Engine& engine)
+    void Anim::SetPaused(bool paused)
     {
+        this->paused = paused;        
+    }
+
+    bool Anim::IsPaused() const
+    {
+        return paused;
     }
 
     void Anim::Update(Engine& engine, DeltaTime dt)
     {
+        if (IsPaused())
+            return;
+            
         for (auto [entity, anim, sprite] : engine.Select<Animation, Sprite>().EntitiesAndComponents())
         {
             if (anim.is_paused)
@@ -49,13 +52,5 @@ namespace doge::anim
 
             sprite.texture_rectangle = Recti(curr_state->first_frame_position + curr_state->advance * curr_state->frame_size * anim.current_frame, curr_state->frame_size);
         }
-    }
-
-    void Anim::FixedUpdate(Engine& engine, DeltaTime dt)
-    {
-    }
-
-    void Anim::Finish(Engine& engine)
-    {
     }
 }

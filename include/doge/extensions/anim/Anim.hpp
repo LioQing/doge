@@ -9,9 +9,13 @@ namespace doge::anim
         Anim(Engine& engine);
         ~Anim();
 
+        void SetPaused(bool paused);
+        bool IsPaused() const;
+
     private:
 
         Engine& engine;
+        bool paused = false;
         
         void Start(Engine& engine);
         void Update(Engine& engine, DeltaTime dt);

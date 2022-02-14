@@ -46,6 +46,8 @@ namespace doge
 
             doge::Event<sf::Event> sf_event;
 
+            // window
+
             void CreateWindow(const WindowSettings& settings);
 
             void CloseWindow();
@@ -104,6 +106,8 @@ namespace doge
             
             int style = sf::Style::Default;
             std::uint32_t msaa_level = 0;
+
+            friend struct DrawHelpers;
         };
     }
 }

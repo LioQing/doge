@@ -25,6 +25,9 @@ namespace doge
             Physics(Engine& engine);
             ~Physics();
 
+            void SetPaused(bool paused);
+            bool IsPaused() const;
+
             void SetGravity(const Vec2f& gravity);
             const Vec2f& GetGravity() const;
 
@@ -50,6 +53,7 @@ namespace doge
         private:
 
             Engine& engine;
+            bool paused = false;
 
             std::unique_ptr<b2World> world;
             std::unordered_map<EntityID, b2Body*> bodies;

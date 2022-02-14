@@ -6,6 +6,7 @@
 - [x] remove sprite sheet member of texture and unify all io classes into doge::io
 - [x] texture atlas
 - [ ] auto triangulation alg
+- [ ] ability to create custom drawable component
 - [x] core text
   - [x] add text component
   - [x] add custom sf text class
@@ -38,9 +39,8 @@
   - [x] nine slice
   - [x] even simpler sprite creation process (add options)
   - [ ] potentially more creation options (also the logic is a bit messy for now)
-- [ ] extension: anim
-  - [ ] main class Anim
-
+- [x] extension: anim
+  - [x] main class Anim
 - [x] rework physics extensions
   - [x] make collider attach to rgbd instead of entity with rgbd
 - [x] rework camera
