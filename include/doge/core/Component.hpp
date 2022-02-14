@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../utils/lic.hpp"
-#include "PCNode.hpp"
-#include "Entity.hpp"
+#include <doge/utils/lic.hpp>
+#include <doge/core/PCNode.hpp>
+#include <doge/core/Entity.hpp>
 
 namespace doge
 {

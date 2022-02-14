@@ -2,6 +2,7 @@
 
 #include <doge/core/Component.hpp>
 #include <doge/components.hpp>
+#include <doge/utils/global.hpp>
 
 namespace doge
 {

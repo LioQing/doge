@@ -1,8 +1,8 @@
 #pragma once
 
 #include <vector>
-
-#include "../utils.hpp"
+#include <doge/utils/lic.hpp>
+#include <doge/utils/aliases.hpp>
 
 namespace doge
 {

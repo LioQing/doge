@@ -14,3 +14,4 @@
 #include "io/Music.hpp"
 #include "io/Cursor.hpp"
 #include "io/Font.hpp"
+#include "io/Renderer.hpp"

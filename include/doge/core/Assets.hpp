@@ -3,7 +3,13 @@
 #include <doge/utils/aliases.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/utils/Vec2.hpp>
-#include <doge/core/io.hpp>
+#include <doge/core/io/Font.hpp>
+#include <doge/core/io/Texture.hpp>
+#include <doge/core/io/Image.hpp>
+#include <doge/core/io/Cursor.hpp>
+#include <doge/core/io/SoundBuffer.hpp>
+#include <doge/core/io/Sound.hpp>
+#include <doge/core/io/Music.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -98,7 +104,7 @@ namespace doge
         LoadCursor(const std::string& id, const std::uint8_t* pixels, const Vec2u& size, const Vec2u& hotspot);
 
         std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
-        LoadCursor(const std::string& id, io::Cursor::Type type);
+        LoadCursor(const std::string& id, std::int32_t type);
 
         static std::string SearchForSound(const std::string& filename);
 

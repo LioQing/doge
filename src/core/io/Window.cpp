@@ -4,7 +4,7 @@
 #include <doge/core.hpp>
 #include <doge/components.hpp>
 #include <doge/utils.hpp>
-#include <doge/core/io/DrawHelpers.hpp>
+#include <doge/core/io/Renderer.hpp>
 
 namespace doge::io
 {
@@ -51,23 +51,6 @@ namespace doge::io
     {
         layers_draws.clear();
 
-        // helper functions
-
-        auto TextInAnyViewHelper = [&](const custom_sf::Text& text, const Entity& entity, const DrawableKey& key)
-        {
-            return DrawHelpers::InAnyViewHelperHelper(*this, engine, text.GetAABB(), entity, key);
-        };
-
-        auto InAnyViewHelper = [&]<typename TComp>(
-            const TComp& comp, 
-            const Entity& entity, 
-            const DrawableKey& key)
-        {
-            if constexpr (std::is_same_v<TComp, Sprite>)
-                return DrawHelpers::InAnyViewHelperHelper(*this, engine, global::GetAABB(comp, entity, engine), entity, key);
-            return DrawHelpers::InAnyViewHelperHelper(*this, engine, global::GetAABB(comp, entity), entity, key);
-        };
-
         // view
         for (auto [entity, cam] : engine.Select<Camera>().EntitiesAndComponents())
         {
@@ -100,36 +83,15 @@ namespace doge::io
         }
 
         // convex shape
-        auto SyncConvex = [&](sf::ConvexShape& convex_shape, const ConvexShape& convex_comp, const Entity& entity)
+        for (auto [convex_comp] : engine.Select<ConvexShape>().Components())
         {
-            DrawHelpers::SyncShape(engine, convex_shape, convex_comp, entity);
-            convex_shape.setPointCount(convex_comp.points.size());
-            for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
-            {
-                convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
-            }
-        };
-
-        auto UpdateConvex = [&]<typename TComp>(Component<TComp>& comp, const ConvexShape& convex_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::Convex, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<sf::ConvexShape>(*this, key, comp);
-
-            if (InAnyViewHelper(convex_comp, entity, key))
-            {
-                SyncConvex(static_cast<sf::ConvexShape&>(*draw_itr->second), convex_comp, entity);
-            }
-        };
-
-        for (auto [entity, convex_comp] : engine.Select<ConvexShape>().EntitiesAndComponents())
-        {
-            UpdateConvex(convex_comp, convex_comp, entity, 0);
+            Renderer::RenderConvexShape(*this, engine, convex_comp, convex_comp, 0);
         }
 
         // circle shape
         auto SyncCircle = [&](sf::CircleShape& circle_shape, const CircleShape& circle_comp, const Entity& entity)
         {
-            DrawHelpers::SyncShape(engine, circle_shape, circle_comp, entity);
+            Renderer::SyncShape(engine, circle_shape, circle_comp, entity);
             circle_shape.setRadius(circle_comp.radius);
             circle_shape.setPointCount(circle_comp.point_count);
         };
@@ -137,9 +99,9 @@ namespace doge::io
         auto UpdateCircle = [&]<typename TComp>(Component<TComp>& comp, const CircleShape& circle_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::Circle, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<sf::CircleShape>(*this, key, comp);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::CircleShape>(*this, key, comp);
             
-            if (InAnyViewHelper(circle_comp, entity, key))
+            if (Renderer::InAnyViewHelper(*this, engine, circle_comp, entity, key))
             {
                 SyncCircle(static_cast<sf::CircleShape&>(*draw_itr->second), circle_comp, entity);
             }
@@ -153,16 +115,16 @@ namespace doge::io
         // rectangle shape
         auto SyncRectangle = [&](sf::RectangleShape& rectangle_shape, const RectangleShape& rectangle_comp, const Entity& entity)
         {
-            DrawHelpers::SyncShape(engine, rectangle_shape, rectangle_comp, entity);
+            Renderer::SyncShape(engine, rectangle_shape, rectangle_comp, entity);
             rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
         };
 
         auto UpdateRectangle = [&]<typename TComp>(Component<TComp>& comp, const RectangleShape& rectangle_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::Rectangle, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<sf::RectangleShape>(*this, key, comp);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::RectangleShape>(*this, key, comp);
 
-            if (InAnyViewHelper(rectangle_comp, entity, key))
+            if (Renderer::InAnyViewHelper(*this, engine, rectangle_comp, entity, key))
             {
                 SyncRectangle(static_cast<sf::RectangleShape&>(*draw_itr->second), rectangle_comp, entity);
             }
@@ -176,7 +138,7 @@ namespace doge::io
         // sprite
         auto SyncSprite = [&](sf::Sprite& sprite, const Sprite& sprite_comp, const Entity& entity)
         {
-            DrawHelpers::SyncTransformable(sprite, sprite_comp, entity);
+            Renderer::SyncTransformable(sprite, sprite_comp, entity);
 
             auto& texture = engine.assets.GetTexture(sprite_comp.texture_id);
 
@@ -195,9 +157,9 @@ namespace doge::io
         auto UpdateSprite = [&]<typename TComp>(Component<TComp>& comp, const Sprite& sprite_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::SpriteType, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<sf::Sprite>(*this, key, comp);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::Sprite>(*this, key, comp);
 
-            if (InAnyViewHelper(sprite_comp, entity, key))
+            if (Renderer::InAnyViewHelper(*this, engine, sprite_comp, entity, key))
             {
                 SyncSprite(static_cast<sf::Sprite&>(*draw_itr->second), sprite_comp, entity);
             }
@@ -243,9 +205,9 @@ namespace doge::io
         auto UpdatePolygon = [&]<typename TComp>(Component<TComp>& comp, const PolygonShape& polygon_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::Polygon, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<custom_sf::DrawableVertices>(*this, key, comp);
+            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::DrawableVertices>(*this, key, comp);
 
-            if (InAnyViewHelper(polygon_comp, entity, key))
+            if (Renderer::InAnyViewHelper(*this, engine, polygon_comp, entity, key))
             {
                 SyncPolygon(static_cast<custom_sf::DrawableVertices&>(*draw_itr->second), polygon_comp, entity);
             }
@@ -259,17 +221,17 @@ namespace doge::io
         // text
         auto SyncText = [&](custom_sf::Text& text, const doge::Text& text_comp, const Entity& entity)
         {
-            DrawHelpers::SyncTransformable(text, text_comp, entity);
+            Renderer::SyncTransformable(text, text_comp, entity);
             text.Update(engine.assets, text_comp);
         };
 
         auto UpdateText = [&]<typename TComp>(Component<TComp>& comp, const doge::Text& text_comp, const Entity& entity, std::size_t index)
         {
             auto key = DrawableKey(entity, DrawableType::Text, index);
-            auto draw_itr = DrawHelpers::EmplaceDrawables<custom_sf::Text>(*this, key, comp, engine.assets, text_comp);
+            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::Text>(*this, key, comp, engine.assets, text_comp);
 
             custom_sf::Text& text = static_cast<custom_sf::Text&>(*draw_itr->second);
-            if (TextInAnyViewHelper(text, entity, key))
+            if (Renderer::InAnyViewHelper(*this, engine, text, entity, key))
             {
                 SyncText(text, text_comp, entity);
             }
@@ -286,7 +248,7 @@ namespace doge::io
             // convex sub shape
             for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)
             {
-                UpdateConvex(compound_comp, compound_comp.convex_shapes.at(i), entity, i);
+                Renderer::RenderConvexShape(*this, engine, compound_comp, compound_comp.convex_shapes.at(i), i);
             }
 
             // circle sub shape

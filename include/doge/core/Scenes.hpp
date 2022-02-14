@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <doge/utils/aliases.hpp>
+#include <doge/core/GameLoopFunctions.hpp>
 
 namespace doge
 {

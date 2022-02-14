@@ -1,6 +1,7 @@
 #include <doge/extensions/anim/Anim.hpp>
 
 #include <doge/extensions/anim/Animation.hpp>
+#include <doge/core/GameLoopFunctions.hpp>
 
 namespace doge::anim
 {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-#include "../utils.hpp"
+#include <doge/utils/aliases.hpp>
 
 namespace doge
 {

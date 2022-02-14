@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <box2d/box2d.h>
 #include <doge/components/PolygonShape.hpp>
 #include <doge/components/Text.hpp>
 #include <doge/utils/Color.hpp>
@@ -9,7 +8,10 @@
 #include <doge/utils/Vec3.hpp>
 #include <doge/utils/Rect.hpp>
 #include <doge/core/WindowSettings.hpp>
-#include <doge/core/io.hpp>
+#include <doge/core/io/Mouse.hpp>
+#include <doge/core/io/Keyboard.hpp>
+#include <doge/core/io/Sensor.hpp>
+#include <doge/core/io/Event.hpp>
 #include <doge/events.hpp>
 
 namespace doge

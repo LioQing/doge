@@ -213,6 +213,19 @@ namespace main1
                 {
                     anim.GetComponent<doge::anim::Animation>().SetState("idle");
                 }
+                
+                shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
+                for (auto entity : engine.Select<doge::Tag>()
+                    .Where([](const doge::Entity& _, const doge::Tag& tag)
+                    { return *tag.tags.begin() == "particle"; })
+                    .Entities())
+                {
+                    if (!phy->GetCollider(entity).TestPoint(shoot_mouse_position))
+                        continue;
+
+                    engine.DestroyEntity(entity);
+                    return;
+                }
             }
             else if (event.button == doge::event::MouseButton::Button::Left)
             {
@@ -239,20 +252,9 @@ namespace main1
 
                 AddParticle(engine, shoot_mouse_position);
             }
-            else if (event.button == doge::event::MouseButton::Button::Right)
+            else if (event.button == doge::event::MouseButton::Button::Middle)
             {
-                shoot_mouse_position = engine.window.MapPixelToCoords(event.position, *cam_comp);
-                for (auto entity : engine.Select<doge::Tag>()
-                    .Where([](const doge::Entity& _, const doge::Tag& tag)
-                    { return *tag.tags.begin() == "particle"; })
-                    .Entities())
-                {
-                    if (!phy->GetCollider(entity).TestPoint(shoot_mouse_position))
-                        continue;
-
-                    engine.DestroyEntity(entity);
-                    return;
-                }
+                phy->SetPaused(!phy->IsPaused());
             }
         };
 

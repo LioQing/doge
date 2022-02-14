@@ -1,6 +1,7 @@
 #include <doge/extensions/physics/Physics.hpp>
 
 #include <doge/core/Engine.hpp>
+#include <doge/core/GameLoopFunctions.hpp>
 #include <doge/components.hpp>
 #include <doge/extensions/physics.hpp>
 #include <algorithm>

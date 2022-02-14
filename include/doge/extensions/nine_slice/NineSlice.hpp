@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <doge/utils/Rect.hpp>
 #include <doge/core/Component.hpp>
+#include <doge/components/Sprite.hpp>
 #include <doge/extensions/nine_slice/Texture.hpp>
 #include <doge/core/io/Texture.hpp>
 

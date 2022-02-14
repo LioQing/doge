@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <doge/core/io/Cursor.hpp>
 #include <doge/utils/Vec2.hpp>
 
 namespace doge::io

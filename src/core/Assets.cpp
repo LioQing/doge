@@ -280,13 +280,13 @@ namespace doge
     }
 
     std::pair<std::unordered_map<std::string, io::Cursor>::iterator, bool>
-    Assets::LoadCursor(const std::string& id, io::Cursor::Type type)
+    Assets::LoadCursor(const std::string& id, std::int32_t type)
     {
         io::Cursor cursor;
 
         auto p = cursors.try_emplace(id);
 
-        if (!p.second || p.first->second.FromSystem(type))
+        if (!p.second || p.first->second.FromSystem(static_cast<io::Cursor::Type>(type)))
             return p;
 
         return std::make_pair(cursors.end(), false);

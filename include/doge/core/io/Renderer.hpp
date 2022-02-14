@@ -1,18 +1,38 @@
 #pragma once
 
-#include <memory>
 #include <SFML/Graphics.hpp>
-#include <doge/core.hpp>
 #include <doge/components.hpp>
+#include <doge/core/Engine.hpp>
+#include <doge/core/Component.hpp>
+#include <doge/core/io/Window.hpp>
 #include <doge/utils.hpp>
 
 namespace doge::io
 {
-    struct DrawHelpers
+    struct Renderer
     {
-    private:
+        Renderer(const Renderer&) = delete;
 
-        DrawHelpers(const DrawHelpers&) = delete;
+        template <typename TComp>
+        static void RenderConvexShape(Window& window, const Engine& engine, Component<TComp>& component, const ConvexShape& convex, std::size_t index)
+        {
+            auto entity = component.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Convex, index);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::ConvexShape>(window, key, component);
+            auto& convex_shape = static_cast<sf::ConvexShape&>(*draw_itr->second);
+
+            if (Renderer::InAnyViewHelper(window, engine, convex, entity, key))
+            {
+                Renderer::SyncShape(engine, convex_shape, convex, entity);
+                convex_shape.setPointCount(convex.points.size());
+                for (std::size_t i = 0; i < convex.points.size(); ++i)
+                {
+                    convex_shape.setPoint(i, cast::ToSfVec2(convex.points.at(i)));
+                }
+            }
+        }
+
+    private:
 
         template <typename TComp>
         static void SyncTransformable(sf::Transformable& transform, const TComp& comp, const Entity& entity)
@@ -115,6 +135,17 @@ namespace doge::io
             }
 
             return is_in_any_view;
+        }
+
+        template <typename TComp>
+        static bool InAnyViewHelper(Window& window, const Engine& engine, const TComp& comp, const Entity& entity, const Window::DrawableKey& key)
+        {
+            if constexpr (std::is_same_v<TComp, custom_sf::Text>)
+                return Renderer::InAnyViewHelperHelper(window, engine, comp.GetAABB(), entity, key);
+            else if constexpr (std::is_same_v<TComp, Sprite>)
+                return Renderer::InAnyViewHelperHelper(window, engine, global::GetAABB(comp, entity, engine), entity, key);
+            else
+                return Renderer::InAnyViewHelperHelper(window, engine, global::GetAABB(comp, entity), entity, key);
         }
 
         friend struct Window;

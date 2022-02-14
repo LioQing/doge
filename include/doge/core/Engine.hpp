@@ -8,11 +8,6 @@
 #include <deque>
 #include <unordered_map>
 #include <unordered_set>
-
-#include <doge/utils.hpp>
-#include <doge/components/EntityInfo.hpp>
-#include <doge/core/io.hpp>
-#include <doge/core/GameLoopFunctions.hpp>
 #include <doge/core/Window.hpp>
 #include <doge/core/Entity.hpp>
 #include <doge/core/PCNode.hpp>
@@ -23,6 +18,8 @@
 
 namespace doge
 {
+    struct GameLoopFunctions;
+
     struct Engine
     {
         // IO

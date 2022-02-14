@@ -1,7 +1,7 @@
 #pragma once
 
 #include <doge/events.hpp>
-#include <doge/utils.hpp>
+#include <doge/utils/lev.hpp>
 #include <doge/core/io/Event.hpp>
 
 namespace doge

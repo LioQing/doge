@@ -106,8 +106,6 @@ namespace doge
             
             int style = sf::Style::Default;
             std::uint32_t msaa_level = 0;
-
-            friend struct DrawHelpers;
         };
     }
 }
