@@ -217,14 +217,14 @@ namespace main0
         ground.AddComponent<doge::Scale>(0.01, 0.01);
 
         auto my_custom_shape = e.AddEntity();
-        my_custom_shape.AddComponent(doge::PolygonShape
+        my_custom_shape.AddComponent(doge::CustomShape
         {
-            .type = doge::PolygonShape::Type::Triangles,
+            .type = doge::CustomShape::Type::Triangles,
             .vertices = 
             {
-                doge::PolygonShape::Vertex({ 0, 0 }, doge::Color::Red),
-                doge::PolygonShape::Vertex({ 100, 100 }, doge::Color::Green),
-                doge::PolygonShape::Vertex({ 100, 0 }, doge::Color::Blue),
+                doge::CustomShape::Vertex({ 0, 0 }, doge::Color::Red),
+                doge::CustomShape::Vertex({ 100, 100 }, doge::Color::Green),
+                doge::CustomShape::Vertex({ 100, 0 }, doge::Color::Blue),
             },
             .origin = { 50, 50 },
             .texture_id = "missing_texture",
@@ -299,13 +299,13 @@ namespace main0
         line = e.AddEntity();
         line.AddComponent(doge::Tag::Create("line"));
         line.AddComponent<doge::Position>();
-        line.AddComponent(doge::PolygonShape
+        line.AddComponent(doge::CustomShape
         { 
-            .type = doge::PolygonShape::Lines, 
+            .type = doge::CustomShape::Lines, 
             .vertices = 
             { 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
+                doge::CustomShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
+                doge::CustomShape::Vertex(doge::Vec2f(0, 0), doge::Color::White), 
             } 
         });
     }
@@ -375,7 +375,7 @@ namespace main0
                 [](doge::EntityID entity, const doge::Tag& tag)
                 {
                     return *tag.tags.begin() == "line";
-                }).Select<doge::PolygonShape, doge::Position>().Components())
+                }).Select<doge::CustomShape, doge::Position>().Components())
             {
                 line.vertices.at(1).position = e.window.MapPixelToCoords(e.window.window_io.GetMousePosition(), cam.GetComponent<doge::Camera>()) - pos.position;
             }

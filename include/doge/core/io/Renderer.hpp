@@ -14,21 +14,140 @@ namespace doge::io
         Renderer(const Renderer&) = delete;
 
         template <typename TComp>
-        static void RenderConvexShape(Window& window, const Engine& engine, Component<TComp>& component, const ConvexShape& convex, std::size_t index)
+        static void RenderConvexShape(Engine& engine, Component<TComp>& comp, const ConvexShape& convex_comp, std::size_t index)
         {
-            auto entity = component.GetEntity();
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
             auto key = Window::DrawableKey(entity, Window::DrawableType::Convex, index);
-            auto draw_itr = Renderer::EmplaceDrawables<sf::ConvexShape>(window, key, component);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::ConvexShape>(window, key, comp);
             auto& convex_shape = static_cast<sf::ConvexShape&>(*draw_itr->second);
 
-            if (Renderer::InAnyViewHelper(window, engine, convex, entity, key))
+            if (Renderer::InAnyViewHelper(window, engine, convex_comp, entity, key))
             {
-                Renderer::SyncShape(engine, convex_shape, convex, entity);
-                convex_shape.setPointCount(convex.points.size());
-                for (std::size_t i = 0; i < convex.points.size(); ++i)
+                Renderer::SyncShape(engine, convex_shape, convex_comp, entity);
+                convex_shape.setPointCount(convex_comp.points.size());
+                for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
                 {
-                    convex_shape.setPoint(i, cast::ToSfVec2(convex.points.at(i)));
+                    convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
                 }
+            }
+        }
+
+        template <typename TComp>
+        static void RenderCircle(Engine& engine, Component<TComp>& comp, const CircleShape& circle_comp, std::size_t index)
+        {
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Circle, index);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::CircleShape>(window, key, comp);
+            auto& circle_shape = static_cast<sf::CircleShape&>(*draw_itr->second);
+            
+            if (Renderer::InAnyViewHelper(window, engine, circle_comp, entity, key))
+            {
+                Renderer::SyncShape(engine, circle_shape, circle_comp, entity);
+                circle_shape.setRadius(circle_comp.radius);
+                circle_shape.setPointCount(circle_comp.point_count);
+            }
+        }
+
+        template <typename TComp>
+        static void RenderRectangle(Engine& engine, Component<TComp>& comp, const RectangleShape& rectangle_comp, std::size_t index)
+        {
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Rectangle, index);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::RectangleShape>(window, key, comp);
+            auto& rectangle_shape = static_cast<sf::RectangleShape&>(*draw_itr->second);
+
+            if (Renderer::InAnyViewHelper(window, engine, rectangle_comp, entity, key))
+            {
+                Renderer::SyncShape(engine, rectangle_shape, rectangle_comp, entity);
+                rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
+            }
+        }
+
+        template <typename TComp>
+        static void RenderCustom(Engine& engine, Component<TComp>& comp, const CustomShape& custom_comp, std::size_t index)
+        {
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Custom, index);
+            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::DrawableVertices>(window, key, comp);
+            auto& vertices = static_cast<custom_sf::DrawableVertices&>(*draw_itr->second);
+
+            if (Renderer::InAnyViewHelper(window, engine, custom_comp, entity, key))
+            {
+                auto size = custom_comp.vertices.size();
+
+                vertices.type = cast::ToSfPolygonType(custom_comp.type);
+
+                if (vertices.vertices.size() < custom_comp.vertices.size())
+                {
+                    vertices.vertices.resize(size);
+                }
+
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    auto& vertex = custom_comp.vertices.at(i);
+                    vertices.vertices.at(i).position = 
+                        cast::ToSfVec2(((vertex.position - custom_comp.origin) * global::GetScale(entity)).Rotated(global::GetRotation(entity))
+                        + global::GetPosition(entity));
+                    vertices.vertices.at(i).color = cast::ToSfColor(vertex.color);
+                    vertices.vertices.at(i).texCoords = cast::ToSfVec2(vertex.texture_coordinates);
+                }
+
+                if (custom_comp.texture_id != "")
+                {
+                    vertices.texture = &engine.assets.GetTexture(custom_comp.texture_id).texture;
+                }
+                else
+                {
+                    vertices.texture = nullptr;
+                }
+            }
+        }
+
+        template <typename TComp>
+        static void RenderSprite(Engine& engine, Component<TComp>& comp, const Sprite& sprite_comp, std::size_t index)
+        {
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Sprite, index);
+            auto draw_itr = Renderer::EmplaceDrawables<sf::Sprite>(window, key, comp);
+            auto& sprite = static_cast<sf::Sprite&>(*draw_itr->second);
+
+            if (Renderer::InAnyViewHelper(window, engine, sprite_comp, entity, key))
+            {
+                Renderer::SyncTransformable(sprite, sprite_comp, entity);
+
+                auto& texture = engine.assets.GetTexture(sprite_comp.texture_id);
+
+                Recti rect = sprite_comp.GetActualRectangle(engine.assets);
+
+                auto scale = sprite_comp.size / rect.GetSize();
+                sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
+                sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
+
+                sprite.setTexture(texture.texture);
+
+                sprite.setTextureRect(cast::ToSfRect(rect));
+                sprite.setColor(cast::ToSfColor(sprite_comp.color));
+            }
+        }
+
+        template <typename TComp>
+        static void RenderText(Engine& engine, Component<TComp>& comp, const doge::Text& text_comp, std::size_t index)
+        {
+            auto& window = engine.window.window_io;
+            auto entity = comp.GetEntity();
+            auto key = Window::DrawableKey(entity, Window::DrawableType::Text, index);
+            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::Text>(window, key, comp, engine.assets, text_comp);
+            auto& text = static_cast<custom_sf::Text&>(*draw_itr->second);
+
+            if (Renderer::InAnyViewHelper(window, engine, text, entity, key))
+            {
+                Renderer::SyncTransformable(text, text_comp, entity);
+                text.Update(engine.assets, text_comp);
             }
         }
 

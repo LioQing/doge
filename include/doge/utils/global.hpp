@@ -45,8 +45,8 @@ namespace doge
         static Rectf GetAABB(const Sprite& sprite, const Entity& entity, const Engine& engine);
         static Rectf GetAABB(const Component<Sprite>& sprite, const Engine& engine);
 
-        static Rectf GetAABB(const PolygonShape& polygon, const Entity& entity);
-        static Rectf GetAABB(const Component<PolygonShape>& custom);
+        static Rectf GetAABB(const CustomShape& polygon, const Entity& entity);
+        static Rectf GetAABB(const Component<CustomShape>& custom);
 
         static bool IsEnabled(const Entity& entity);
 

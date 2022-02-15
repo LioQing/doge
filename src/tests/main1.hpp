@@ -191,13 +191,13 @@ namespace main1
         shoot_line = engine.AddEntity();
         shoot_line.AddComponent(doge::Tag::Create("line"));
         shoot_line.AddComponent<doge::Position>();
-        shoot_line.AddComponent(doge::PolygonShape
+        shoot_line.AddComponent(doge::CustomShape
         { 
-            .type = doge::PolygonShape::Lines, 
+            .type = doge::CustomShape::Lines, 
             .vertices = 
             { 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
-                doge::PolygonShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
+                doge::CustomShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
+                doge::CustomShape::Vertex(doge::Vec2f(0, 0), doge::Color::Transparent), 
             } 
         });
 
@@ -239,7 +239,7 @@ namespace main1
                         continue;
 
                     shoot_line.GetComponent<doge::Position>().position = shoot_mouse_position;
-                    for (auto& vertex : shoot_line.GetComponent<doge::PolygonShape>().vertices)
+                    for (auto& vertex : shoot_line.GetComponent<doge::CustomShape>().vertices)
                         vertex.color = doge::Color::White;
                     
                     shoot_particle_position = entity.GetIfHasComponentElseDefault<doge::Position>().position;
@@ -270,7 +270,7 @@ namespace main1
                 auto impulse = (shoot_mouse_position - engine.window.MapPixelToCoords(event.position, *cam_comp));
                 phy->GetBody(shoot_particle).ApplyImpulse(impulse, shoot_mouse_position);
 
-                for (auto& vertex : shoot_line.GetComponent<doge::PolygonShape>().vertices)
+                for (auto& vertex : shoot_line.GetComponent<doge::CustomShape>().vertices)
                     vertex.color = doge::Color::Transparent;
 
                 // engine.GetEntity(shoot_particle).GetComponent<EntityInfo>().enabled = false;
@@ -357,7 +357,7 @@ namespace main1
             for (auto [tag, line, pos] : engine.Select<doge::Tag>()
                 .Where([](doge::EntityID entity, const doge::Tag& tag)
                 { return *tag.tags.begin() == "line"; })
-                .Select<doge::PolygonShape, doge::Position>().Components())
+                .Select<doge::CustomShape, doge::Position>().Components())
             {
                 line.vertices.at(1).position = engine.window.MapPixelToCoords(engine.window.window_io.GetMousePosition(), *cam_comp) - pos.position;
             }

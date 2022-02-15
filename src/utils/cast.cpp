@@ -197,33 +197,33 @@ namespace doge
         return Event::Content(Event::Type::Count);
     }
 
-    PolygonShape::Type cast::FromSfPolygonType(sf::PrimitiveType type)
+    CustomShape::Type cast::FromSfPolygonType(sf::PrimitiveType type)
     {
         switch (type)
         {
-            case sf::PrimitiveType::Points:             return PolygonShape::Type::Points;
-            case sf::PrimitiveType::Lines:              return PolygonShape::Type::Lines;
-            case sf::PrimitiveType::LineStrip:          return PolygonShape::Type::LineStrip;
-            case sf::PrimitiveType::Triangles:          return PolygonShape::Type::Triangles;
-            case sf::PrimitiveType::TriangleStrip:      return PolygonShape::Type::TriangleStrip;
-            case sf::PrimitiveType::TriangleFan:        return PolygonShape::Type::TriangleFan;
-            case sf::PrimitiveType::Quads:              return PolygonShape::Type::Quads;
-            default: throw std::invalid_argument("Invalid PolygonShape::Type");
+            case sf::PrimitiveType::Points:             return CustomShape::Type::Points;
+            case sf::PrimitiveType::Lines:              return CustomShape::Type::Lines;
+            case sf::PrimitiveType::LineStrip:          return CustomShape::Type::LineStrip;
+            case sf::PrimitiveType::Triangles:          return CustomShape::Type::Triangles;
+            case sf::PrimitiveType::TriangleStrip:      return CustomShape::Type::TriangleStrip;
+            case sf::PrimitiveType::TriangleFan:        return CustomShape::Type::TriangleFan;
+            case sf::PrimitiveType::Quads:              return CustomShape::Type::Quads;
+            default: throw std::invalid_argument("Invalid CustomShape::Type");
         }
     }
 
-    sf::PrimitiveType cast::ToSfPolygonType(PolygonShape::Type type)
+    sf::PrimitiveType cast::ToSfPolygonType(CustomShape::Type type)
     {
         switch (type)
         {
-            case PolygonShape::Type::Points:            return sf::PrimitiveType::Points;
-            case PolygonShape::Type::Lines:             return sf::PrimitiveType::Lines;
-            case PolygonShape::Type::LineStrip:         return sf::PrimitiveType::LineStrip;
-            case PolygonShape::Type::Triangles:         return sf::PrimitiveType::Triangles;
-            case PolygonShape::Type::TriangleStrip:     return sf::PrimitiveType::TriangleStrip;
-            case PolygonShape::Type::TriangleFan:       return sf::PrimitiveType::TriangleFan;
-            case PolygonShape::Type::Quads:             return sf::PrimitiveType::Quads;
-            default: throw std::invalid_argument("Invalid PolygonShape::Type");
+            case CustomShape::Type::Points:            return sf::PrimitiveType::Points;
+            case CustomShape::Type::Lines:             return sf::PrimitiveType::Lines;
+            case CustomShape::Type::LineStrip:         return sf::PrimitiveType::LineStrip;
+            case CustomShape::Type::Triangles:         return sf::PrimitiveType::Triangles;
+            case CustomShape::Type::TriangleStrip:     return sf::PrimitiveType::TriangleStrip;
+            case CustomShape::Type::TriangleFan:       return sf::PrimitiveType::TriangleFan;
+            case CustomShape::Type::Quads:             return sf::PrimitiveType::Quads;
+            default: throw std::invalid_argument("Invalid CustomShape::Type");
         }
     }
 

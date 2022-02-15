@@ -110,6 +110,7 @@ namespace doge
                 active_scene.late_update(*this, dt);
 
             window.window_io.Render(*this);
+            window.window_io.Draw(*this);
             window.window_io.Display();
         }
         

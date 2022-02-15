@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include <doge/components/PolygonShape.hpp>
+#include <doge/components/CustomShape.hpp>
 #include <doge/components/Text.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Vec2.hpp>
@@ -79,8 +79,8 @@ namespace doge
 
         static io::Event::Content FromSfEvent(const sf::Event& event);
 
-        static PolygonShape::Type FromSfPolygonType(sf::PrimitiveType type);
-        static sf::PrimitiveType ToSfPolygonType(PolygonShape::Type type);
+        static CustomShape::Type FromSfPolygonType(sf::PrimitiveType type);
+        static sf::PrimitiveType ToSfPolygonType(CustomShape::Type type);
 
         static std::uint8_t FromSfControllerAxis(sf::Joystick::Axis axis);
         static sf::Joystick::Axis ToSfControllerAxis(std::uint8_t axis);

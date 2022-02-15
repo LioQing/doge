@@ -34,7 +34,7 @@ namespace doge
 
             enum DrawableType
             {
-                Convex, Circle, Rectangle, SpriteType, Polygon, Text
+                Convex, Circle, Rectangle, Sprite, Custom, Text
             };
 
             using DrawableKey = std::tuple<EntityID, DrawableType, std::size_t>; // eid, draw type, index
@@ -54,7 +54,9 @@ namespace doge
 
             void PollEvent();
 
-            void Render(const Engine& engine);
+            void Render(Engine& engine);
+
+            void Draw(Engine& engine);
 
             void Display();
 

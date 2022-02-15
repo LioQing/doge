@@ -5,7 +5,7 @@
 #include <doge/components/ConvexShape.hpp>
 #include <doge/components/CircleShape.hpp>
 #include <doge/components/RectangleShape.hpp>
-#include <doge/components/PolygonShape.hpp>
+#include <doge/components/CustomShape.hpp>
 #include <doge/components/Sprite.hpp>
 #include <doge/components/Text.hpp>
 
@@ -16,7 +16,7 @@ namespace doge
         std::vector<ConvexShape> convex_shapes;
         std::vector<CircleShape> circle_shapes;
         std::vector<RectangleShape> rectangle_shapes;
-        std::vector<PolygonShape> polygon_shapes;
+        std::vector<CustomShape> custom_shapes;
         std::vector<Sprite> sprites;
         std::vector<Text> texts;
 
@@ -34,8 +34,8 @@ namespace doge
                     comp_sprite.circle_shapes.emplace_back(sprite);
                 else if constexpr (std::is_constructible_v<S, RectangleShape>)
                     comp_sprite.rectangle_shapes.emplace_back(sprite);
-                else if constexpr (std::is_constructible_v<S, PolygonShape>)
-                    comp_sprite.polygon_shapes.emplace_back(sprite);
+                else if constexpr (std::is_constructible_v<S, CustomShape>)
+                    comp_sprite.custom_shapes.emplace_back(sprite);
                 else if constexpr (std::is_constructible_v<S, Sprite>)
                     comp_sprite.sprites.emplace_back(sprite);
                 else if constexpr (std::is_constructible_v<S, Text>)

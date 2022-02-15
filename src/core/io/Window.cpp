@@ -47,7 +47,7 @@ namespace doge::io
         }
     }
 
-    void Window::Render(const Engine& engine)
+    void Window::Render(Engine& engine)
     {
         layers_draws.clear();
 
@@ -85,161 +85,37 @@ namespace doge::io
         // convex shape
         for (auto [convex_comp] : engine.Select<ConvexShape>().Components())
         {
-            Renderer::RenderConvexShape(*this, engine, convex_comp, convex_comp, 0);
+            Renderer::RenderConvexShape(engine, convex_comp, convex_comp, 0);
         }
 
         // circle shape
-        auto SyncCircle = [&](sf::CircleShape& circle_shape, const CircleShape& circle_comp, const Entity& entity)
-        {
-            Renderer::SyncShape(engine, circle_shape, circle_comp, entity);
-            circle_shape.setRadius(circle_comp.radius);
-            circle_shape.setPointCount(circle_comp.point_count);
-        };
-
-        auto UpdateCircle = [&]<typename TComp>(Component<TComp>& comp, const CircleShape& circle_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::Circle, index);
-            auto draw_itr = Renderer::EmplaceDrawables<sf::CircleShape>(*this, key, comp);
-            
-            if (Renderer::InAnyViewHelper(*this, engine, circle_comp, entity, key))
-            {
-                SyncCircle(static_cast<sf::CircleShape&>(*draw_itr->second), circle_comp, entity);
-            }
-        };
-
         for (auto [entity, circle_comp] : engine.Select<CircleShape>().EntitiesAndComponents())
         {
-            UpdateCircle(circle_comp, circle_comp, entity, 0);
+            Renderer::RenderCircle(engine, circle_comp, circle_comp, 0);
         }
 
         // rectangle shape
-        auto SyncRectangle = [&](sf::RectangleShape& rectangle_shape, const RectangleShape& rectangle_comp, const Entity& entity)
-        {
-            Renderer::SyncShape(engine, rectangle_shape, rectangle_comp, entity);
-            rectangle_shape.setSize(cast::ToSfVec2(rectangle_comp.size));
-        };
-
-        auto UpdateRectangle = [&]<typename TComp>(Component<TComp>& comp, const RectangleShape& rectangle_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::Rectangle, index);
-            auto draw_itr = Renderer::EmplaceDrawables<sf::RectangleShape>(*this, key, comp);
-
-            if (Renderer::InAnyViewHelper(*this, engine, rectangle_comp, entity, key))
-            {
-                SyncRectangle(static_cast<sf::RectangleShape&>(*draw_itr->second), rectangle_comp, entity);
-            }
-        };
-
         for (auto [entity, rectangle_comp] : engine.Select<RectangleShape>().EntitiesAndComponents())
         {
-            UpdateRectangle(rectangle_comp, rectangle_comp, entity, 0);
+            Renderer::RenderRectangle(engine, rectangle_comp, rectangle_comp, 0);
+        }
+
+        // custom shape
+        for (auto [entity, custom_comp] : engine.Select<CustomShape>().EntitiesAndComponents())
+        {
+            Renderer::RenderCustom(engine, custom_comp, custom_comp, 0);
         }
 
         // sprite
-        auto SyncSprite = [&](sf::Sprite& sprite, const Sprite& sprite_comp, const Entity& entity)
+        for (auto [entity, sprite_comp] : engine.Select<doge::Sprite>().EntitiesAndComponents())
         {
-            Renderer::SyncTransformable(sprite, sprite_comp, entity);
-
-            auto& texture = engine.assets.GetTexture(sprite_comp.texture_id);
-
-            Recti rect = sprite_comp.GetActualRectangle(engine.assets);
-
-            auto scale = sprite_comp.size / rect.GetSize();
-            sprite.setScale(sprite.getScale().x * scale.x, sprite.getScale().y * scale.y);
-            sprite.setOrigin(sprite.getOrigin().x / scale.x, sprite.getOrigin().y / scale.y);
-
-            sprite.setTexture(texture.texture);
-
-            sprite.setTextureRect(cast::ToSfRect(rect));
-            sprite.setColor(cast::ToSfColor(sprite_comp.color));
-        };
-
-        auto UpdateSprite = [&]<typename TComp>(Component<TComp>& comp, const Sprite& sprite_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::SpriteType, index);
-            auto draw_itr = Renderer::EmplaceDrawables<sf::Sprite>(*this, key, comp);
-
-            if (Renderer::InAnyViewHelper(*this, engine, sprite_comp, entity, key))
-            {
-                SyncSprite(static_cast<sf::Sprite&>(*draw_itr->second), sprite_comp, entity);
-            }
-        };
-
-        for (auto [entity, sprite_comp] : engine.Select<Sprite>().EntitiesAndComponents())
-        {
-            UpdateSprite(sprite_comp, sprite_comp, entity, 0);
-        }
-
-        // polygon shape
-        auto SyncPolygon = [&](custom_sf::DrawableVertices& vertices, const PolygonShape& polygon_comp, const Entity& entity)
-        {
-            auto size = polygon_comp.vertices.size();
-
-            vertices.type = cast::ToSfPolygonType(polygon_comp.type);
-
-            if (vertices.vertices.size() < polygon_comp.vertices.size())
-            {
-                vertices.vertices.resize(size);
-            }
-
-            for (std::size_t i = 0; i < size; ++i)
-            {
-                auto& vertex = polygon_comp.vertices.at(i);
-                vertices.vertices.at(i).position = 
-                    cast::ToSfVec2(((vertex.position - polygon_comp.origin) * global::GetScale(entity)).Rotated(global::GetRotation(entity))
-                    + global::GetPosition(entity));
-                vertices.vertices.at(i).color = cast::ToSfColor(vertex.color);
-                vertices.vertices.at(i).texCoords = cast::ToSfVec2(vertex.texture_coordinates);
-            }
-
-            if (polygon_comp.texture_id != "")
-            {
-                vertices.texture = &engine.assets.GetTexture(polygon_comp.texture_id).texture;
-            }
-            else
-            {
-                vertices.texture = nullptr;
-            }
-        };
-
-        auto UpdatePolygon = [&]<typename TComp>(Component<TComp>& comp, const PolygonShape& polygon_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::Polygon, index);
-            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::DrawableVertices>(*this, key, comp);
-
-            if (Renderer::InAnyViewHelper(*this, engine, polygon_comp, entity, key))
-            {
-                SyncPolygon(static_cast<custom_sf::DrawableVertices&>(*draw_itr->second), polygon_comp, entity);
-            }
-        };
-
-        for (auto [entity, polygon_comp] : engine.Select<PolygonShape>().EntitiesAndComponents())
-        {
-            UpdatePolygon(polygon_comp, polygon_comp, entity, 0);
+            Renderer::RenderSprite(engine, sprite_comp, sprite_comp, 0);
         }
 
         // text
-        auto SyncText = [&](custom_sf::Text& text, const doge::Text& text_comp, const Entity& entity)
-        {
-            Renderer::SyncTransformable(text, text_comp, entity);
-            text.Update(engine.assets, text_comp);
-        };
-
-        auto UpdateText = [&]<typename TComp>(Component<TComp>& comp, const doge::Text& text_comp, const Entity& entity, std::size_t index)
-        {
-            auto key = DrawableKey(entity, DrawableType::Text, index);
-            auto draw_itr = Renderer::EmplaceDrawables<custom_sf::Text>(*this, key, comp, engine.assets, text_comp);
-
-            custom_sf::Text& text = static_cast<custom_sf::Text&>(*draw_itr->second);
-            if (Renderer::InAnyViewHelper(*this, engine, text, entity, key))
-            {
-                SyncText(text, text_comp, entity);
-            }
-        };
-
         for (auto [entity, text_comp] : engine.Select<doge::Text>().EntitiesAndComponents())
         {
-            UpdateText(text_comp, text_comp, entity, 0);
+            Renderer::RenderText(engine, text_comp, text_comp, 0);
         }
 
         // compound shape
@@ -248,41 +124,43 @@ namespace doge::io
             // convex sub shape
             for (std::size_t i = 0; i < compound_comp.convex_shapes.size(); ++i)
             {
-                Renderer::RenderConvexShape(*this, engine, compound_comp, compound_comp.convex_shapes.at(i), i);
+                Renderer::RenderConvexShape(engine, compound_comp, compound_comp.convex_shapes.at(i), i);
             }
 
             // circle sub shape
             for (std::size_t i = 0; i < compound_comp.circle_shapes.size(); ++i)
             {
-                UpdateCircle(compound_comp, compound_comp.circle_shapes.at(i), entity, i);
+                Renderer::RenderCircle(engine, compound_comp, compound_comp.circle_shapes.at(i), i);
             }
 
             // rectangle sub shape
             for (std::size_t i = 0; i < compound_comp.rectangle_shapes.size(); ++i)
             {
-                UpdateRectangle(compound_comp, compound_comp.rectangle_shapes.at(i), entity, i);
+                Renderer::RenderRectangle(engine, compound_comp, compound_comp.rectangle_shapes.at(i), i);
             }
 
-            // polygon sub shape
-            for (std::size_t i = 0; i < compound_comp.polygon_shapes.size(); ++i)
+            // custom sub shape
+            for (std::size_t i = 0; i < compound_comp.custom_shapes.size(); ++i)
             {
-                UpdatePolygon(compound_comp, compound_comp.polygon_shapes.at(i), entity, i);
+                Renderer::RenderCustom(engine, compound_comp, compound_comp.custom_shapes.at(i), i);
             }
 
             // sub sprites
             for (std::size_t i = 0; i < compound_comp.sprites.size(); ++i)
             {
-                UpdateSprite(compound_comp, compound_comp.sprites.at(i), entity, i);
+                Renderer::RenderSprite(engine, compound_comp, compound_comp.sprites.at(i), i);
             }
 
             // text sub sprites
             for (std::size_t i = 0; i < compound_comp.texts.size(); ++i)
             {
-                UpdateText(compound_comp, compound_comp.texts.at(i), entity, i);
+                Renderer::RenderText(engine, compound_comp, compound_comp.texts.at(i), i);
             }
         }
+    }
 
-        // draw
+    void Window::Draw(Engine& engine)
+    {
         window.clear(cast::ToSfColor(background_color));
 
         for (auto& [layer, draw_keys] : layers_draws)
