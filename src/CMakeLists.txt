@@ -12,11 +12,11 @@ include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
 if (MSVC)
 
-    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VC++15-64bit/lib/cmake/SFML)
+    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VC++16-64bit/lib/cmake/SFML)
     set(SFML_STATIC_LIBRARIES TRUE)
     find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++15-64bit/bin/Debug)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Debug)
 
 else()
 
@@ -98,8 +98,6 @@ else()
     set(BOX2D_LIB ${BOX2D_DIR}/libbox2d.a)
 
     set(CMAKE_CXX_FLAGS "-O3")
-
-    message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
 endif()
 
