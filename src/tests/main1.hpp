@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 #include <doge/doge.hpp>
 #include <doge/extensions/physics.hpp>
@@ -49,6 +50,15 @@ namespace main1
     {
         phy = std::make_unique<doge::physics::Physics>(engine);
         anim = std::make_unique<doge::anim::Anim>(engine);
+
+        engine.window.window_io.AddDrawFunction(std::numeric_limits<std::int32_t>::min(), "my_min", 
+        [](doge::Engine&){ std::cout << "Min Custom Draw" << std::endl; });
+
+        engine.window.window_io.AddDrawFunction(std::numeric_limits<std::int32_t>::max(), "my_max", 
+        [](doge::Engine&){ std::cout << "Max Custom Draw" << std::endl; });
+        
+        engine.window.window_io.AddDrawFunction(0, "my_0", 
+        [](doge::Engine&){ std::cout << "0 Custom Draw" << std::endl; });
 
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");

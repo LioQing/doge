@@ -163,6 +163,7 @@ namespace doge::io
     {
         window.clear(cast::ToSfColor(background_color));
 
+        auto cdf_itr = custom_draw_functions.begin();
         for (auto& [layer, draw_keys] : layers_draws)
         {
             for (auto& draw_key : draw_keys)
@@ -183,6 +184,22 @@ namespace doge::io
                     }
                 }
             }
+
+            for (; cdf_itr != custom_draw_functions.end() && cdf_itr->first <= layer; ++cdf_itr)
+            {
+                for (auto& [id, cdf] : cdf_itr->second)
+                {
+                    cdf(engine);
+                }
+            }
+        }
+
+        for (; cdf_itr != custom_draw_functions.end(); ++cdf_itr)
+        {
+            for (auto& [id, cdf] : cdf_itr->second)
+            {
+                cdf(engine);
+            }
         }
     }
 
@@ -200,6 +217,14 @@ namespace doge::io
         sf::Image screenshot = texture.copyToImage();
 
         return Image(screenshot);
+    }
+
+    void Window::RemoveDrawFunction(std::int32_t layer, const std::string& id)
+    {
+        custom_draw_functions.at(layer).erase(id);
+
+        if (custom_draw_functions.at(layer).empty())
+            custom_draw_functions.erase(layer);
     }
 
     // delta time

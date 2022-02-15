@@ -44,6 +44,8 @@ namespace doge
             std::map<std::int32_t, std::set<DrawableKey>> layers_draws;
             std::map<DrawableKey, std::unique_ptr<sf::Drawable>> drawables;
 
+            std::map<std::int32_t, std::unordered_map<std::string, std::function<void(Engine&)>>> custom_draw_functions;
+
             doge::Event<sf::Event> sf_event;
 
             // window
@@ -61,6 +63,17 @@ namespace doge
             void Display();
 
             Image TakeScreenshot() const;
+
+            template <std::invocable<Engine&> F>
+            void AddDrawFunction(std::int32_t layer, const std::string& id, F function)
+            {
+                if (!custom_draw_functions.contains(layer))
+                    custom_draw_functions.emplace(layer, std::unordered_map<std::string, std::function<void(Engine&)>>());
+
+                custom_draw_functions.at(layer).emplace(id, function);
+            }
+
+            void RemoveDrawFunction(std::int32_t layer, const std::string& id);
 
             // delta time
 
