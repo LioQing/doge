@@ -110,6 +110,15 @@ namespace doge
                 active_scene.late_update(*this, dt);
 
             window.window_io.Render(*this);
+
+            for (auto [id, extension] : scenes.extensions)
+            {
+                if(extension.render)
+                    extension.render(*this);
+            }
+            if (active_scene.render)
+                active_scene.render(*this);
+
             window.window_io.Draw(*this);
             window.window_io.Display();
         }

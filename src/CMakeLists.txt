@@ -65,6 +65,7 @@ set(SRC_FILES
     # nine_slice
     extensions/nine_slice/NineSlice.cpp
     extensions/nine_slice/Texture.cpp
+    extensions/nine_slice/Sprite.cpp
 
     # anim
     extensions/anim/Anim.cpp

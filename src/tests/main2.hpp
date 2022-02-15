@@ -10,8 +10,8 @@ namespace main2
     {
         ns = std::make_unique<doge::nine_slice::NineSlice>(engine);
 
-        engine.assets.LoadTexture("crate", "test2.png").first->second.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
-        engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23)).first->second.SetRenderOptions(doge::io::Texture::RenderOptions::Repeated);
+        engine.assets.LoadTexture("crate", "test2.png").first->second.SetRepeated(true);
+        engine.assets.LoadTexture("crate_center", "test2.png", doge::Recti(4, 5, 23, 23)).first->second.SetRepeated(true);
 
         ns->LoadTexture("crate", "test2.png", doge::Recti(4, 5, 5, 4));
         ns->SetRepeated("crate", true);
@@ -32,25 +32,24 @@ namespace main2
 
         doge::Entity crate_9sliced = engine.AddEntity();
         crate_9sliced.AddComponent(doge::Position(-150, 0));
-        auto& cs = ns->Add9SliceSpriteBySize(
-            crate_9sliced,
+        crate_9sliced.AddComponent(doge::nine_slice::Sprite(
             "crate",
             doge::Vec2f(200, 200),
             doge::Vec2i(46, 46),
             doge::Rectf(),
             doge::Vec2f(100, 100)
-        );
+        ));
 
         doge::Entity crate_9sliced2 = engine.AddEntity();
         crate_9sliced2.AddComponent(doge::Position(-500, 0));
-        ns->Add9SliceSpriteByTile(
-            crate_9sliced2,
+        crate_9sliced2.AddComponent(doge::nine_slice::Sprite::CreateByTile(
+            *ns,
             "crate",
             doge::Vec2f(100, 100),
             doge::Vec2u(2, 2),
-            doge::nine_slice::NineSlice::BorderThickness::TileScale,
+            doge::nine_slice::Sprite::BorderThickness::TileScale,
             doge::Vec2f(100, 100)
-        );
+        ));
 
         doge::Entity ind = engine.AddEntity();
         ind.AddComponent(doge::Position(-150, 0));
@@ -67,6 +66,11 @@ namespace main2
         std::cout << 1000 / dt << std::endl;
     }
 
+    void Finish(doge::Engine& engine)
+    {
+        ns.release();
+    }
+
     int Main()
     {
         doge::Engine engine;
@@ -74,6 +78,7 @@ namespace main2
         doge::GameLoopFunctions glf;
         glf.start           = Start;
         glf.update          = Update;
+        glf.finish          = Finish;
 
         engine.AddScene("test2", glf);
 

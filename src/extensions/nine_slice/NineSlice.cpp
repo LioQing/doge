@@ -2,6 +2,7 @@
 
 #include <doge/extensions/nine_slice/Texture.hpp>
 #include <doge/core/Engine.hpp>
+#include <doge/core/io/Renderer.hpp>
 #include <doge/core/Assets.hpp>
 #include <doge/core/io/Texture.hpp>
 #include <doge/utils/math.hpp>
@@ -10,14 +11,32 @@ namespace doge::nine_slice
 {
     NineSlice::NineSlice(Engine& engine) : engine(engine) 
     {
+        GameLoopFunctions glf;
+        glf.late_update = [&](Engine& engine, DeltaTime dt){ LateUpdate(engine, dt); };
+        glf.render = [&](Engine& engine){ Render(engine); };
+        
+        engine.scenes.extensions.emplace("doge_nine_slice", glf);
     }
 
-    std::string NineSlice::TextureIDFromSlice(Texture::Slice slice, const std::string& id)
+    NineSlice::~NineSlice()
     {
-        return std::string("nine_slice_") + id + "_" + Texture::PostFixFromSlice(slice);
+        for (auto& [id, texture] : GetTextures())
+        {
+            for (auto& s_id : texture.textures)
+            {
+                engine.assets.EraseTexture(s_id);
+            }
+        }
+
+        engine.scenes.extensions.erase("doge_nine_slice");
     }
 
-    std::string NineSlice::SliceTextureIDFromTextureID(const std::string& id, Texture::Slice slice)
+    std::string NineSlice::SliceTextureIDFromTextureID(const std::string& id, Slice slice)
+    {
+        return "nine_slice_" + id + "_" + Texture::PostFixFromSlice(slice);
+    }
+
+    std::string NineSlice::TextureIDFromSliceTextureID(const std::string& id, Slice slice)
     {
         auto prefix_size = std::string("nine_slice_").size();
         return id.substr(prefix_size, id.find(Texture::PostFixFromSlice(slice)) - prefix_size - 1);
@@ -32,8 +51,8 @@ namespace doge::nine_slice
 
         auto& texture = result.first->second;
 
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
-            texture.textures.at(i) = TextureIDFromSlice(static_cast<Texture::Slice>(i), id);
+        for (auto i = 0; i < Slice::Count; ++i)
+            texture.textures.at(i) = SliceTextureIDFromTextureID(id, static_cast<Slice>(i));
 
         return result;
     }
@@ -54,6 +73,11 @@ namespace doge::nine_slice
     const Texture& NineSlice::GetTexture(const std::string& id) const
     {
         return textures.at(id);
+    }
+
+    const io::Texture& NineSlice::GetSliceTexture(const std::string& id, Slice slice) const
+    {
+        return engine.assets.GetTexture(SliceTextureIDFromTextureID(id, slice));
     }
 
     std::pair<std::unordered_map<std::string, Texture>::iterator, bool>
@@ -165,9 +189,9 @@ namespace doge::nine_slice
 
     void NineSlice::SetRenderOptions(const std::string& id, doge::io::Texture::RenderOptions options)
     {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(SliceTextureIDFromTextureID(id, static_cast<Slice>(i)));
 
             texture.SetRenderOptions(options);
         }
@@ -175,9 +199,9 @@ namespace doge::nine_slice
 
     void NineSlice::SetSmooth(const std::string& id, bool smooth)
     {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(SliceTextureIDFromTextureID(id, static_cast<Slice>(i)));
 
             texture.SetSmooth(smooth);
         }
@@ -185,14 +209,14 @@ namespace doge::nine_slice
 
     bool NineSlice::IsSmooth(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSmooth();
+        return engine.assets.GetTexture(SliceTextureIDFromTextureID(id, Slice::Center)).IsSmooth();
     }
 
     void NineSlice::SetSRGB(const std::string& id, bool srgb)
     {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(SliceTextureIDFromTextureID(id, static_cast<Slice>(i)));
 
             texture.SetSRGB(srgb);
         }
@@ -200,14 +224,14 @@ namespace doge::nine_slice
 
     bool NineSlice::IsSRGB(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsSRGB();
+        return engine.assets.GetTexture(SliceTextureIDFromTextureID(id, Slice::Center)).IsSRGB();
     }
 
     void NineSlice::SetRepeated(const std::string& id, bool repeated)
     {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            auto& texture = engine.assets.GetTexture(TextureIDFromSlice(static_cast<Texture::Slice>(i), id));
+            auto& texture = engine.assets.GetTexture(SliceTextureIDFromTextureID(id, static_cast<Slice>(i)));
 
             texture.SetRepeated(repeated);
         }   
@@ -215,220 +239,184 @@ namespace doge::nine_slice
 
     bool NineSlice::IsRepeated(const std::string& id) const
     {
-        return engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, id)).IsRepeated();
+        return engine.assets.GetTexture(SliceTextureIDFromTextureID(id, Slice::Center)).IsRepeated();
     }
 
-    Component<CompoundSprite>& NineSlice::Add9SliceSpriteBySize(
-        Entity entity,
-        const std::string& texture_id,
-        const Vec2f& size,
-        const Vec2i& center_texture_size,
-        const Rectf& border_thickness,
-        const Vec2f& origin,
-        const Color& color
-    ) const
+    void NineSlice::UpdateSprite(Sprite& sprite) const
     {
-        auto& comp_sprite = entity.AddComponent<CompoundSprite>();
+        for (auto i = 0; i < Slice::Count; ++i)
+        {
+            if (sprite.texture_id == "missing_texture")
+                sprite.sprites.at(i).texture_id = "missing_texture";
+            else
+                sprite.sprites.at(i).texture_id = textures.at(sprite.texture_id).textures.at(i);
+            sprite.sprites.at(i).color = sprite.color;
+        }
 
-        Update9SliceSprite(comp_sprite, texture_id, center_texture_size, size, border_thickness, origin, color);
-
-        return comp_sprite;
+        SetSpriteSizeAndBorder(sprite, sprite.size, sprite.border_thickness);
+        SetSpriteOrigin(sprite, sprite.origin);
+        SetSpriteCenterTextureSize(sprite, sprite.center_texture_size);
     }
 
-    Component<CompoundSprite>& NineSlice::Add9SliceSpriteByTile(
-        Entity entity,
-        const std::string& texture_id,
-        const Vec2f& tile_size,
-        const Vec2u& tile_count,
-        BorderThickness border_thickness_option,
-        const Vec2f& origin,
-        const Color& color
-    ) const
+    void NineSlice::SetSpriteTextureID(Sprite& sprite, const std::string& id) const
     {
-        auto& comp_sprite = entity.AddComponent<CompoundSprite>();
-        auto& slice_tex = textures.at(texture_id);
+        sprite.texture_id = id;
 
-        auto texture_center_size = engine.assets.GetTexture(TextureIDFromSlice(Texture::Slice::Center, texture_id)).GetSize();
-        auto center_texture_size = texture_center_size * tile_count;
-
-        auto size = tile_size * tile_count;
-
-        auto border_thickness = slice_tex.border_thickness;
-        if (border_thickness_option == BorderThickness::Stretch)
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            border_thickness.SetPosition(border_thickness.GetPosition() * size / slice_tex.texture_rectangle.GetSize());
-            border_thickness.SetSize(border_thickness.GetSize() * size / slice_tex.texture_rectangle.GetSize());
-        }
-        else if (border_thickness_option == BorderThickness::TileScale)
-        {
-            border_thickness.SetPosition(border_thickness.GetPosition() * tile_size / slice_tex.texture_rectangle.GetSize());
-            border_thickness.SetSize(border_thickness.GetSize() * tile_size / slice_tex.texture_rectangle.GetSize());
-        }
-        else if (border_thickness_option == BorderThickness::HorizontalScale)
-        {
-            border_thickness.SetPosition(border_thickness.GetPosition() * size.x / slice_tex.texture_rectangle.GetSize().x);
-            border_thickness.SetSize(border_thickness.GetSize() * size.x / slice_tex.texture_rectangle.GetSize().x);
-        }
-        else if (border_thickness_option == BorderThickness::VerticalScale)
-        {
-            border_thickness.SetPosition(border_thickness.GetPosition() * size.y / slice_tex.texture_rectangle.GetSize().y);
-            border_thickness.SetSize(border_thickness.GetSize() * size.y / slice_tex.texture_rectangle.GetSize().y);
-        }
-
-        Update9SliceSprite(comp_sprite, texture_id, center_texture_size, size, border_thickness, origin, color);
-
-        return comp_sprite;
-    }
-    
-    void NineSlice::SetSpriteTextureID(CompoundSprite& comp_sprite, const std::string& id) const
-    {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
-        {
-            comp_sprite.sprites.at(i).texture_id = textures.at(id).textures.at(i);
+            sprite.sprites.at(i).texture_id = textures.at(id).textures.at(i);
         }
     }
 
-    void NineSlice::SetSpriteSizeAndBorder(CompoundSprite& comp_sprite, const Vec2f& size, const Rectf& border_thickness) const
+    void NineSlice::SetSpriteSizeAndBorder(Sprite& sprite, const Vec2f& size, const Rectf& border_thickness) const
     {
+        sprite.size = size;
+        sprite.border_thickness = border_thickness;
+
         auto rect_size = math::AutoSize(size, doge::Vec2i(32, 32));
         auto bord_thick = Rectf();
-        if (GetSpriteTextureID(comp_sprite) != "missing_texture")
+        if (GetSpriteTextureID(sprite) != "missing_texture")
         {
-            auto& slice_tex = GetTexture(GetSpriteTextureID(comp_sprite));
+            auto& slice_tex = GetTexture(GetSpriteTextureID(sprite));
             
             rect_size = math::AutoSize(size, slice_tex.texture_rectangle.GetSize());
             bord_thick = border_thickness == Rectf() ? slice_tex.border_thickness.Cast<float>() : border_thickness;
         }
 
-        comp_sprite.sprites.at(Texture::Slice::Center)  .size = rect_size - bord_thick.GetPosition() - bord_thick.GetSize();
+        sprite.sprites.at(Slice::Center)  .size = rect_size - bord_thick.GetPosition() - bord_thick.GetSize();
         
-        comp_sprite.sprites.at(Texture::Slice::Top)     .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::i + bord_thick.top     * Vec2f::j;
-        comp_sprite.sprites.at(Texture::Slice::Left)    .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::j + bord_thick.left    * Vec2f::i;
-        comp_sprite.sprites.at(Texture::Slice::Bottom)  .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::i + bord_thick.height  * Vec2f::j;
-        comp_sprite.sprites.at(Texture::Slice::Right)   .size = comp_sprite.sprites.at(Texture::Slice::Center).size * Vec2f::j + bord_thick.width   * Vec2f::i;
+        sprite.sprites.at(Slice::Top)     .size = sprite.sprites.at(Slice::Center).size * Vec2f::i + bord_thick.top     * Vec2f::j;
+        sprite.sprites.at(Slice::Left)    .size = sprite.sprites.at(Slice::Center).size * Vec2f::j + bord_thick.left    * Vec2f::i;
+        sprite.sprites.at(Slice::Bottom)  .size = sprite.sprites.at(Slice::Center).size * Vec2f::i + bord_thick.height  * Vec2f::j;
+        sprite.sprites.at(Slice::Right)   .size = sprite.sprites.at(Slice::Center).size * Vec2f::j + bord_thick.width   * Vec2f::i;
 
-        comp_sprite.sprites.at(Texture::Slice::TopLeft)     .size = Vec2f(bord_thick.left,    bord_thick.top);
-        comp_sprite.sprites.at(Texture::Slice::BottomLeft)  .size = Vec2f(bord_thick.left,    bord_thick.height);
-        comp_sprite.sprites.at(Texture::Slice::BottomRight) .size = Vec2f(bord_thick.width,   bord_thick.height);
-        comp_sprite.sprites.at(Texture::Slice::TopRight)    .size = Vec2f(bord_thick.width,   bord_thick.top);
+        sprite.sprites.at(Slice::TopLeft)     .size = Vec2f(bord_thick.left,    bord_thick.top);
+        sprite.sprites.at(Slice::BottomLeft)  .size = Vec2f(bord_thick.left,    bord_thick.height);
+        sprite.sprites.at(Slice::BottomRight) .size = Vec2f(bord_thick.width,   bord_thick.height);
+        sprite.sprites.at(Slice::TopRight)    .size = Vec2f(bord_thick.width,   bord_thick.top);
 
-        SetSpriteOrigin(comp_sprite, comp_sprite.sprites.at(Texture::Slice::TopLeft).origin);
+        SetSpriteOrigin(sprite, sprite.origin);
     }
 
-    void NineSlice::SetSpriteOrigin(CompoundSprite& comp_sprite, const Vec2f& origin) const
+    void NineSlice::SetSpriteOrigin(Sprite& sprite, const Vec2f& origin) const
     {
+        sprite.origin = origin;
+
         auto tl0 = Vec2f::Zero;
-        auto tl1 = comp_sprite.sprites.at(Texture::Slice::TopLeft).size;
-        auto tl2 = tl1 + comp_sprite.sprites.at(Texture::Slice::Center).size;
-        auto tl3 = tl2 + comp_sprite.sprites.at(Texture::Slice::BottomRight).size;
+        auto tl1 = sprite.sprites.at(Slice::TopLeft).size;
+        auto tl2 = tl1 + sprite.sprites.at(Slice::Center).size;
+        auto tl3 = tl2 + sprite.sprites.at(Slice::BottomRight).size;
         
-        comp_sprite.sprites.at(Texture::Slice::Center)      .origin = origin - tl1;
-        comp_sprite.sprites.at(Texture::Slice::TopLeft)     .origin = origin - tl0;
-        comp_sprite.sprites.at(Texture::Slice::BottomLeft)  .origin = origin - Vec2f(0, tl2.y);
-        comp_sprite.sprites.at(Texture::Slice::BottomRight) .origin = origin - tl2;
-        comp_sprite.sprites.at(Texture::Slice::TopRight)    .origin = origin - Vec2f(tl2.x, 0);
-        comp_sprite.sprites.at(Texture::Slice::Top)         .origin = origin - Vec2f(tl1.x, 0);
-        comp_sprite.sprites.at(Texture::Slice::Left)        .origin = origin - Vec2f(0, tl1.y);
-        comp_sprite.sprites.at(Texture::Slice::Bottom)      .origin = origin - Vec2f(tl1.x, tl2.y);
-        comp_sprite.sprites.at(Texture::Slice::Right)       .origin = origin - Vec2f(tl2.x, tl1.y);
+        sprite.sprites.at(Slice::Center)      .origin = origin - tl1;
+        sprite.sprites.at(Slice::TopLeft)     .origin = origin - tl0;
+        sprite.sprites.at(Slice::BottomLeft)  .origin = origin - Vec2f(0, tl2.y);
+        sprite.sprites.at(Slice::BottomRight) .origin = origin - tl2;
+        sprite.sprites.at(Slice::TopRight)    .origin = origin - Vec2f(tl2.x, 0);
+        sprite.sprites.at(Slice::Top)         .origin = origin - Vec2f(tl1.x, 0);
+        sprite.sprites.at(Slice::Left)        .origin = origin - Vec2f(0, tl1.y);
+        sprite.sprites.at(Slice::Bottom)      .origin = origin - Vec2f(tl1.x, tl2.y);
+        sprite.sprites.at(Slice::Right)       .origin = origin - Vec2f(tl2.x, tl1.y);
     }
 
-    void NineSlice::SetSpriteColor(CompoundSprite& comp_sprite, const Color& color) const
+    void NineSlice::SetSpriteColor(Sprite& sprite, const Color& color) const
     {
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+        sprite.color = color;
+
+        for (auto i = 0; i < Slice::Count; ++i)
         {
-            comp_sprite.sprites.at(i).color = color;
+            sprite.sprites.at(i).color = color;
         }
     }
 
-    void NineSlice::SetSpriteCenterTextureSize(CompoundSprite& comp_sprite, const Vec2i& center_texture_size) const
+    void NineSlice::SetSpriteCenterTextureSize(Sprite& sprite, const Vec2i& center_texture_size) const
     {
-        comp_sprite.sprites.at(Texture::Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
+        sprite.center_texture_size = center_texture_size;
 
-        comp_sprite.sprites.at(Texture::Slice::Top)     .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
-        comp_sprite.sprites.at(Texture::Slice::Left)    .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
-        comp_sprite.sprites.at(Texture::Slice::Bottom)  .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
-        comp_sprite.sprites.at(Texture::Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
+        sprite.sprites.at(Slice::Center)  .texture_rectangle.SetSize(center_texture_size);
+
+        sprite.sprites.at(Slice::Top)     .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
+        sprite.sprites.at(Slice::Left)    .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
+        sprite.sprites.at(Slice::Bottom)  .texture_rectangle.SetSize(center_texture_size * Vec2i::i);
+        sprite.sprites.at(Slice::Right)   .texture_rectangle.SetSize(center_texture_size * Vec2i::j);
     }
 
-    std::string NineSlice::GetSpriteTextureID(const CompoundSprite& comp_sprite) const
+    std::string NineSlice::GetSpriteTextureID(const Sprite& sprite) const
     {
-        if (GetSpriteTextureID(comp_sprite, Texture::Slice::TopLeft) == "missing_texture")
+        if (GetSpriteSliceTextureID(sprite, Slice::TopLeft) == "missing_texture")
             return "missing_texture";
-        return SliceTextureIDFromTextureID(GetSpriteTextureID(comp_sprite, Texture::Slice::TopLeft), Texture::Slice::TopLeft);
+        return TextureIDFromSliceTextureID(GetSpriteSliceTextureID(sprite, Slice::TopLeft), Slice::TopLeft);
     }
 
-    const std::string& NineSlice::GetSpriteTextureID(const CompoundSprite& comp_sprite, Texture::Slice slice) const
+    const std::string& NineSlice::GetSpriteSliceTextureID(const Sprite& sprite, Slice slice) const
     {
-        return comp_sprite.sprites.at(slice).texture_id;
+        return sprite.sprites.at(slice).texture_id;
     }
 
-    const Sprite& NineSlice::GetSprite(const CompoundSprite& comp_sprite, Texture::Slice slice) const
+    const Texture& NineSlice::GetSpriteTexture(const Sprite& sprite) const
     {
-        return comp_sprite.sprites.at(slice);
+        return GetTexture(sprite.texture_id);
     }
 
-    Vec2f NineSlice::GetSpriteSize(const CompoundSprite& comp_sprite) const
+    const io::Texture& NineSlice::GetSpriteSliceTexture(const Sprite& sprite, Slice slice) const
     {
-        return GetSprite(comp_sprite, Texture::Slice::TopLeft).size
-        + GetSprite(comp_sprite, Texture::Slice::Center).size
-        + GetSprite(comp_sprite, Texture::Slice::BottomRight).size;
+        return GetSliceTexture(sprite.texture_id, slice);
     }
 
-    Vec2f NineSlice::GetSpriteActualSize(const CompoundSprite& comp_sprite, const Assets& assets) const
+    const doge::Sprite& NineSlice::GetSprite(const Sprite& sprite, Slice slice) const
     {
-        return GetSprite(comp_sprite, Texture::Slice::TopLeft).GetActualSize(assets)
-        + GetSprite(comp_sprite, Texture::Slice::Center).GetActualSize(assets)
-        + GetSprite(comp_sprite, Texture::Slice::BottomRight).GetActualSize(assets);
+        return sprite.sprites.at(slice);
     }
 
-    Rectf NineSlice::GetSpriteBorderThickness(const CompoundSprite& comp_sprite) const
+    Vec2f NineSlice::GetSpriteSize(const Sprite& sprite) const
     {
-        return Rectf(GetSprite(comp_sprite, Texture::Slice::TopLeft).size, GetSprite(comp_sprite, Texture::Slice::BottomRight).size);
+        return GetSprite(sprite, Slice::TopLeft).size
+        + GetSprite(sprite, Slice::Center).size
+        + GetSprite(sprite, Slice::BottomRight).size;
     }
 
-    const Vec2f& NineSlice::GetSpriteOrigin(const CompoundSprite& comp_sprite) const
+    Vec2f NineSlice::GetSpriteActualSize(const Sprite& sprite, const Assets& assets) const
     {
-        return GetSprite(comp_sprite, Texture::Slice::TopLeft).origin;
+        return GetSprite(sprite, Slice::TopLeft).GetActualSize(assets)
+        + GetSprite(sprite, Slice::Center).GetActualSize(assets)
+        + GetSprite(sprite, Slice::BottomRight).GetActualSize(assets);
     }
 
-    const Color& NineSlice::GetSpriteColor(const CompoundSprite& comp_sprite) const
+    Rectf NineSlice::GetSpriteBorderThickness(const Sprite& sprite) const
     {
-        return GetSprite(comp_sprite, Texture::Slice::TopLeft).color;
+        return Rectf(GetSprite(sprite, Slice::TopLeft).size, GetSprite(sprite, Slice::BottomRight).size);
     }
 
-    Vec2i NineSlice::GetSpriteCenterTextureSize(const CompoundSprite& comp_sprite) const
+    const Vec2f& NineSlice::GetSpriteOrigin(const Sprite& sprite) const
     {
-        return GetSprite(comp_sprite, Texture::Slice::Center).texture_rectangle.GetSize();
+        return GetSprite(sprite, Slice::TopLeft).origin;
     }
 
-    void NineSlice::Update9SliceSprite(
-        CompoundSprite& comp_sprite,
-        const std::string& texture_id,
-        const Vec2f& center_texture_size,
-        const Vec2f& size,
-        const Rectf& border_thickness,
-        const Vec2f& origin,
-        const Color& color) const
+    const Color& NineSlice::GetSpriteColor(const Sprite& sprite) const
     {
-        auto tl0 = Vec2f::Zero;
-        auto tl1 = border_thickness.GetPosition();
-        auto tl2 = size - border_thickness.GetSize();
-        auto tl3 = size;
+        return GetSprite(sprite, Slice::TopLeft).color;
+    }
 
-        comp_sprite.sprites.resize(Texture::Slice::Count);
+    Vec2i NineSlice::GetSpriteCenterTextureSize(const Sprite& sprite) const
+    {
+        return GetSprite(sprite, Slice::Center).texture_rectangle.GetSize();
+    }
 
-        for (auto i = 0; i < Texture::Slice::Count; ++i)
+    void NineSlice::LateUpdate(Engine& engine, DeltaTime dt)
+    {
+        for (auto [sprite] : engine.Select<Sprite>().Components())
         {
-            if (texture_id == "missing_texture")
-                comp_sprite.sprites.at(i).texture_id = "missing_texture";
-            else
-                comp_sprite.sprites.at(i).texture_id = textures.at(texture_id).textures.at(i);
-            comp_sprite.sprites.at(i).color = color;
+            UpdateSprite(sprite);
         }
+    }
 
-        SetSpriteSizeAndBorder(comp_sprite, size, border_thickness);
-        SetSpriteOrigin(comp_sprite, origin);
-        SetSpriteCenterTextureSize(comp_sprite, center_texture_size);
+    void NineSlice::Render(Engine& engine)
+    {
+        for (auto [sprite_comp] : engine.Select<Sprite>().Components())
+        {
+            for (auto i = 0; i < Slice::Count; ++i)
+            {
+                io::Renderer::RenderSprite(engine, sprite_comp, sprite_comp.sprites.at(i), i);
+            }
+        }
     }
 }

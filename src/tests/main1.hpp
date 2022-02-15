@@ -72,6 +72,7 @@ namespace main1
         });
 
         anim.AddComponent<doge::Position>(0, 2);
+        anim.AddComponent<doge::Rotation>();
 
         anim.AddComponent(doge::anim::Animation
         {
@@ -103,6 +104,16 @@ namespace main1
             .current_state = "running",
         });
 
+        anim.AddComponent(doge::physics::RigidBody
+        {
+            .type = doge::physics::RigidBody::Dynamic,
+        });
+
+        anim.AddComponent(doge::physics::RectangleCollider
+        {
+            .rigid_body_entity = anim,
+            .size = { 1, 2 },
+        });
 
         // cam
         doge::Entity cam = engine.AddCamera(doge::Camera{ .size = doge::Vec2f(12.8, 7.2) });

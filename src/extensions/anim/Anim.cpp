@@ -7,7 +7,10 @@ namespace doge::anim
 {
     Anim::Anim(Engine& engine) : engine(engine)
     {
-        engine.scenes.extensions.emplace("doge_anim", GameLoopFunctions::Create(*this, nullptr, &Anim::Update));
+        GameLoopFunctions glf;
+        glf.update = [&](Engine& engine, DeltaTime dt){ Update(engine, dt); };
+
+        engine.scenes.extensions.emplace("doge_anim", glf);
     }
 
     Anim::~Anim()

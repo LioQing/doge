@@ -12,8 +12,8 @@ namespace doge::physics
     {
         GameLoopFunctions glf;
         glf.start = [&](Engine& engine){ Start(engine); };
-        glf.update = [&](Engine& engine, DeltaTime dt){ Update(engine, dt); };
         glf.fixed_update = [&](Engine& engine, DeltaTime dt){ FixedUpdate(engine, dt); };
+        glf.late_update = [&](Engine& engine, DeltaTime dt){ LateUpdate(engine, dt); };
         glf.finish = [&](Engine& engine){ Finish(engine); };
         
         engine.scenes.extensions.emplace("doge_physics", glf);
@@ -133,7 +133,7 @@ namespace doge::physics
     {
     }
 
-    void Physics::Update(Engine& engine, DeltaTime dt)
+    void Physics::LateUpdate(Engine& engine, DeltaTime dt)
     {
         if (IsPaused())
             return;

@@ -304,10 +304,27 @@ namespace main3
         engine.window.settings.msaa_level = 4;
         
         SceneA a(engine);
-        engine.AddScene("a", doge::GameLoopFunctions::Create(a, &SceneA::Start, &SceneA::Update, &SceneA::FixedUpdate, &SceneA::Finish));
+        {
+            doge::GameLoopFunctions glf;
+            glf.start = std::bind(&SceneA::Start, a);
+            glf.fixed_update = std::bind(&SceneA::FixedUpdate, a);
+            glf.update = std::bind(&SceneA::Update, a);
+            glf.finish = std::bind(&SceneA::Finish, a);
+
+            engine.AddScene("a", glf);
+        }
 
         SceneB b(engine);
-        engine.AddScene("b", doge::GameLoopFunctions::Create(b, &SceneB::Start, &SceneB::Update, &SceneB::FixedUpdate, &SceneB::Finish));
+        {
+            doge::GameLoopFunctions glf;
+            glf.start = std::bind(&SceneB::Start, b);
+            glf.fixed_update = std::bind(&SceneB::FixedUpdate, b);
+            glf.update = std::bind(&SceneB::Update, b);
+            glf.finish = std::bind(&SceneB::Finish, b);
+
+            engine.AddScene("b", glf);
+        }
+        engine.AddScene("b", glf);
 
         engine.StartScene("a");
 

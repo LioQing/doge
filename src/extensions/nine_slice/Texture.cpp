@@ -21,7 +21,7 @@ namespace doge::nine_slice
         }
     }
 
-    Texture::Slice Texture::SliceFromPostFix(const std::string& post_fix)
+    Slice Texture::SliceFromPostFix(const std::string& post_fix)
     {
         if (post_fix == "center")          return Slice::Center;
         if (post_fix == "top_left")        return Slice::TopLeft;

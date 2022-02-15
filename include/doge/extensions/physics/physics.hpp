@@ -62,7 +62,7 @@ namespace doge
             Vec2f gravity = Vec2f(0, 9.8f);
 
             void Start(Engine& engine);
-            void Update(Engine& engine, DeltaTime dt);
+            void LateUpdate(Engine& engine, DeltaTime dt);
             void FixedUpdate(Engine& engine, DeltaTime dt);
             void Finish(Engine& engine);
         };
