@@ -5,6 +5,11 @@
 
 namespace doge
 {
+    /**
+     * @brief A 3D vector class
+     * 
+     * @tparam T Type for storing the coordinates
+     */
     template <typename T>
     struct Vec3
     {
@@ -12,21 +17,59 @@ namespace doge
         T y = 0.0;
         T z = 0.0;
 
+        /**
+         * @brief Construct a new Vec3 at (0, 0, 0)
+         * 
+         */
         Vec3() = default;
+
+        /**
+         * @brief Construct a new Vec3 from another Vec3
+         * 
+         */
         Vec3(const Vec3&) = default;
+
+        /**
+         * @brief Construct a new Vec 3 given the coordinates
+         * 
+         * @param x X coordinate
+         * @param y Y coordinate
+         * @param z Z coordinate
+         */
         Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
 
+        /**
+         * @brief Cast to Vec3\<U\>
+         * 
+         * @tparam U The type to cast to
+         * @return Vec3\<U\> The casted Vec3
+         */
         template <typename U>
         operator Vec3<U>() const
         {
             return Vec3<U>(x, y, z);
         }
+
+        /**
+         * @brief Cast to Vec3\<U\>
+         * 
+         * @tparam U The type to cast to
+         * @return Vec3\<U\> The casted Vec3
+         */
         template <typename U>
         Vec3<U> Cast() const
         {
             return Vec3<U>(x, y, z);
         }
 
+        /**
+         * @brief Set the coordinates of this
+         * 
+         * @param x X coordinate
+         * @param y Y coordinate
+         * @param z Z coordinate
+         * @return Vec2& This Vec3
+         */
         Vec3& Set(T x, T y, T z) &
         {
             this->x = x;
@@ -35,15 +78,33 @@ namespace doge
             return *this;
         }
 
+        /**
+         * @brief Get the normalized Vec3 of v
+         * 
+         * @param v The Vec3 to be normalized
+         * @return Vec3 The normalized Vec3
+         */
         static Vec3 Normalized(const Vec3& v) 
         {
             return v.Normalized();
         }
+
+        /**
+         * @brief Get the normalized Vec3 of this
+         * 
+         * @return Vec3 The normalized Vec3
+         */
         Vec3 Normalized() const
         {
             if (Magnitude() == 0) return *this;
             return Vec3(*this / Magnitude());
         }
+
+        /**
+         * @brief Normalize this
+         * 
+         * @return Vec3& This Vec3
+         */
         Vec3& Normalize() &
         {
             if (Magnitude() == 0) return *this;
@@ -51,11 +112,25 @@ namespace doge
             return *this;
         }
 
+        /**
+         * @brief Get the distance between v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return auto The distance
+         */
         template <typename U = T>
         static auto Distance(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.Distance(v2);
         }
+
+        /**
+         * @brief Get the distance between this and v
+         * 
+         * @param v The Vec3 to be used with this
+         * @return auto The distance
+         */
         template <typename U = T>
         auto Distance(const Vec3<U>& v) const
         {
@@ -63,48 +138,113 @@ namespace doge
             return d.Magnitude();
         }
 
+        /**
+         * @brief Get the square of magnitude of v
+         * 
+         * @param v The Vec3 to be used
+         * @return auto The square of magnitude
+         */
         static auto SqrMagnitude(const Vec3& v)
         {
             return v.SqrMagnitude();
         }
+
+        /**
+         * @brief Get the square of magnitude of this
+         * 
+         * @return auto The square of magnitude
+         */
         auto SqrMagnitude() const
         {
             return x * x + y * y + z * z;
         }
         
+        /**
+         * @brief Get the magnitude of v
+         * 
+         * @param v The Vec3 to be used
+         * @return auto The magnitude
+         */
         static auto Magnitude(const Vec3& v)
         {
             return v.Magnitude();
         }
+
+        /**
+         * @brief Get the magnitude of this
+         * 
+         * @return auto The magnitude
+         */
         auto Magnitude() const
         {
             return std::hypot(x, y, z);
         }
 
+        /**
+         * @brief Get the absolute values of v
+         * 
+         * @param v The Vec3 to be used
+         * @return Vec3 The absolute values
+         */
         static Vec3 Abs(const Vec3& v)
         {
             return v.Abs();
         }
+
+        /**
+         * @brief Get the absolute values of this
+         * 
+         * @return Vec3 The absolute values
+         */
         Vec3 Abs() const
         {
             return Vec3(x < 0 ? x * -1 : x, y < 0 ? y * -1 : y, z < 0 ? z * -1 : z);
         }
 
+        /**
+         * @brief Get the dot product of v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return auto The dot product
+         */
         template <typename U = T>
         static auto Dot(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.Dot(v2);
         } 
+
+        /**
+         * @brief Get the dot product of this and v
+         * 
+         * @param v The Vec3 to be used
+         * @return auto The dot product
+         */
         template <typename U = T>
         auto Dot(const Vec3<U>& v) const
         {
             return x * v.x + y * v.y + z * v.z;
         }
+
+        /**
+         * @brief Get the cross product of v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return Vec3 The cross product
+         */
         template <typename U = T>
         static auto Cross(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.Cross(v2);
         } 
+
+        /**
+         * @brief Get the cross product of this and v
+         * 
+         * @param v The Vec3 to be used
+         * @return Vec3 The cross product
+         */
         template <typename U = T>
         auto Cross(const Vec3<U>& v) const
         {
@@ -116,54 +256,129 @@ namespace doge
             );
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) multiplication product of v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return Vec3 The Hadamard multiplication product
+         */
         template <typename U = T>
         static auto HadamardMultiplication(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.HadamardMultiplication(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) multiplication product of this and v
+         * 
+         * @param v The Vec3 to be used
+         * @return Vec3 The Hadamard multiplication product
+         */
         template <typename U = T>
         auto HadamardMultiplication(const Vec3<U>& v) const
         {
             return Vec3<decltype(std::declval<T&>() * std::declval<U&>())>(x * v.x, y * v.y, z * v.z);
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) division quotient of v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return Vec3 The Hadamard division quotient
+         */
         template <typename U = T>
         static auto HadamardDivision(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.HadamardDivision(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) division quotient of this and v
+         * 
+         * @param v The Vec3 to be used
+         * @return Vec3 The Hadamard division quotient
+         */
         template <typename U = T>
         auto HadamardDivision(const Vec3<U>& v) const
         {
             return Vec3<decltype(std::declval<T&>() / std::declval<U&>())>(x / v.x, y / v.y, z / v.z);
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) modulo remainder of v1 and v2
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @return Vec3 The Hadamard modulo remainder
+         */
         template <typename U = T>
         static auto HadamardModulo(const Vec3& v1, const Vec3<U>& v2)
         {
             return v1.HadamardModulo(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) modulo remainder of this and v
+         * 
+         * @param v The Vec3 to be used
+         * @return Vec3 The Hadamard modulo remainder
+         */
         template <typename U = T>
         auto HadamardModulo(const Vec3<U>& v) const
         {
             return Vec3<decltype(std::fmod(std::declval<T&>(), std::declval<U&>()))>(std::fmod(x, v.x), std::fmod(y, v.y), std::fmod(z, v.z));
         }
 
+        /**
+         * @brief Get v3.Cross(v2 - v1)
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @param v3 The third Vec3
+         * @return auto The product
+         */
         template <typename U = T, typename S = T>
         static auto CollinearEx(const Vec3& v1, const Vec3<U>& v2, const Vec3<S>& v3)
         {
             return v1.CollinearEx(v2, v3);
         }
+
+        /**
+         * @brief Get v3.Cross(v2 - *this)
+         * 
+         * @param v2 The second Vec3
+         * @param v3 The third Vec3
+         * @return auto The product
+         */
         template <typename U = T, typename S = T>
         auto CollinearEx(const Vec3<U>& v2, const Vec3<S>& v3) const
         {
             return v3.Cross(v2 - *this);
         }
+
+        /**
+         * @brief Check if v1, v2, v3 are collinear
+         * 
+         * @param v1 The first Vec3
+         * @param v2 The second Vec3
+         * @param v3 The third Vec3
+         * @return bool Boolean representing whether they are collinear
+         */
         template <typename U = T, typename S = T>
         static bool Collinear(const Vec3& v1, const Vec3<U>& v2, const Vec3<S>& v3)
         {
             return v1.Collinear(v2, v3);
         }
+
+        /**
+         * @brief Check if this, v2, v3 are collinear
+         * 
+         * @param v2 The second Vec3
+         * @param v3 The third Vec3
+         * @return bool Boolean representing whether they are collinear
+         */
         template <typename U = T, typename S = T>
         bool Collinear(const Vec3<U>& v2, const Vec3<S>& v3) const
         {

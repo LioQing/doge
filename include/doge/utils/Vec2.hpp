@@ -5,27 +5,68 @@
 
 namespace doge
 {
+    /**
+     * @brief A 2D vector class
+     * 
+     * @tparam T Type for storing the coordinates
+     */
     template <typename T>
     struct Vec2
     {
         T x = 0.0;
         T y = 0.0;
 
+        /**
+         * @brief Construct a new Vec2 at (0, 0)
+         * 
+         */
         Vec2() = default;
+
+        /**
+         * @brief Construct a new Vec2 from another Vec2
+         * 
+         */
         Vec2(const Vec2&) = default;
+
+        /**
+         * @brief Construct a new Vec2 given the coordinates
+         * 
+         * @param x X coordinate
+         * @param y Y coordinate
+         */
         Vec2(T x, T y) : x(x), y(y) {}
 
+        /**
+         * @brief Cast to Vec2\<U\>
+         * 
+         * @tparam U The type to cast to
+         * @return Vec2\<U\> The casted Vec2
+         */
         template <typename U>
         operator Vec2<U>() const
         {
             return Vec2<U>(x, y);
         }
+
+        /**
+         * @brief Cast to Vec2\<U\>
+         * 
+         * @tparam U The type to cast to
+         * @return Vec2\<U\> The casted Vec2
+         */
         template <typename U>
         Vec2<U> Cast() const
         {
             return Vec2<U>(x, y);
         }
 
+        /**
+         * @brief Set the coordinates of this
+         * 
+         * @param x X coordinate
+         * @param y Y coordinate
+         * @return Vec2& This Vec2
+         */
         Vec2& Set(T x, T y) &
         {
             this->x = x;
@@ -33,11 +74,25 @@ namespace doge
             return *this;
         }
 
+        /**
+         * @brief Get the rotated Vec2 of v by theta radian
+         * 
+         * @param v The Vec2 to be rotated
+         * @param theta The angle to be rotated in radian
+         * @return Vec2 The Vec2 rotated
+         */
         template <typename U>
         static Vec2 Rotated(Vec2 v, U theta)
         {
             return v.Rotated(theta);
         }
+
+        /**
+         * @brief Get the rotated Vec2 of this by theta radian
+         * 
+         * @param theta The angle to be rotated in radian
+         * @return Vec2 The Vec2 rotated
+         */
         template <typename U>
         Vec2<T> Rotated(U theta) const
         {
@@ -48,6 +103,12 @@ namespace doge
 
             return Vec2<T>(tx, ty);
         }
+
+        /**
+         * @brief Rotate this by theta radian
+         * 
+         * @param theta The angle to be rotated in radian
+         */
         template <typename U>
         Vec2& Rotate(U theta) &
         {
@@ -56,15 +117,33 @@ namespace doge
             return *this;
         }
 
+        /**
+         * @brief Get the normalized Vec2 of v
+         * 
+         * @param v The Vec2 to be normalized
+         * @return Vec2 The normalized Vec2
+         */
         static Vec2 Normalized(const Vec2& v) 
         {
             return v.Normalized();
         }
+
+        /**
+         * @brief Get the normalized Vec2 of this
+         * 
+         * @return Vec2 The normalized Vec2
+         */
         Vec2 Normalized() const
         {
             if (Magnitude() == 0) return *this;
             return Vec2(*this / Magnitude());
         }
+
+        /**
+         * @brief Normalize this
+         * 
+         * @return Vec2& This Vec2
+         */
         Vec2& Normalize() &
         {
             if (Magnitude() == 0) return *this;
@@ -72,20 +151,46 @@ namespace doge
             return *this;
         }
 
+        /**
+         * @brief Get the orthogonal Vec2 of v
+         * 
+         * @param v The Vec2 to be used
+         * @return Vec2 The Vec2 orthogonal to v
+         */
         static Vec2 Ortho(const Vec2& v)
         {
             return v.Ortho();
         }
+
+        /**
+         * @brief Get the orthogonal Vec2 of this
+         * 
+         * @return Vec2 The Vec2 orthogonal to this
+         */
         Vec2 Ortho() const
         {
             return Vec2(y, -x);
         }
 
+        /**
+         * @brief Get the distance between v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return auto The distance
+         */
         template <typename U = T>
         static auto Distance(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.Distance(v2);
         }
+
+        /**
+         * @brief Get the distance between this and v
+         * 
+         * @param v The Vec2 to be used with this
+         * @return auto The distance
+         */
         template <typename U = T>
         auto Distance(const Vec2<U>& v) const
         {
@@ -93,109 +198,254 @@ namespace doge
             return d.Magnitude();
         }
 
+        /**
+         * @brief Get the square of magnitude of v
+         * 
+         * @param v The Vec2 to be used
+         * @return auto The square of magnitude
+         */
         static auto SqrMagnitude(const Vec2& v)
         {
             return v.SqrMagnitude();
         }
+
+        /**
+         * @brief Get the square of magnitude of this
+         * 
+         * @return auto The square of magnitude
+         */
         auto SqrMagnitude() const
         {
             return x * x + y * y;
         }
 
+        /**
+         * @brief Get the magnitude of v
+         * 
+         * @param v The Vec2 to be used
+         * @return auto The magnitude
+         */
         static auto Magnitude(const Vec2& v)
         {
             return v.Magnitude();
         }
+
+        /**
+         * @brief Get the magnitude of this
+         * 
+         * @return auto The magnitude
+         */
         auto Magnitude() const
         {
             return std::hypot(x, y);
         }
 
+        /**
+         * @brief Get the absolute values of v
+         * 
+         * @param v The Vec2 to be used
+         * @return Vec2 The absolute values
+         */
         static Vec2 Abs(const Vec2& v)
         {
             return v.Abs();
         }
+
+        /**
+         * @brief Get the absolute values of this
+         * 
+         * @return Vec2 The absolute values
+         */
         Vec2 Abs() const
         {
             return Vec2(x < 0 ? x * -1 : x, y < 0 ? y * -1 : y);
         }
 
+        /**
+         * @brief Get the dot product of v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return auto The dot product
+         */
         template <typename U = T>
         static auto Dot(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.Dot(v2);
         } 
+
+        /**
+         * @brief Get the dot product of this and v
+         * 
+         * @param v The Vec2 to be used
+         * @return auto The dot product
+         */
         template <typename U = T>
         auto Dot(const Vec2<U>& v) const
         {
             return x * v.x + y * v.y;
         }
+
+        /**
+         * @brief Get the cross product of v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return auto The cross product
+         */
         template <typename U = T>
         static auto Cross(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.Cross(v2);
         } 
+
+        /**
+         * @brief Get the cross product of this and v
+         * 
+         * @param v The Vec2 to be used
+         * @return auto The cross product
+         */
         template <typename U = T>
         auto Cross(const Vec2<U>& v) const
         {
             return (x * v.y) - (y * v.x);
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) multiplication product of v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return Vec2 The Hadamard multiplication product
+         */
         template <typename U = T>
         static auto HadamardMultiplication(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.HadamardMultiplication(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) multiplication product of this and v
+         * 
+         * @param v The Vec2 to be used
+         * @return Vec2 The Hadamard multiplication product
+         */
         template <typename U = T>
         auto HadamardMultiplication(const Vec2<U>& v) const
         {
             return Vec2<decltype(std::declval<T&>() * std::declval<U&>())>(x * v.x, y * v.y);
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) division quotient of v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return Vec2 The Hadamard division quotient
+         */
         template <typename U = T>
         static auto HadamardDivision(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.HadamardDivision(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) division quotient of this and v
+         * 
+         * @param v The Vec2 to be used
+         * @return Vec2 The Hadamard division quotient
+         */
         template <typename U = T>
         auto HadamardDivision(const Vec2<U>& v) const
         {
             return Vec2<decltype(std::declval<T&>() / std::declval<U&>())>(x / v.x, y / v.y);
         }
 
+        /**
+         * @brief Get the Hadamard (element-wise) modulo remainder of v1 and v2
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @return Vec2 The Hadamard modulo remainder
+         */
         template <typename U = T>
         static auto HadamardModulo(const Vec2& v1, const Vec2<U>& v2)
         {
             return v1.HadamardModulo(v2);
         }
+
+        /**
+         * @brief Get the Hadamard (element-wise) modulo remainder of this and v
+         * 
+         * @param v The Vec2 to be used
+         * @return Vec2 The Hadamard modulo remainder
+         */
         template <typename U = T>
         auto HadamardModulo(const Vec2<U>& v) const
         {
             return Vec2<decltype(std::fmod(std::declval<T&>(), std::declval<U&>()))>(std::fmod(x, v.x), std::fmod(y, v.y));
         }
 
-        // 0 --> collinear
-        // >0 -> v3 to rotate clockwise to become collinear
-        // <0 -> v3 to rotate anticlockwise to become collinear
+        /**
+         * @brief Get the orientation of v1, v2, v3. Equivalent to v3.Cross(v2 - v1).
+         * 0: collinear.
+         * >0: v3 to rotate clockwise to become collinear
+         * <0: v3 to rotate anticlockwise to become collinear
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @param v3 The third Vec2
+         * @return auto The orientation
+         */
         template <typename U = T, typename S = T>
         static auto OrientationEx(const Vec2& v1, const Vec2<U>& v2, const Vec2<S>& v3)
         {
             return v1.OrientationEx(v2, v3);
         }
+
+        /**
+         * @brief Get the orientation of this, v2, v3. Equivalent to v3.Cross(v2 - *this).
+         * 0: collinear.
+         * >0: v3 to rotate clockwise to become collinear
+         * <0: v3 to rotate anticlockwise to become collinear
+         * 
+         * @param v2 The second Vec2
+         * @param v3 The third Vec2
+         * @return auto The orientation
+         */
         template <typename U = T, typename S = T>
         auto OrientationEx(const Vec2<U>& v2, const Vec2<S>& v3) const
         {
             return v3.Cross(v2 - *this);
         }
 
-        // 0 --> collinear
-        // 1 --> v3 to rotate clockwise to become collinear
-        // -1 -> v3 to rotate anticlockwise to become collinear 
+        /**
+         * @brief Get the orientation of v1, v2, v3.
+         * 0: collinear.
+         * 1: v3 to rotate clockwise to become collinear
+         * -1: v3 to rotate anticlockwise to become collinear
+         * 
+         * @param v1 The first Vec2
+         * @param v2 The second Vec2
+         * @param v3 The third Vec2
+         * @return int The orientation
+         */
         template <typename U = T, typename S = T>
         static int Orientation(const Vec2& v1, const Vec2<U>& v2, const Vec2<S>& v3)
         {
             return v1.Orientation(v2, v3);
         }
+
+        /**
+         * @brief Get the orientation of this, v2, v3.
+         * 0: collinear.
+         * 1: v3 to rotate clockwise to become collinear
+         * -1: v3 to rotate anticlockwise to become collinear
+         * 
+         * @param v2 The second Vec2
+         * @param v3 The third Vec2
+         * @return int The orientation
+         */
         template <typename U = T, typename S = T>
         int Orientation(const Vec2<U>& v2, const Vec2<S>& v3) const
         {

@@ -20,10 +20,7 @@ namespace doge
     {
     public:
 
-        /**
-         * Max number of components
-         * Modify this value in header file lic.hpp as needed
-         */
+        // Max number of components, modify as needed.
         static constexpr size_t LIC_MAX_COMPONENT = 64;
 
         // Forward declarations
@@ -46,7 +43,7 @@ namespace doge
             /**
              * @brief Get the entity of this component
              * 
-             * @return the entity of this component
+             * @return The entity of this component
              */
             Entity GetEntity() const
             {
@@ -89,7 +86,7 @@ namespace doge
              * @brief Check if this entity has a component
              * 
              * @param cid ID of the component to be checked
-             * @return Boolean indicating the result
+             * @return bool Boolean indicating the result
              */
             bool HasComponent(ComponentID cid) const;
 
@@ -97,7 +94,7 @@ namespace doge
              * @brief Check if this entity has a component
              * 
              * @tparam TComp type of the component to be checked
-             * @return Boolean indicating the result
+             * @return boo Boolean indicating the result
              */
             template <typename TComp>
             bool HasComponent() const;
@@ -168,14 +165,14 @@ namespace doge
             void OnComponentRemoval(const std::function<void()>& callback) const;        
         
             /**
-             * @brief Call the on component removal callback function manually
+             * @brief Call and remove the on component removal callback function manually
              * 
              * @param cid ID of the component
              */
             void RaiseComponentRemoval(ComponentID cid) const;
 
             /**
-             * @brief Call the on component removal callback function manually
+             * @brief Call and remove the on component removal callback function manually
              * 
              * @param eid ID of the entity where the component belongs
              */
@@ -267,7 +264,7 @@ namespace doge
          * @brief Get the ID of a component type by extracting it from a Componen<T> class
          * If this is the first time this function is called with the type, a new ID will be generated
          * 
-         * @param comp component which the ID will be returned
+         * @param comp Component which the ID will be returned
          * @return ID of the component comp
          */
         template <typename TComp>
@@ -280,7 +277,7 @@ namespace doge
          * @brief Get the ID of a component type
          * If this is the first time this function is called with the type, a new ID will be generated
          * 
-         * @param comp component which the ID will be returned
+         * @param comp Component which the ID will be returned
          * @return ID of the component comp
          */
         template <typename TComp>
@@ -307,7 +304,7 @@ namespace doge
          * @brief Check whether an entity is alive (added and not destroyed)
          * 
          * @param eid ID of the entity
-         * @return boolean indicating whether the entity is alive
+         * @return bool Boolean indicating whether the entity is alive
          */
         static bool HasEntity(EntityID eid);
 
@@ -344,7 +341,7 @@ namespace doge
          * 
          * @param eid ID of the entity where the component will be checked
          * @param cid ID of the component to be checked
-         * @return Boolean indicating the result
+         * @return bool Boolean indicating the result
          */
         static bool HasComponent(EntityID eid, ComponentID cid);
 
@@ -353,7 +350,7 @@ namespace doge
          * 
          * @tparam TComp type of the component to be checked
          * @param eid ID of the entity where the component will be checked
-         * @return Boolean indicating the result
+         * @return bool Boolean indicating the result
          */
         template <typename TComp>
         static bool HasComponent(EntityID eid)
@@ -458,7 +455,7 @@ namespace doge
         }
 
         /**
-         * @brief Call the on component removal callback function manually
+         * @brief Call and remove the on component removal callback function manually
          * 
          * @param eid ID of the entity where the component belongs
          * @param cid ID of the component
@@ -466,7 +463,7 @@ namespace doge
         static void RaiseComponentRemoval(EntityID eid, ComponentID cid);
 
         /**
-         * @brief Call the on component removal callback function manually
+         * @brief Call and remove the on component removal callback function manually
          * 
          * @tparam TComp type of the component
          * @param eid ID of the entity where the component belongs
@@ -580,7 +577,7 @@ namespace doge
             /**
              * @brief Apply a function to selected entities' components, to which only entities with components that fufill the condition in the function are further selected
              * 
-             * @param predicate a function that takes all selected entity and components as parameter and returns a boolean value indicating whether the entity will be further selected
+             * @param predicate A function that takes all selected entity and components as parameter and returns a boolean value indicating whether the entity will be further selected
              * @return Range of entities with selected components
              */
             template <std::predicate<Entity, TComps...> TPred>
@@ -599,7 +596,7 @@ namespace doge
             /**
              * @brief Gets a container that allows iterating through every selected entities
              * 
-             * @return an EntityContainer object that contains all selected entities
+             * @return An EntityContainer object that contains all selected entities
              */
             EntityContainer Entities() const
             {
