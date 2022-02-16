@@ -7,18 +7,25 @@ endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/include)
-include_directories(${PROJECT_NAME}-static ${CMAKE_SOURCE_DIR}/include)
 include_directories(test ${CMAKE_SOURCE_DIR}/include)
 
 if (MSVC)
 
-    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VC++16-64bit/lib/cmake/SFML)
+    # set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+
+    set(SFML_DIR C:/Code_Libraries/SFML-2.5.1/VC++15-64bit/lib/cmake/SFML)
     set(SFML_STATIC_LIBRARIES TRUE)
     find_package(SFML 2.5 COMPONENTS system graphics window audio REQUIRED)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Debug)
+    include_directories(${PROJECT_NAME} C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
+    include_directories(test C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
+
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Release)
 
 else()
+
+    include_directories(${PROJECT_NAME} /mnt/c/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
+    include_directories(test /mnt/c/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
 
     set(BOX2D_DIR /mnt/c/Code_Libraries/box2d-2.4.1/GCC11/bin)
 
@@ -71,8 +78,8 @@ set(SRC_FILES
     extensions/anim/Anim.cpp
 )
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-add_library(${PROJECT_NAME}-static STATIC ${SRC_FILES})
+# add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
 
 if (MSVC)
@@ -101,11 +108,11 @@ else()
 
 endif()
 
+# target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
 target_link_libraries(${PROJECT_NAME} ${SFML_LIBS} ${BOX2D_LIB})
-target_link_libraries(${PROJECT_NAME}-static ${SFML_LIBS} ${BOX2D_LIB})
 
 add_executable(test
     main.cpp
 )
 
-target_link_libraries(test ${PROJECT_NAME}-static)
+target_link_libraries(test ${PROJECT_NAME})
