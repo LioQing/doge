@@ -26,7 +26,15 @@ provide interface for 9-slice sprites using CompoundSprite
 
 provide simple sprite sheet animation functions
 
-# Dependencies
+## Installing
+
+1. Add the include directory
+2. Link the libraries.
+3. Put the assets folder into the executable output folder
+
+If you are in Windows, you also need to place the openal32.dll in the executable output folder.
+
+## Dependencies
 
 - [SFML](https://www.sfml-dev.org/)
 - [Box2D](https://box2d.org/)
