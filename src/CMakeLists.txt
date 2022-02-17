@@ -21,7 +21,7 @@ if (MSVC)
     include_directories(${PROJECT_NAME}-shared C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
     include_directories(test C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Release)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Debug)
 
 else()
 
@@ -70,6 +70,7 @@ set(SRC_FILES
     extensions/physics/Physics.cpp
     extensions/physics/Body.cpp
     extensions/physics/Collider.cpp
+    extensions/physics/CollisionEvents.cpp
 
     # nine_slice
     extensions/nine_slice/NineSlice.cpp

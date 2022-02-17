@@ -51,15 +51,6 @@ namespace main1
         phy = std::make_unique<doge::physics::Physics>(engine);
         anim = std::make_unique<doge::anim::Anim>(engine);
 
-        engine.window.window_io.AddDrawFunction(std::numeric_limits<std::int32_t>::min(), "my_min", 
-        [](doge::Engine&){ std::cout << "Min Custom Draw" << std::endl; });
-
-        engine.window.window_io.AddDrawFunction(std::numeric_limits<std::int32_t>::max(), "my_max", 
-        [](doge::Engine&){ std::cout << "Max Custom Draw" << std::endl; });
-        
-        engine.window.window_io.AddDrawFunction(0, "my_0", 
-        [](doge::Engine&){ std::cout << "0 Custom Draw" << std::endl; });
-
         {
             auto [itr, success] = engine.assets.LoadTexture("icons", "test.png");
             if (success)
@@ -114,15 +105,28 @@ namespace main1
             .current_state = "running",
         });
 
-        anim.AddComponent(doge::physics::RigidBody
+        auto& rgbd = anim.AddComponent(doge::physics::RigidBody
         {
             .type = doge::physics::RigidBody::Dynamic,
         });
 
+        rgbd.on_collision_began.AddListener("boi",
+        [&](doge::Entity other){ std::cout << "the boi collided began with " << other << std::endl; });
+
+        rgbd.on_collision_ended.AddListener("boi",
+        [&](doge::Entity other){ std::cout << "the boi collided ended with " << other << std::endl; });
+
+        rgbd.on_collision_presolve.AddListener("boi",
+        [&](doge::Entity other){ std::cout << "the boi collided presolve with " << other << std::endl; });
+
+        rgbd.on_collision_postsolve.AddListener("boi",
+        [&](doge::Entity other){ std::cout << "the boi collided postsolve with " << other << std::endl; });
+
         anim.AddComponent(doge::physics::RectangleCollider
         {
             .rigid_body_entity = anim,
-            .size = { 1, 2 },
+            .size = { .75, 1.75 },
+            .origin = { 0, -.25 },
         });
 
         // cam

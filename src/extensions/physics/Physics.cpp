@@ -8,7 +8,7 @@
 
 namespace doge::physics
 {
-    Physics::Physics(Engine& engine) : engine(engine)
+    Physics::Physics(Engine& engine) : engine(engine), collision_events(*this)
     {
         GameLoopFunctions glf;
         glf.start = [&](Engine& engine){ Start(engine); };
@@ -18,6 +18,7 @@ namespace doge::physics
         
         engine.scenes.extensions.emplace("doge_physics", glf);
         world = std::make_unique<b2World>(ToB2Vec2(gravity));
+        world->SetContactListener(&collision_events);
     }
 
     Physics::~Physics()
@@ -95,6 +96,36 @@ namespace doge::physics
     const Collider Physics::GetCollider(EntityID entity_id, Collider::Type type, std::size_t index) const
     {
         return Collider(fixtures.at(FixtureKey(entity_id, type, index)));
+    }
+
+    Entity Physics::FindEntityByB2Body(const b2Body* body) const
+    {
+        auto itr = std::find_if(bodies.begin(), bodies.end(), [body](auto& p){ return p.second == body; });
+
+        if (itr == bodies.end())
+            throw std::invalid_argument("Cannot find entity in doge::physics::Physics");
+
+        return engine.GetEntity(itr->first);
+    }
+
+    Entity Physics::FindEntityByBody(const Body& body) const
+    {
+        return FindEntityByB2Body(body.b2_body);
+    }
+
+    Entity Physics::FindEntityByB2Fixture(const b2Fixture* fixture) const
+    {
+        auto itr = std::find_if(fixtures.begin(), fixtures.end(), [fixture](auto& p){ return p.second == fixture; });
+
+        if (itr == fixtures.end())
+            throw std::invalid_argument("Cannot find entity in doge::physics::Physics");
+
+        return engine.GetEntity(std::get<0>(itr->first));
+    }
+
+    Entity Physics::FindEntityByCollider(const Collider& collider) const
+    {
+        return FindEntityByB2Fixture(collider.b2_fixture);
     }
     
     Vec2f Physics::FromB2Vec2(const b2Vec2& v)

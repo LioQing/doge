@@ -85,6 +85,20 @@ namespace main4
                     }
                 }
             );
+
+            // collision event
+
+            phy.collision_events.on_collision_began.AddListener("scene_a",
+            [&](doge::Entity a, doge::Entity b){ std::cout << a << " " << b << " collision began" << std::endl; });
+
+            phy.collision_events.on_collision_ended.AddListener("scene_a",
+            [&](doge::Entity a, doge::Entity b){ std::cout << a << " " << b << " collision ended" << std::endl; });
+
+            phy.collision_events.on_collision_presolve.AddListener("scene_a",
+            [&](doge::Entity a, doge::Entity b){ std::cout << a << " " << b << " collision presolve" << std::endl; });
+
+            phy.collision_events.on_collision_postsolve.AddListener("scene_a",
+            [&](doge::Entity a, doge::Entity b){ std::cout << a << " " << b << " collision postsolve" << std::endl; });
         }
 
         void Update(doge::Engine& engine, doge::DeltaTime dt)
@@ -110,6 +124,11 @@ namespace main4
         void Finish(doge::Engine& engine)
         {
             engine.events.on_mouse_button_pressed.RemoveListener("scene_a");
+
+            phy.collision_events.on_collision_began.RemoveListener("scene_a");
+            phy.collision_events.on_collision_ended.RemoveListener("scene_a");
+            phy.collision_events.on_collision_presolve.RemoveListener("scene_a");
+            phy.collision_events.on_collision_postsolve.RemoveListener("scene_a");
         }
     };
 

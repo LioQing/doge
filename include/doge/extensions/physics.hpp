@@ -7,3 +7,4 @@
 #include "physics/EdgeCollider.hpp"
 #include "physics/RectangleCollider.hpp"
 #include "physics/RigidBody.hpp"
+#include "physics/CollisionEvents.hpp"
