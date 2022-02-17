@@ -62,8 +62,8 @@ namespace doge
         static float ToDegree(float radian);
         static float ToRadian(float degree);
 
-        static WindowSettings::Style FromSfStyle(int style);
-        static int ToSfStyle(WindowSettings::Style style);
+        static std::int32_t FromSfStyle(std::int32_t style);
+        static std::int32_t ToSfStyle(std::int32_t style);
 
         static io::Keyboard::Key FromSfKeyboardKey(sf::Keyboard::Key key);
         static sf::Keyboard::Key ToSfKeyboardKey(io::Keyboard::Key key);
@@ -85,7 +85,7 @@ namespace doge
         static std::uint8_t FromSfControllerAxis(sf::Joystick::Axis axis);
         static sf::Joystick::Axis ToSfControllerAxis(std::uint8_t axis);
 
-        static Text::Style FromSfTextStyle(std::uint32_t style);
-        static std::uint32_t ToSfTextStyle(Text::Style style);
+        static std::int32_t FromSfTextStyle(std::int32_t style);
+        static std::int32_t ToSfTextStyle(std::int32_t style);
     };
 }

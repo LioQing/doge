@@ -28,9 +28,10 @@ provide simple sprite sheet animation functions
 
 ## Installing
 
-1. Add the include directory
+1. Add the include directory.
 2. Link the libraries.
-3. Put the assets folder into the executable output folder
+3. Also include SFML into your project (And Box2D if you are going to use doge::phy).
+4. Put the assets folder into the executable output folder.
 
 If you are in Windows, you also need to place the openal32.dll in the executable output folder.
 

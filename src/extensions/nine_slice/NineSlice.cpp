@@ -187,7 +187,7 @@ namespace doge::nine_slice
         return result;
     }
 
-    void NineSlice::SetRenderOptions(const std::string& id, doge::io::Texture::RenderOptions options)
+    void NineSlice::SetRenderOptions(const std::string& id, std::int32_t options)
     {
         for (auto i = 0; i < Slice::Count; ++i)
         {

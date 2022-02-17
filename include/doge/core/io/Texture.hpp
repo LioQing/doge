@@ -15,7 +15,7 @@ namespace doge
 
         struct Texture
         {
-            enum RenderOptions
+            enum RenderOptions : std::int32_t
             {
                 None = 0,
                 Smooth = 1 << 0,
@@ -35,7 +35,7 @@ namespace doge
             bool FromMemory(void* data, std::size_t size, const Recti& area = Recti());
             bool FromImage(const Image& image, const Recti& area = Recti());
 
-            void SetRenderOptions(RenderOptions options);
+            void SetRenderOptions(std::int32_t options);
 
             void SetSmooth(bool smooth);
             bool IsSmooth() const;

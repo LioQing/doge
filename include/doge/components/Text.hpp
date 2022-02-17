@@ -9,7 +9,7 @@ namespace doge
 {
     struct Text
     {
-        enum Style
+        enum Style : std::int32_t
         {
             Regular = 0,
             Bold = 1 << 0,
@@ -27,7 +27,7 @@ namespace doge
 
         struct Appearance
         {
-            Style style = Style::Regular;
+            std::int32_t style = Style::Regular;
             Color fill_color = Color::White;
             float outline_thickness = 0.f;
             Color outline_color = Color::Black;

@@ -28,7 +28,7 @@ namespace doge
         return degree * 3.1415926535f / 180.f;
     }
 
-    WindowSettings::Style cast::FromSfStyle(int style)
+    std::int32_t cast::FromSfStyle(std::int32_t style)
     {
         switch (style)
         {
@@ -41,7 +41,7 @@ namespace doge
         }
     }
 
-    int cast::ToSfStyle(WindowSettings::Style style)
+    std::int32_t cast::ToSfStyle(std::int32_t style)
     {
         switch (style)
         {
@@ -263,7 +263,7 @@ namespace doge
         }
     }
 
-    Text::Style cast::FromSfTextStyle(std::uint32_t style)
+    std::int32_t cast::FromSfTextStyle(std::int32_t style)
     {
         Text::Style dstyle = Text::Style::Regular;
 
@@ -275,7 +275,7 @@ namespace doge
         return dstyle;
     }
 
-    std::uint32_t cast::ToSfTextStyle(Text::Style style)
+    std::int32_t cast::ToSfTextStyle(std::int32_t style)
     {
         std::uint32_t sftext = sf::Text::Regular;
 
