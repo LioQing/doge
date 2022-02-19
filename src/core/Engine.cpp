@@ -238,6 +238,7 @@ namespace doge
             if (entity.HasComponent(cid))
                 entity.RaiseComponentRemoval(cid);
         }
+        entity.GetComponent<EntityInfo>().enabled = false;
     }
 
     const std::shared_ptr<PCNode> Engine::GetPCNode(EntityID eid) const
