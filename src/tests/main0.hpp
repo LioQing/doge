@@ -24,7 +24,7 @@ namespace main0
         my_shape.AddComponent(doge::physics::ConvexCollider
         {
             .rigid_body_entity = my_shape,
-            .points =
+            .vertices =
             {
                 { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
             },
@@ -59,7 +59,7 @@ namespace main0
 
         my_shape.AddComponent(doge::ConvexShape
         {
-            .points =
+            .vertices =
             {
                 { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
             },
@@ -191,28 +191,49 @@ namespace main0
 
         auto ground = e.AddEntity();
         ground.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Type::Static);
-        ground.AddComponent(doge::physics::ConvexCollider
+        ground.AddComponent(doge::physics::CompoundCollider
         {
-            .rigid_body_entity = ground,
-            .points = // shape: /\.
+            .convex_colliders = // shape: /\.
             { 
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
-                doge::Vec2f(0, -100), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
+                {
+                    .rigid_body_entity = ground,
+                    .vertices = 
+                    {
+                        doge::Vec2f(0, 50),
+                        doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
+                        doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
+                        doge::Vec2f(0, 0), 
+                    }
+                },
+                {
+                    .rigid_body_entity = ground,
+                    .vertices = 
+                    {
+                        doge::Vec2f(0, 0), 
+                        doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
+                        doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
+                        doge::Vec2f(0, 50),
+                    }
+                },
             },
         });
         ground.AddComponent<doge::Position>(0.f, (e.window.settings.size.y / 2.f - 100.f) * 0.01);
 
-        ground.AddComponent(doge::ConvexShape
-        {
-            .points = // shape: /\.
-            { 
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, 0),
-                doge::Vec2f(0, -100), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, 0), 
+        ground.AddComponent(doge::CustomShape::CreatePolygon(
+            std::vector<doge::Vec2f>{ 
+                doge::Vec2f(0, 50),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
+                doge::Vec2f(0, 0), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
             },
-            .color = doge::Color::Red,
-        });
+            doge::Color::Red,
+            doge::Vec2f::Zero,
+            "missing_texture",
+            doge::Recti(0, 0, 48, 48),
+            doge::triangulation::Fast
+        ));
 
         ground.AddComponent<doge::Scale>(0.01, 0.01);
 
@@ -233,7 +254,7 @@ namespace main0
         my_custom_shape.AddComponent(doge::physics::ConvexCollider
         {
             .rigid_body_entity = my_custom_shape,
-            .points = 
+            .vertices = 
             {
                 doge::Vec2f(0, 0),
                 doge::Vec2f(100, 100),

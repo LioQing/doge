@@ -10,7 +10,7 @@ namespace doge::physics
         EntityID rigid_body_entity;
 
         // collision only happen on right side of edge
-        std::vector<Vec2f> points;
+        std::vector<Vec2f> vertices;
 
         Vec2f origin = Vec2f::Zero;
         

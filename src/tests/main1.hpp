@@ -174,7 +174,7 @@ namespace main1
         rr.AddComponent(doge::Position(1, 0));
         rr.AddComponent(doge::ConvexShape
         {
-            .points = doge::math::RoundedRectangle(doge::Vec2f(1, 1), 0.08),
+            .vertices = doge::math::RoundedRectangle(doge::Vec2f(1, 1), 0.08),
             .origin = doge::Vec2f(0.5, 0.5),
         });
         rr.AddComponent(doge::physics::RigidBody
@@ -194,7 +194,7 @@ namespace main1
         wall.AddComponent(doge::physics::EdgeCollider
         {
             .rigid_body_entity = wall,
-            .points = 
+            .vertices = 
             {
                 doge::Vec2f(-6.4, -3.6),
                 doge::Vec2f(-6.4, 3.6),

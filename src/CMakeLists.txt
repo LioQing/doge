@@ -21,7 +21,7 @@ if (MSVC)
     include_directories(${PROJECT_NAME}-shared C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
     include_directories(test C:/Code_Libraries/box2d-2.4.1/box2d-2.4.1/include)
 
-    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Release)
+    set(BOX2D_DIR C:/Code_Libraries/box2d-2.4.1/VC++16-64bit/bin/Debug)
 
 else()
 
@@ -65,6 +65,9 @@ set(SRC_FILES
     utils/custom_sf/Text.cpp
     utils/custom_sf/DrawableVertices.cpp
     components/Sprite.cpp
+    components/CustomShape.cpp
+    utils/polypartition/polypartition.cpp
+    utils/triangulation.cpp
 
     # physics
     extensions/physics/Physics.cpp

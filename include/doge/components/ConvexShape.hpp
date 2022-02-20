@@ -9,7 +9,7 @@ namespace doge
 {
     struct ConvexShape
     {
-        std::vector<Vec2f> points;
+        std::vector<Vec2f> vertices;
         
         Vec2f origin = Vec2f::Zero;
         Color color = Color::White;

@@ -53,6 +53,6 @@ namespace doge
     private:
 
         static Rectf GetAABB(const Vec2f& tl, const Vec2f& br, const Vec2f& bl, const Vec2f& tr, const Vec2f& position);
-        static Rectf GetAABB(const std::vector<Vec2f>& points, const Vec2f& position);
+        static Rectf GetAABB(const std::vector<Vec2f>& vertices, const Vec2f& position);
     };
 }

@@ -71,7 +71,7 @@ namespace doge
     Rectf global::GetAABB(const ConvexShape& convex, const Entity& entity)
     {
         std::vector<Vec2f> points;
-        std::transform(convex.points.begin(), convex.points.end(), std::back_inserter(points),
+        std::transform(convex.vertices.begin(), convex.vertices.end(), std::back_inserter(points),
         [&](const Vec2f& v){ return ((v - convex.origin) * GetScale(entity)).Rotated(GetRotation(entity)); });
 
         return GetAABB(points, GetPosition(entity));

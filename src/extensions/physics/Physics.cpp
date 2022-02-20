@@ -313,7 +313,7 @@ namespace doge::physics
         {
             auto scale = global::GetScale(entity);
             std::vector<b2Vec2> vertices;
-            std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+            std::transform(coll.vertices.begin(), coll.vertices.end(), std::back_inserter(vertices), 
             [&](const Vec2f& v) { return ToB2Vec2((v - coll.origin) * scale); });
             convex.Set(vertices.data(), vertices.size());
         };
@@ -339,7 +339,7 @@ namespace doge::physics
             {
                 auto* shape = static_cast<b2PolygonShape*>(fixture_itr->second->GetShape());
 
-                if (shape->m_count != coll.points.size())
+                if (shape->m_count != coll.vertices.size())
                 {
                     body->DestroyFixture(fixture_itr->second);
                     b2PolygonShape convex;
@@ -446,7 +446,7 @@ namespace doge::physics
         {
             auto scale = global::GetScale(entity);
             std::vector<b2Vec2> vertices;
-            std::transform(coll.points.begin(), coll.points.end(), std::back_inserter(vertices), 
+            std::transform(coll.vertices.begin(), coll.vertices.end(), std::back_inserter(vertices), 
             [&](const Vec2f& v) { return ToB2Vec2((v - coll.origin) * scale); });
             if (coll.is_loop)
                 chain.CreateLoop(vertices.data(), vertices.size());
@@ -474,7 +474,7 @@ namespace doge::physics
             if (coll.apply_changes)
             {
                 auto* shape = static_cast<b2ChainShape*>(fixture_itr->second->GetShape());
-                if (shape->m_count != coll.points.size())
+                if (shape->m_count != coll.vertices.size())
                 {
                     body->DestroyFixture(fixture_itr->second);
                     b2ChainShape chain;

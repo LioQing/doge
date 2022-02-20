@@ -25,10 +25,10 @@ namespace doge::io
             if (Renderer::InAnyViewHelper(window, engine, convex_comp, entity, key))
             {
                 Renderer::SyncShape(engine, convex_shape, convex_comp, entity);
-                convex_shape.setPointCount(convex_comp.points.size());
-                for (std::size_t i = 0; i < convex_comp.points.size(); ++i)
+                convex_shape.setPointCount(convex_comp.vertices.size());
+                for (std::size_t i = 0; i < convex_comp.vertices.size(); ++i)
                 {
-                    convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.points.at(i)));
+                    convex_shape.setPoint(i, cast::ToSfVec2(convex_comp.vertices.at(i)));
                 }
             }
         }
