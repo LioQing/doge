@@ -28,8 +28,6 @@ namespace doge
             Quads,
         };
 
-        
-
         Type type = Type::Points;
         std::vector<Vertex> vertices = std::vector<Vertex>();
         Vec2f origin = Vec2f::Zero;
@@ -41,7 +39,7 @@ namespace doge
             const Color& color = Color::White,
             const Vec2f& origin = Vec2f::Zero,
             const std::string& texture_id = "",
-            const Recti& texture_rectangle = Recti()
+            const Rectf& texture_rectangle = Rectf()
         );
 
         static CustomShape CreatePolygon(
@@ -56,8 +54,27 @@ namespace doge
             const Color& color = Color::White,
             const Vec2f& origin = Vec2f::Zero,
             const std::string& texture_id = "",
-            const Recti& texture_rectangle = Recti(),
+            const Rectf& texture_rectangle = Rectf(),
             triangulation::Type tri = triangulation::Type::Default
+        );
+
+        static CustomShape CreateOutline(
+            const std::vector<Vec2f>& vertices,
+            float thickness = 1.f,
+            const Color& color = Color::White,
+            const Color& inner_color = Color::White,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = "",
+            const Rectf& texture_rectangle = Rectf()
+        );
+
+        static CustomShape CreateOutline(
+            const std::vector<Vec2f>& vertices,
+            float thickness = 1.f,
+            const Color& color = Color::White,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = "",
+            const Rectf& texture_rectangle = Rectf()
         );
     };
 }

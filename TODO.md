@@ -1,3 +1,4 @@
 - [x] triangulation for CustomShape
 - [ ] outline for CustomShape
 - [ ] potentially remove all other predefined shapes and change CustomShape to just Shape
+- [ ] reorganize all the utils functions and classes

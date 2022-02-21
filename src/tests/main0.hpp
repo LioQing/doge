@@ -219,8 +219,9 @@ namespace main0
         });
         ground.AddComponent<doge::Position>(0.f, (e.window.settings.size.y / 2.f - 100.f) * 0.01);
 
-        ground.AddComponent(doge::CustomShape::CreatePolygon(
-            std::vector<doge::Vec2f>{ 
+        ground.AddComponent(doge::CompoundSprite::Create(
+            doge::CustomShape::CreatePolygon(
+            { 
                 doge::Vec2f(0, 50),
                 doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
                 doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
@@ -231,8 +232,25 @@ namespace main0
             doge::Color::Red,
             doge::Vec2f::Zero,
             "missing_texture",
-            doge::Recti(0, 0, 48, 48),
+            doge::Recti(0, 0, e.window.settings.size.x - 200, 150),
             doge::triangulation::Fast
+            ),
+            doge::CustomShape::CreateOutline(
+            {
+                doge::Vec2f(0, 50),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
+                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
+                doge::Vec2f(0, 0), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
+                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
+            },
+            10.f,
+            doge::Color::Transparent,
+            doge::Color::White,
+            doge::Vec2f::Zero,
+            "missing_texture",
+            doge::Rectf(0, 0, e.window.settings.size.x - 200, 150)
+            )
         ));
 
         ground.AddComponent<doge::Scale>(0.01, 0.01);
