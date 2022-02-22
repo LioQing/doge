@@ -66,7 +66,7 @@ namespace doge
         return outline_verts;
     }
 
-    static std::vector<Vec2f> _MapTextureRectToCoords(const std::vector<Vec2f>& vertices, const Rectf& texture_rectangle)
+    static std::vector<Vec2f> _MapTextureRectToCoords(const std::vector<Vec2f>& vertices, const std::vector<Vec2f>& to_be_mapped, const Rectf& texture_rectangle)
     {
         auto rect = Rectf(vertices.front(), vertices.front());
         for (auto& v : vertices)
@@ -79,13 +79,18 @@ namespace doge
         rect.width -= rect.left;
         rect.height -= rect.top;
 
-        std::vector<Vec2f> texture_coords(vertices.size());
-        for (auto i = 0; i < vertices.size(); ++i)
+        std::vector<Vec2f> texture_coords(to_be_mapped.size());
+        for (auto i = 0; i < to_be_mapped.size(); ++i)
         {
-            texture_coords.at(i) = texture_rectangle.GetPosition() + (vertices.at(i) - rect.GetPosition()) / rect.GetSize() * texture_rectangle.GetSize();
+            texture_coords.at(i) = texture_rectangle.GetPosition() + (to_be_mapped.at(i) - rect.GetPosition()) / rect.GetSize() * texture_rectangle.GetSize();
         }
 
         return texture_coords;
+    }
+
+    static std::vector<Vec2f> _MapTextureRectToCoords(const std::vector<Vec2f>& vertices, const Rectf& texture_rectangle)
+    {
+        return _MapTextureRectToCoords(vertices, vertices, texture_rectangle);
     }
 
     CustomShape CustomShape::Create(
@@ -163,7 +168,7 @@ namespace doge
     )
     {
         auto outline_verts = _GenOutlineVertices(vertices, thickness);
-        auto texture_coords = _MapTextureRectToCoords(outline_verts, texture_rectangle);
+        auto texture_coords = _MapTextureRectToCoords(vertices, outline_verts, texture_rectangle);
 
         std::vector<Vertex> verts(outline_verts.size());
         for (std::size_t i = 0; i < outline_verts.size(); i += 6)
