@@ -17,8 +17,6 @@ namespace doge
         static bool TestPoint(const Vec2f& point, const Rectf& rectangle, float corner_radius);
         static bool TestPoint(const Vec2f& point, const std::vector<Vec2f>& convex);
 
-        static std::vector<Vec2f> RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count = 6);
-
         template <typename T, typename U>
         static Vec2<T> AutoSize(const Vec2<T>& size, const Vec2<U>& auto_size)
         {

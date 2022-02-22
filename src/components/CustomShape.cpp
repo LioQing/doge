@@ -23,49 +23,6 @@ namespace doge
         return shape_vert;
     }
 
-    // at the returned vec: 0in, 1out, 1in (0), 0in, 0out, 1out (0), 1in, 2out, 2in (1), 1in, 1out, 2out (1), ...
-    static std::vector<Vec2f> _GenOutlineVertices(const std::vector<Vec2f>& vertices, float thickness)
-    {
-        std::vector<Vec2f> outline_verts(vertices.size() * 6);
-
-        auto GetOutterVertex = [&](std::size_t i)
-        {
-            auto last = vertices.at(i + (i == 0) * vertices.size() - 1);
-            auto curr = vertices.at(i);
-            auto next = vertices.at((i + 1) % vertices.size());
-
-            auto a = last - curr;
-            auto b = next - curr;
-            auto c = (a * b.Magnitude() + b * a.Magnitude()).Normalized();
-
-            auto cp = a.Cross(b);
-            auto angle = std::acos(a.Dot(b) / (a.Magnitude() * b.Magnitude())) / 2.f;
-            c *= cp / std::abs(cp) * thickness / std::sin(angle);
-
-            return c + curr;
-        };
-        
-        auto curr_out_vert = GetOutterVertex(0);
-        for (std::size_t i = 0; i < vertices.size(); ++i)
-        {
-            auto curr_vert = vertices.at(i);
-            auto next_vert = vertices.at((i + 1) % vertices.size());
-            auto next_out_vert = GetOutterVertex((i + 1) % vertices.size());
-
-            outline_verts.emplace_back(curr_vert);
-            outline_verts.emplace_back(next_out_vert);
-            outline_verts.emplace_back(next_vert);
-
-            outline_verts.emplace_back(curr_vert);
-            outline_verts.emplace_back(curr_out_vert);
-            outline_verts.emplace_back(next_out_vert);
-
-            curr_out_vert = next_out_vert;
-        }
-
-        return outline_verts;
-    }
-
     static std::vector<Vec2f> _MapTextureRectToCoords(const std::vector<Vec2f>& vertices, const std::vector<Vec2f>& to_be_mapped, const Rectf& texture_rectangle)
     {
         auto rect = Rectf(vertices.front(), vertices.front());
@@ -126,14 +83,14 @@ namespace doge
         const std::vector<Vertex>& vertices,
         const Vec2f& origin,
         const std::string& texture_id,
-        triangulation::Type tri
+        polygon::TriType tri
     )
     {
         std::vector<Vec2f> v_vertices(vertices.size());
         std::transform(vertices.begin(), vertices.end(), v_vertices.begin(),
         [](const Vertex& v){ return v.position; });
 
-        auto output = triangulation::Triangulate(v_vertices, tri);
+        auto output = polygon::Triangulate(v_vertices, tri);
 
         return CustomShape
         {
@@ -150,10 +107,10 @@ namespace doge
         const Vec2f& origin,
         const std::string& texture_id,
         const Rectf& texture_rectangle,
-        triangulation::Type tri
+        polygon::TriType tri
     )
     {
-        auto output = triangulation::Triangulate(vertices, tri);
+        auto output = polygon::Triangulate(vertices, tri);
         return Create(Type::Triangles, _TriToShapeVertices(vertices, output), color, origin, texture_id, texture_rectangle);
     }
 
@@ -167,7 +124,7 @@ namespace doge
         const Rectf& texture_rectangle
     )
     {
-        auto outline_verts = _GenOutlineVertices(vertices, thickness);
+        auto outline_verts = polygon::Outline(vertices, thickness);
         auto texture_coords = _MapTextureRectToCoords(vertices, outline_verts, texture_rectangle);
 
         std::vector<Vertex> verts(outline_verts.size());

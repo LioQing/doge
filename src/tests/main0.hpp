@@ -233,7 +233,7 @@ namespace main0
             doge::Vec2f::Zero,
             "missing_texture",
             doge::Recti(0, 0, e.window.settings.size.x - 200, 150),
-            doge::triangulation::Fast
+            doge::polygon::Fast
             ),
             doge::CustomShape::CreateOutline(
             {

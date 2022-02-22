@@ -80,26 +80,4 @@ namespace doge
         }
         return true;
     }
-
-    std::vector<Vec2f> math::RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count)
-    {
-        using std::numbers::pi;
-
-        if (corner_vertex_count == 1)
-            return std::vector<Vec2f>{ size, Vec2f(size.x, 0), Vec2f::Zero, Vec2f(0, size.y) };
-
-        std::vector<Vec2f> vertices(corner_vertex_count * 4);
-
-        for (auto i = 0; i < corner_vertex_count; ++i)
-        {
-            auto theta = pi * (corner_vertex_count - i - 1) / 2.f / (corner_vertex_count - 1);
-
-            vertices.at(i)                           = (Vec2f::Right * radius).Rotated(theta)                   + size - Vec2f(radius, radius);
-            vertices.at(corner_vertex_count * 1 + i) = (Vec2f::Right * radius).Rotated(theta - pi / 2.f)        + Vec2f(size.x - radius, radius);
-            vertices.at(corner_vertex_count * 2 + i) = (Vec2f::Right * radius).Rotated(theta - pi)              + Vec2f(radius, radius);
-            vertices.at(corner_vertex_count * 3 + i) = (Vec2f::Right * radius).Rotated(theta - pi * 3.f / 2.f)  + Vec2f(radius, size.y - radius);
-        }
-
-        return vertices;
-    }
 }

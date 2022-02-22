@@ -2,5 +2,5 @@
 
 int main()
 {
-    return main0::Main();
+    return main1::Main();
 }

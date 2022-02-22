@@ -174,7 +174,7 @@ namespace main1
         rr.AddComponent(doge::Position(1, 0));
         rr.AddComponent(doge::ConvexShape
         {
-            .vertices = doge::math::RoundedRectangle(doge::Vec2f(1, 1), 0.08),
+            .vertices = doge::polygon::RoundedRectangle(doge::Vec2f(1, 1), 0.08),
             .origin = doge::Vec2f(0.5, 0.5),
         });
         rr.AddComponent(doge::physics::RigidBody

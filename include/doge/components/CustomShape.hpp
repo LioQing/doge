@@ -3,7 +3,7 @@
 #include <doge/utils/Vec2.hpp>
 #include <doge/utils/Color.hpp>
 #include <doge/utils/Rect.hpp>
-#include <doge/utils/triangulation.hpp>
+#include <doge/utils/polygon.hpp>
 #include <vector>
 
 namespace doge
@@ -46,7 +46,7 @@ namespace doge
             const std::vector<Vertex>& vertices,
             const Vec2f& origin = Vec2f::Zero,
             const std::string& texture_id = "",
-            triangulation::Type tri = triangulation::Type::Default
+            polygon::TriType tri = polygon::TriType::Default
         );
 
         static CustomShape CreatePolygon(
@@ -55,7 +55,7 @@ namespace doge
             const Vec2f& origin = Vec2f::Zero,
             const std::string& texture_id = "",
             const Rectf& texture_rectangle = Rectf(),
-            triangulation::Type tri = triangulation::Type::Default
+            polygon::TriType tri = polygon::TriType::Default
         );
 
         static CustomShape CreateOutline(

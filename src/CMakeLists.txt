@@ -67,7 +67,7 @@ set(SRC_FILES
     components/Sprite.cpp
     components/CustomShape.cpp
     utils/polypartition/polypartition.cpp
-    utils/triangulation.cpp
+    utils/polygon.cpp
 
     # physics
     extensions/physics/Physics.cpp
