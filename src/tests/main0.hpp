@@ -33,22 +33,6 @@ namespace main0
             .restitution = .5f,
         });
 
-        auto instant_dest = e.AddEntity();
-        instant_dest.AddComponent<doge::Scale>(0.01, 0.01);
-        instant_dest.AddComponent<doge::Position>();
-        instant_dest.AddComponent(doge::physics::CircleCollider
-        {
-            .rigid_body_entity = my_shape,
-            .radius = 50.f,
-        });
-        instant_dest.AddComponent(doge::CircleShape
-        {
-            .radius = 50.f,
-            .origin = doge::Vec2f(50.f, 50.f),
-            .color = 0xFFFFFF01,
-        });
-        e.DestroyEntity(instant_dest);
-
         my_shape.AddComponent<doge::Position>();
         my_shape.AddComponent<doge::Rotation>(std::fmod(rand(), std::numbers::pi * 2));
 
@@ -119,23 +103,18 @@ namespace main0
             init.angular_velocity = 20.f;
             phy->SetBodyInit(my_shape, init);
 
-            // auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
-            // (
-            my_shape.AddComponent(
-                doge::CircleShape
-                {
-                    .radius = 10.f,
-                    .origin = doge::Vec2f(25.f, 10.f),
-                    .color = doge::Color(0x0000FF88),
-                });
-            my_shape.AddComponent(
+            my_shape.AddComponent(doge::Tag::Create("blue"));
+
+            auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
+            (
+                doge::CustomShape::CreateCircle(10.f, 32, 0x0000FF88, { 15, 0 }, "missing_texture", { 0, 0, 16, 16 }),
                 doge::RectangleShape
                 {
                     .size = { 30, 8 },
                     .origin = { 15, 4 },
                     .color = doge::Color(0x0000FF88),
-                });
-            //));
+                }
+            ));
         }
 
         auto my_sprite = e.AddEntity();
@@ -221,35 +200,34 @@ namespace main0
 
         ground.AddComponent(doge::CompoundSprite::Create(
             doge::CustomShape::CreatePolygon(
-            { 
-                doge::Vec2f(0, 50),
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
-                doge::Vec2f(0, 0), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
-            },
-            doge::Color::Red,
-            doge::Vec2f::Zero,
-            "missing_texture",
-            doge::Recti(0, 0, e.window.settings.size.x - 200, 150),
-            doge::polygon::Fast
+                { 
+                    doge::Vec2f(0, 50),
+                    doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
+                    doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
+                    doge::Vec2f(0, 0), 
+                    doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
+                    doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
+                },
+                doge::Color::Red,
+                doge::Vec2f::Zero,
+                "missing_texture",
+                doge::Rectf(0, 0, e.window.settings.size.x - 200, 150)
             ),
             doge::CustomShape::CreateOutline(
-            {
-                doge::Vec2f(0, 50),
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
-                doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
-                doge::Vec2f(0, 0), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
-                doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
-            },
-            10.f,
-            doge::Color::Transparent,
-            doge::Color::White,
-            doge::Vec2f::Zero,
-            "missing_texture",
-            doge::Rectf(0, 0, e.window.settings.size.x - 200, 150)
+                {
+                    doge::Vec2f(0, 50),
+                    doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -50),
+                    doge::Vec2f(-static_cast<float>(e.window.settings.size.x) / 2.f + 100, -100),
+                    doge::Vec2f(0, 0), 
+                    doge::Vec2f(e.window.settings.size.x / 2.f - 100, -100), 
+                    doge::Vec2f(e.window.settings.size.x / 2.f - 100, -50), 
+                },
+                10.f,
+                doge::Color::Transparent,
+                doge::Color::White,
+                doge::Vec2f::Zero,
+                "missing_texture",
+                doge::Rectf(0, 0, e.window.settings.size.x - 200, 150)
             )
         ));
 
@@ -376,21 +354,24 @@ namespace main0
                 e.DestroyEntity(entity);
         }
 
-        // for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::RigidBody, doge::Position, doge::CompoundSprite, doge::CompoundCollider>().EntitiesAndComponents())
-        // {
-        //     auto aabb = doge::global::GetAABB(shape.circle_shapes.at(0), entity);
-
-        //     if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
-        //         e.DestroyEntity(entity);
-        // }
-
-        for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::physics::RigidBody, doge::Position, doge::CircleShape, doge::physics::CompoundCollider>().EntitiesAndComponents())
+        for (auto [entity, tag, rgbd, position, shape, coll] : e
+        .Select<doge::Tag>()
+        .Where([](doge::Entity e, const doge::Tag& tag){ return tag.tags.contains("blue"); })
+        .Select<doge::physics::RigidBody, doge::Position, doge::CompoundSprite, doge::physics::CompoundCollider>().EntitiesAndComponents())
         {
-            auto aabb = doge::global::GetAABB(shape, entity);
+            auto aabb = doge::global::GetAABB(shape.custom_shapes.at(0), entity);
 
             if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
                 e.DestroyEntity(entity);
         }
+
+        // for (auto [entity, rgbd, position, shape, coll] : e.Select<doge::physics::RigidBody, doge::Position, doge::CircleShape, doge::physics::CompoundCollider>().EntitiesAndComponents())
+        // {
+        //     auto aabb = doge::global::GetAABB(shape, entity);
+
+        //     if (aabb.top > e.window.settings.size.y / 2.f * 0.01)
+        //         e.DestroyEntity(entity);
+        // }
 
         for (auto [sprite] : e.Select<doge::Sprite>().Components())
         {

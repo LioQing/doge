@@ -25,6 +25,8 @@ namespace doge
         // return: { 0in, 1out, 1in (0), 0in, 0out, 1out (0), 1in, 2out, 2in (1), 1in, 1out, 2out (1), ... }
         static std::vector<Vec2f> Outline(const std::vector<Vec2f>& vertices, float thickness);
 
-        static std::vector<Vec2f> RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count = 8);
+        static std::vector<Vec2f> Circle(float radius, std::size_t vertex_count = 32, const Vec2f& offset = Vec2f::Zero);
+
+        static std::vector<Vec2f> RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count = 8, const Vec2f& offset = Vec2f::Zero);
     };
 }

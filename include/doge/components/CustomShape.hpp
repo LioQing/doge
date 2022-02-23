@@ -76,5 +76,14 @@ namespace doge
             const std::string& texture_id = "",
             const Rectf& texture_rectangle = Rectf()
         );
+
+        static CustomShape CreateCircle(
+            float radius,
+            std::size_t vertex_count = 32,
+            const Color& color = Color::White,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = "",
+            const Rectf& texture_rectangle = Rectf()
+        );
     };
 }

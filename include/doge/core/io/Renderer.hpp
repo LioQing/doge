@@ -46,7 +46,7 @@ namespace doge::io
             {
                 Renderer::SyncShape(engine, circle_shape, circle_comp, entity);
                 circle_shape.setRadius(circle_comp.radius);
-                circle_shape.setPointCount(circle_comp.point_count);
+                circle_shape.setPointCount(circle_comp.vertex_count);
             }
         }
 

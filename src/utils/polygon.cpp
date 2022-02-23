@@ -86,7 +86,23 @@ namespace doge
         return outline_verts;
     }
 
-    std::vector<Vec2f> polygon::RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count)
+    std::vector<Vec2f> polygon::Circle(float radius, std::size_t vertex_count, const Vec2f& offset)
+    {
+        using std::numbers::pi;
+
+        std::vector<Vec2f> vertices(vertex_count);
+
+        for (std::size_t i = 0; i < vertex_count; ++i)
+        {
+            auto theta = 2 * pi / vertex_count * i;
+
+            vertices.at(i) = (Vec2f::Right * radius).Rotated(theta); + offset;
+        }
+
+        return vertices;
+    }
+
+    std::vector<Vec2f> polygon::RoundedRectangle(const Vec2f& size, float radius, std::uint32_t corner_vertex_count, const Vec2f& offset)
     {
         using std::numbers::pi;
 
@@ -99,10 +115,10 @@ namespace doge
         {
             auto theta = pi * (corner_vertex_count - i - 1) / 2.f / (corner_vertex_count - 1);
 
-            vertices.at(i)                           = (Vec2f::Right * radius).Rotated(theta)                   + size - Vec2f(radius, radius);
-            vertices.at(corner_vertex_count * 1 + i) = (Vec2f::Right * radius).Rotated(theta - pi / 2.f)        + Vec2f(size.x - radius, radius);
-            vertices.at(corner_vertex_count * 2 + i) = (Vec2f::Right * radius).Rotated(theta - pi)              + Vec2f(radius, radius);
-            vertices.at(corner_vertex_count * 3 + i) = (Vec2f::Right * radius).Rotated(theta - pi * 3.f / 2.f)  + Vec2f(radius, size.y - radius);
+            vertices.at(i)                           = (Vec2f::Right * radius).Rotated(theta)                   + size - Vec2f(radius, radius)      + offset;
+            vertices.at(corner_vertex_count * 1 + i) = (Vec2f::Right * radius).Rotated(theta - pi / 2.f)        + Vec2f(size.x - radius, radius)    + offset;
+            vertices.at(corner_vertex_count * 2 + i) = (Vec2f::Right * radius).Rotated(theta - pi)              + Vec2f(radius, radius)             + offset;
+            vertices.at(corner_vertex_count * 3 + i) = (Vec2f::Right * radius).Rotated(theta - pi * 3.f / 2.f)  + Vec2f(radius, size.y - radius)    + offset;
         }
 
         return vertices;

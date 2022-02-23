@@ -9,7 +9,7 @@ namespace doge
     struct CircleShape
     {
         float radius = 1.f;
-        std::size_t point_count = 32;
+        std::size_t vertex_count = 32;
 
         Vec2f origin = Vec2f::Zero;
         Color color = Color::White;

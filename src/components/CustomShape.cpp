@@ -159,4 +159,31 @@ namespace doge
     {
         return CreateOutline(vertices, thickness, color, color, origin, texture_id, texture_rectangle);
     }
+
+    CustomShape CustomShape::CreateCircle(
+        float radius,
+        std::size_t vertex_count,
+        const Color& color,
+        const Vec2f& origin,
+        const std::string& texture_id,
+        const Rectf& texture_rectangle
+    )
+    {
+        auto verts = polygon::Circle(radius, vertex_count);
+        auto texture_coords = _MapTextureRectToCoords(verts, texture_rectangle);
+
+        std::vector<Vertex> vertices(verts.size());
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+        {
+            vertices.at(i) = Vertex{ .position = verts.at(i), .color = color, .texture_coordinates = texture_coords.at(i) };
+        }
+
+        return CustomShape
+        {
+            .type = Type::TriangleFan,
+            .vertices = vertices,
+            .origin = origin,
+            .texture_id = texture_id,
+        };
+    }
 }
