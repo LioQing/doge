@@ -186,4 +186,77 @@ namespace doge
             .texture_id = texture_id,
         };
     }
+
+    CustomShape CustomShape::CreateRectangle(
+        const Vec2f& size,
+        const Color& color,
+        const Vec2f& origin,
+        const std::string& texture_id,
+        const Rectf& texture_rectangle
+    )
+    {
+        auto corner = size / 2.f;
+        auto verts = std::vector<Vec2f>{ -corner, corner * Vec2f(1, -1), corner * Vec2f(-1, 1), corner };
+        auto texture_coords = std::vector<Vec2f>
+        {
+            texture_rectangle.GetPosition(),
+            texture_rectangle.GetPosition() + Vec2f(texture_rectangle.width, 0),
+            texture_rectangle.GetPosition() + Vec2f(0, texture_rectangle.height),
+            texture_rectangle.GetPosition() + texture_rectangle.GetSize(),
+        };
+
+        std::vector<Vertex> vertices(verts.size());
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+        {
+            vertices.at(i) = Vertex{ .position = verts.at(i), .color = color, .texture_coordinates = texture_coords.at(i) };
+        }
+
+        return CustomShape
+        {
+            .type = Type::TriangleStrip,
+            .vertices = vertices,
+            .origin = origin,
+            .texture_id = texture_id,
+        };
+    }
+
+    CustomShape CustomShape::CreateConvex(
+        const std::vector<Vertex>& vertices,
+        const Vec2f& origin,
+        const std::string& texture_id
+    )
+    {
+        return CustomShape
+        {
+            .type = Type::TriangleFan,
+            .vertices = vertices,
+            .origin = origin,
+            .texture_id = texture_id,
+        };
+    }
+
+    CustomShape CustomShape::CreateConvex(
+        const std::vector<Vec2f>& vertices,
+        const Color& color,
+        const Vec2f& origin,
+        const std::string& texture_id,
+        const Rectf& texture_rectangle
+    )
+    {
+        auto texture_coords = _MapTextureRectToCoords(vertices, texture_rectangle);
+
+        std::vector<Vertex> verts(vertices.size());
+        for (std::size_t i = 0; i < verts.size(); ++i)
+        {
+            verts.at(i) = Vertex{ .position = vertices.at(i), .color = color, .texture_coordinates = texture_coords.at(i) };
+        }
+
+        return CustomShape
+        {
+            .type = Type::TriangleFan,
+            .vertices = verts,
+            .origin = origin,
+            .texture_id = texture_id,
+        };
+    }
 }

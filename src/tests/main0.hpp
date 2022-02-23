@@ -41,14 +41,15 @@ namespace main0
         init.angular_velocity = 20.f;
         phy->SetBodyInit(my_shape, init);
 
-        my_shape.AddComponent(doge::ConvexShape
-        {
-            .vertices =
+        my_shape.AddComponent(doge::Tag::Create("convex"));
+
+        my_shape.AddComponent(doge::CustomShape::CreateConvex
+        (
             {
                 { 10.f, 10.f }, { -10.f, 10.f }, { -20.f, -10.f }, { 20.f, -10.f }
             },
-            .color = doge::Color(0x00FF0088),
-        });
+            0x00FF0088
+        ));
 
         my_shape.AddComponent<doge::Scale>(0.02, 0.02);
 
@@ -108,12 +109,7 @@ namespace main0
             auto my_comp = my_shape.AddComponent(doge::CompoundSprite::Create
             (
                 doge::CustomShape::CreateCircle(10.f, 32, 0x0000FF88, { 15, 0 }, "missing_texture", { 0, 0, 16, 16 }),
-                doge::RectangleShape
-                {
-                    .size = { 30, 8 },
-                    .origin = { 15, 4 },
-                    .color = doge::Color(0x0000FF88),
-                }
+                doge::CustomShape::CreateRectangle({ 30.f, 8.f }, 0x0000FF88)
             ));
         }
 
@@ -335,7 +331,10 @@ namespace main0
             count = 0;
         }
 
-        for (auto [entity, rgbd, scale, position, convex, coll, rot] : e.Select<doge::physics::RigidBody, doge::Scale, doge::Position, doge::ConvexShape, doge::physics::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
+        for (auto [entity, tag, rgbd, scale, position, convex, coll, rot] : e
+        .Select<doge::Tag>()
+        .Where([](doge::Entity e, const doge::Tag& tag){ return tag.tags.contains("convex"); })
+        .Select<doge::physics::RigidBody, doge::Scale, doge::Position, doge::CustomShape, doge::physics::ConvexCollider, doge::Rotation>().EntitiesAndComponents())
         {
             if (entity == mouse_down_id)
             {

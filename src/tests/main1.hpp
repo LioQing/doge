@@ -23,13 +23,7 @@ namespace main1
 
         particle.AddComponent(doge::Tag::Create("particle"));
 
-        particle.AddComponent(doge::CircleShape
-        {
-            .radius = .2f,
-            .origin = { .2f, .2f },
-            //.texture_id = "icons",
-            .texture_rectangle = doge::Recti(0, 0, 32, 32),
-        });
+        particle.AddComponent(doge::CustomShape::CreateCircle(.2f));
 
         particle.AddComponent<doge::physics::RigidBody>(doge::physics::RigidBody::Type::Dynamic, true);
         particle.AddComponent(doge::physics::CircleCollider
@@ -143,31 +137,16 @@ namespace main1
         doge::Entity foreground = engine.AddEntity();
         foreground.AddComponent(doge::Layer::Create(1));
         foreground.AddComponent(doge::Position(-0.5, 0));
-        foreground.AddComponent(doge::RectangleShape
-        {
-            .size = doge::Vec2f(0.7, 0.7),
-            .origin = doge::Vec2f(0.35, 0.35),
-            .color = doge::Color::Yellow,
-        });
+        foreground.AddComponent(doge::CustomShape::CreateRectangle({ .7f, .7f }, doge::Color::Yellow));
 
         doge::Entity midground = engine.AddEntity();
         midground.AddComponent(doge::Position(0, 0));
-        midground.AddComponent(doge::RectangleShape
-        {
-            .size = doge::Vec2f(0.5, 0.5),
-            .origin = doge::Vec2f(0.25, 0.25),
-            .color = doge::Color::Cyan,
-        });
+        midground.AddComponent(doge::CustomShape::CreateRectangle({ .5f, .5f }, doge::Color::Cyan));
 
         doge::Entity background = engine.AddEntity();
         background.AddComponent(doge::Layer::Create(-1));
         background.AddComponent(doge::Position(0.5, 0));
-        background.AddComponent(doge::RectangleShape
-        {
-            .size = doge::Vec2f(0.9, 0.9),
-            .origin = doge::Vec2f(0.45, 0.45),
-            .color = doge::Color::Magenta,
-        });
+        background.AddComponent(doge::CustomShape::CreateRectangle({ .9f, .9f }, doge::Color::Magenta));
 
         // rounded rectangle
         doge::Entity rr = engine.AddEntity();

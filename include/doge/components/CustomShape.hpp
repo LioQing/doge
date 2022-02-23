@@ -85,5 +85,27 @@ namespace doge
             const std::string& texture_id = "",
             const Rectf& texture_rectangle = Rectf()
         );
+
+        static CustomShape CreateRectangle(
+            const Vec2f& size,
+            const Color& color = Color::White,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = "",
+            const Rectf& texture_rectangle = Rectf()
+        );
+
+        static CustomShape CreateConvex(
+            const std::vector<Vertex>& vertices,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = ""
+        );
+
+        static CustomShape CreateConvex(
+            const std::vector<Vec2f>& vertices,
+            const Color& color = Color::White,
+            const Vec2f& origin = Vec2f::Zero,
+            const std::string& texture_id = "",
+            const Rectf& texture_rectangle = Rectf()
+        );
     };
 }
