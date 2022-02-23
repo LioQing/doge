@@ -1,4 +1,26 @@
 - [x] triangulation for CustomShape
-- [ ] outline for CustomShape
-- [ ] potentially remove all other predefined shapes and change CustomShape to just Shape
+- [x] outline for CustomShape
 - [ ] reorganize all the utils functions and classes
+- [ ] add ctor and methods for components (full encapsulation)
+  - [ ] camera
+  - [ ] customshape
+  - [ ] circleshape
+  - [ ] convexshape
+  - [ ] rectangleshape
+  - [ ] compoundsprite
+  - [ ] entityinfo
+  - [ ] layer
+  - [ ] position
+  - [ ] rotation
+  - [ ] scale
+  - [ ] sprite
+  - [ ] tag
+  - [ ] text
+  - [ ] anim::Animation
+  - [ ] nine_slice::Sprite
+  - [ ] physics::RigidBody
+  - [ ] physics::CircleCollider
+  - [ ] physics::ConvexCollider
+  - [ ] physics::EdgeCollider
+  - [ ] physics::RectangleCollider
+  - [ ] physics::CompoundCollider

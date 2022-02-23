@@ -51,6 +51,16 @@ namespace doge
     }
 
     CustomShape CustomShape::Create(
+        Type type = Type::Points,
+        const std::vector<Vertex> vertices = std::vector<Vertex>(),
+        const Vec2f& origin = Vec2f::Zero,
+        const std::string& texture_id = ""
+    )
+    {
+        return CustomShape(type, vertices, origin, texture_id);
+    }
+
+    CustomShape CustomShape::Create(
         Type type,
         const std::vector<Vec2f>& vertices,
         const Color& color,
