@@ -114,5 +114,10 @@ namespace doge
             const std::string& texture_id = "",
             const Rectf& texture_rectangle = Rectf()
         );
+
+        void SetColor(const Color& color);
+
+        void SetTextureRectangle(const Rectf& rectangle);
+        void SetTextureRectangle(const Rectf& rectangle, const std::vector<Vec2f>& relative_to);
     };
 }

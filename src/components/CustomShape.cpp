@@ -51,10 +51,10 @@ namespace doge
     }
 
     CustomShape CustomShape::Create(
-        Type type = Type::Points,
-        const std::vector<Vertex> vertices = std::vector<Vertex>(),
-        const Vec2f& origin = Vec2f::Zero,
-        const std::string& texture_id = ""
+        Type type,
+        const std::vector<Vertex> vertices,
+        const Vec2f& origin,
+        const std::string& texture_id
     )
     {
         return CustomShape(type, vertices, origin, texture_id);
@@ -268,5 +268,39 @@ namespace doge
             .origin = origin,
             .texture_id = texture_id,
         };
+    }
+
+    void CustomShape::SetColor(const Color& color)
+    {
+        for (auto& v : vertices)
+        {
+            v.color = color;
+        }
+    }
+
+    void CustomShape::SetTextureRectangle(const Rectf& rectangle)
+    {
+        std::vector<Vec2f> verts(vertices.size());
+        std::transform(vertices.begin(), vertices.end(), verts.end(),
+        [](const Vertex& v){ return v.position; });
+
+        auto texture_coords = _MapTextureRectToCoords(verts, rectangle);
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+        {
+            vertices.at(i).texture_coordinates = texture_coords.at(i);
+        }
+    }
+
+    void CustomShape::SetTextureRectangle(const Rectf& rectangle, const std::vector<Vec2f>& relative_to)
+    {
+        std::vector<Vec2f> verts(vertices.size());
+        std::transform(vertices.begin(), vertices.end(), verts.end(),
+        [](const Vertex& v){ return v.position; });
+
+        auto texture_coords = _MapTextureRectToCoords(verts, relative_to, rectangle);
+        for (std::size_t i = 0; i < vertices.size(); ++i)
+        {
+            vertices.at(i).texture_coordinates = texture_coords.at(i);
+        }
     }
 }
