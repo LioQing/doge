@@ -8,6 +8,15 @@
 
 namespace main1
 {
+    enum CollisionBit
+    {
+        Ball = 0x0001,
+        Boi = 0x0002,
+        Wall = 0x0004,
+
+        All = Ball | Boi | Wall,
+    };
+
     std::unique_ptr<doge::physics::Physics> phy = nullptr;
     std::unique_ptr<doge::anim::Anim> anim = nullptr;
 
@@ -32,6 +41,8 @@ namespace main1
             .radius = .2f,
             .friction = 0.4f,
             .restitution = 0.8f,
+            .category_bits = CollisionBit::Ball,
+            .mask_bits = CollisionBit::Wall,
         });
 
         particle.AddComponent<doge::Position>(position);
@@ -121,6 +132,8 @@ namespace main1
             .rigid_body_entity = anim,
             .size = { .75, 1.75 },
             .origin = { 0, -.25 },
+            .category_bits = CollisionBit::Boi,
+            .mask_bits = CollisionBit::Wall,
         });
 
         // cam
@@ -164,6 +177,8 @@ namespace main1
         {
             .rigid_body_entity = rr,
             .size = doge::Vec2f(1, 1),
+            .category_bits = CollisionBit::Wall,
+            .mask_bits = CollisionBit::All,
         });
 
         // wall
@@ -183,6 +198,8 @@ namespace main1
             .is_loop = true,
             .friction = 0.1f,
             .restitution = 0.8f,
+            .category_bits = CollisionBit::Wall,
+            .mask_bits = CollisionBit::All,
         });
 
         // particles

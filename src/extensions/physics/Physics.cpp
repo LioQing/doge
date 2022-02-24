@@ -249,6 +249,9 @@ namespace doge::physics
             fixture_def.restitution = coll_comp.restitution;
             fixture_def.restitutionThreshold = coll_comp.restitution_threshold;
             fixture_def.isSensor = coll_comp.is_trigger;
+            fixture_def.filter.categoryBits = coll_comp.category_bits;
+            fixture_def.filter.maskBits = coll_comp.mask_bits;
+            fixture_def.filter.groupIndex = coll_comp.group_index;
 
             b2Fixture* fixture = body->CreateFixture(&fixture_def);
             return fixture;
@@ -261,6 +264,13 @@ namespace doge::physics
             fixture->SetRestitution(coll.restitution);
             fixture->SetRestitutionThreshold(coll.restitution_threshold);
             fixture->SetSensor(coll.is_trigger);
+
+            b2Filter filter;
+            filter.categoryBits = coll.category_bits;
+            filter.maskBits = coll.mask_bits;
+            filter.groupIndex = coll.group_index;
+
+            fixture->SetFilterData(filter);
         };
 
         // enable disable

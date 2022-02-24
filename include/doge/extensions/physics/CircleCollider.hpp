@@ -18,6 +18,9 @@ namespace doge::physics
         float restitution_threshold = 1.f;
         
         bool is_trigger = false;
+        std::uint16_t category_bits = 0x0001;
+        std::uint16_t mask_bits = 0xFFFF;
+        std::int16_t group_index = 0;
 
         // doge::Physics check this every frame
         // after changes are applied, it will be reset to false
