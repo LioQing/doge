@@ -16,6 +16,7 @@ namespace doge::physics
 
         Type type = Type::Static;
 
+        bool rotation_fixed = false;
         bool continuous = false;
         bool awake = true;
         bool enabled = true;

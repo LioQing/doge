@@ -316,6 +316,8 @@ namespace doge::physics
             if (ToB2BodyType(rgbd.type) != body->GetType())
                 body->SetType(ToB2BodyType(rgbd.type));
             body->SetBullet(rgbd.continuous);
+
+            body->SetFixedRotation(rgbd.rotation_fixed);
         }
 
         // convex collider

@@ -42,7 +42,7 @@ namespace main1
             .friction = 0.4f,
             .restitution = 0.8f,
             .category_bits = CollisionBit::Ball,
-            .mask_bits = CollisionBit::Wall,
+            .mask_bits = CollisionBit::Wall | CollisionBit::Ball | CollisionBit::Boi,
         });
 
         particle.AddComponent<doge::Position>(position);
@@ -113,6 +113,7 @@ namespace main1
         auto& rgbd = anim.AddComponent(doge::physics::RigidBody
         {
             .type = doge::physics::RigidBody::Dynamic,
+            .rotation_fixed = true,
         });
 
         rgbd.on_collision_began.AddListener("boi",
@@ -133,7 +134,7 @@ namespace main1
             .size = { .75, 1.75 },
             .origin = { 0, -.25 },
             .category_bits = CollisionBit::Boi,
-            .mask_bits = CollisionBit::Wall,
+            .mask_bits = CollisionBit::Wall | CollisionBit::Ball,
         });
 
         // cam
